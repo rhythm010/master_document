@@ -29,9 +29,8 @@
 
 ##### 1.2.1.1 Entry & Account Verification
 *   **1.2.1.1.1 Flow:** Client opens the app and navigates to the "Hire Companion" section.
-*   **1.2.1.1.2 Request:** **[GET] /user/status** check. If a client has a session in `PENDING` or `CONFIRMED` state, they are redirected to the existing booking view (Pending Dashboard or Active Card) instead of the selection flow.
+*   **1.2.1.1.2 Request:** **[GET] /user/status** check. If a client already has an active session, they are redirected to the existing booking card instead of the selection flow.
 *   **1.2.1.1.3 Logic:** A single client account is restricted to one active booking at any given time.
-*   **1.2.1.1.4 Pending Flow Re-entry:** If the user exits the app during the `PENDING` state and returns, they bypass the booking flow and land directly on the "Processing" dashboard until the status transitions.
 
 ##### 1.2.1.2 Venue Selection
 *   **1.2.1.2.1 Request:** **[GET] /malls** to fetch partnered locations.
@@ -53,7 +52,6 @@
 *   **1.2.1.5.1 Request:** **[POST] /bookings** (MallID, Slot, Nickname).
 *   **1.2.1.5.2 BE Operations:** Create record with `status: PENDING`. Apply 15-minute soft-lock on the Duo. Generate unique Booking ID.
 *   **1.2.1.5.3 FE Simulation:** Phase 1 mock payment screen with a spinner for 3-5 seconds before showing the "Processing" dashboard.
-*   **1.2.1.5.4 Pending View Actions:** While in the `PENDING` state, the user is presented with a simplified dashboard. The only available action is a "Cancel Booking" button, which terminates the `PENDING` state and releases the soft-lock on the Duo.
 
 ##### 1.2.1.6 Allocation & Confirmation Sync
 *   **1.2.1.6.1 FE Polling:** FE polls **[GET] /bookings/{id}/status** (background auto-retries enabled) or listens for Realtime update.
@@ -61,15 +59,9 @@
 *   **1.2.1.6.3 Notification:** A push notification is sent to the client once the `CONFIRMED` status is finalized in the backend.
 
 ##### 1.2.1.7 Final Confirmation & Information Display
-*   **1.2.1.7.1 Status Update:** App UI transitions to the active booking view once the status becomes `CONFIRMED`.
-*   **1.2.1.7.2 Request:** **[GET] /bookings/{id}/details** to fetch core booking data (ID, Mall, Timing).
-*   **1.2.1.7.3 Visibility & UI:** Displays Booking ID, Mall name, and Date/Time Slot. No companion-specific details (names/photos) are shown at this stage. UI should focus on a "Luxury Confirmation" aesthetic.
-*   **1.2.1.7.4 Actions:** 
-    *   **Primary Action:** "Cancel Booking" button.
-    *   **Logic:** Tapping cancel sends a request to the backend. The system auto-calculates the refund/penalty based on the timeframe defined in 1.2.5.1.
-    *   **Redirection:** Post-cancellation, the user is redirected back to the beginning of the "Hire Companion" flow.
-*   **1.2.1.7.5 Handshake Readiness:** On the day of service, the UI reveals the QR code for scanning. If GPS is denied, a specific Meeting Point is assigned and displayed.
-*   **1.2.1.7.6 Scope:** This view remains active until the session is officially started via QR scan.
+*   **1.2.1.7.1 Status Update:** App UI transitions to the active booking view.
+*   **1.2.1.7.2 Request:** **[GET] /bookings/{id}/details** to fetch the 4-digit PIN (Matching Code).
+*   **1.2.1.7.3 Visibility:** The unique Booking ID and 4-digit PIN are visible immediately on the active booking card.
 
 ##### 1.2.1.8 Session Maintenance & Termination
 *   **1.2.1.8.1 Cancellation:** Clients can cancel up to 7 hours before the start time. Re-booking requires starting the flow fresh.
@@ -81,13 +73,12 @@
 *   **1.2.1.9.2 Localization:** App UI and AI chat agent support English and Arabic as per user profile.
 
 #### 1.2.2 Functional (Companion) 
-*   **1.2.2.1 Calendar & Blocking:** Upon booking confirmation, calendars are auto-blocked. Dynamic reporting locations are set by Admin/Algo.
-*   **1.2.2.2 Preparation Alerts:** Push notifications sent a few hours before start to ensure devices are at 100% battery.
-*   **1.2.2.3 Pre-Service Dashboard:** Starting **30 minutes prior**, companions see Client Nickname, Backup PIN, and a Countdown Clock.
-*   **1.2.2.4 Mandatory Geolocation:** GPS is mandatory for arrival verification and duty tracking.
-*   **1.2.2.5 Duo Readiness (T-30m):** Captain and Companion must meet and signal readiness at the reporting location 30 minutes before start (Hard Breach Line).
-*   **1.2.2.6 Handshake Mechanism:** Companion/Captain scans the Client’s QR code to verify match and start the session.
-*   **1.2.2.7 Meeting Fallback:** If Client GPS is unavailable, a fallback meeting point is assigned to both parties.
+*   **1.2.2.1 Calendar Sync:** Availability is auto-driven by pre-defined shifts.
+*   **1.2.2.2 Late-Shift Logic:** Bookings allowed up to 2 hours before a shift ends. If service exceeds the shift end, overtime is automatically applied to the companion's session log.
+*   **1.2.2.3 Data Access:** View upcoming booking details, including Client Name/Nickname and Plan of Visit notes.
+*   **1.2.2.4 Cancellation Penalty:** If a companion cancels post-confirmation, a penalty is applied and the system auto-triggers a replacement search.
+*   **1.2.2.5 Admin Authority:** Admin has full control to assign, re-assign, update, or cancel any booking for a companion.
+*   **1.2.2.6 Notifications:** Companions receive real-time push notifications for any Admin-led changes to their schedule.
 
 #### 1.2.3 System Logic & Matching
 *   **1.2.3.1 Matching Params:** Initially "First-Available." Logic is built to support future weighting for Client and Companion ratings.
@@ -103,9 +94,10 @@
         * **7 to 24 Hours Notice:** 50% refund.
         * **< 7 Hours Notice:** No refund (Duo is locked for shift).
         * **Admin-Initiated:** 100% refund.
-    * **1.2.5.2 Payment Failures:** [Placeholder for logic handling DB lock failures after successful payment].
-    * **1.2.5.3 Race Condition:** Resolving simultaneous "Pay" hits for the same Duo (TBD).
-    * **1.2.5.4 Buffer/Gap:** Minimum turnover time between separate bookings (TBD).
+    * **1.2.5.2 Voucher Logic:** Vouchers are validated via `/vouchers/validate`. Phase 1 supports flat-rate and percentage discounts (non-stackable) applied to the base rate.
+    * **1.2.5.3 Payment Failures:** If the DB commit fails post-payment, an automated refund is triggered, and the transaction is logged as `ORPHANED_PAYMENT` for Admin audit.
+    * **1.2.5.4 Race Condition:** Distributed locking (Redis) or Row-level locking (Postgres) during the 15-minute soft-lock period prevents double-booking.
+    * **1.2.5.5 Buffer/Gap:** A mandatory **30-minute turnover buffer** is enforced between separate bookings for the same Duo.
 
 ---
 
