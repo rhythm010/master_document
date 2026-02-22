@@ -2,7 +2,7 @@ import { BookingStatus } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { BUSINESS_RULES } from '../../config/constants';
 import { NotFoundError, AppError } from '../../shared/errors';
-import { buildBusinessDateTime, nowBusiness } from '../../shared/utils';
+import { buildBusinessDateTime, formatBusinessDate, nowBusiness } from '../../shared/utils';
 
 function isDetailRevealed(bookingDate: string, startTime: string) {
   const startDateTime = buildBusinessDateTime(bookingDate, startTime);
@@ -31,7 +31,7 @@ export async function listCompanionBookings(companionId: string) {
   });
 
   return bookings.map((booking) => {
-    const bookingDate = booking.date.toISOString().slice(0, 10);
+    const bookingDate = formatBusinessDate(booking.date);
     const revealed = isDetailRevealed(bookingDate, booking.startTime);
     return {
       bookingId: booking.id,
@@ -68,7 +68,7 @@ export async function getCompanionBooking(companionId: string, bookingId: string
     throw new AppError(403, 'OWNERSHIP_MISMATCH', 'Access denied');
   }
 
-  const bookingDate = booking.date.toISOString().slice(0, 10);
+  const bookingDate = formatBusinessDate(booking.date);
   const revealDetails = isDetailRevealed(bookingDate, booking.startTime);
   const revealDuo = isDuoRevealTime(bookingDate, booking.startTime);
 

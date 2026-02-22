@@ -2,7 +2,7 @@ import { ActorType, BookingStatus, CancelledBy, DuoStatus, PaymentHoldStatus, Pe
 import { prisma } from '../config/prisma';
 import { BUSINESS_RULES } from '../config/constants';
 import { logger } from '../config/logger';
-import { buildBusinessDateTime, nowBusiness } from '../shared/utils';
+import { buildBusinessDateTime, formatBusinessDate, nowBusiness } from '../shared/utils';
 import * as paymentService from '../services/payment.service';
 import { sendNotification } from '../services/notification.service';
 
@@ -16,7 +16,7 @@ export async function runDuoBreach() {
 
   const now = nowBusiness();
   for (const booking of bookings) {
-    const bookingDate = booking.date.toISOString().slice(0, 10);
+    const bookingDate = formatBusinessDate(booking.date);
     const startTime = buildBusinessDateTime(bookingDate, booking.startTime);
     const breachTime = startTime.subtract(BUSINESS_RULES.DUO_BREACH_MINUTES_BEFORE_START, 'minute');
     if (now.isBefore(breachTime)) {

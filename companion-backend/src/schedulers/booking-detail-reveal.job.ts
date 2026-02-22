@@ -2,7 +2,7 @@ import { BookingStatus } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { BUSINESS_RULES } from '../config/constants';
 import { logger } from '../config/logger';
-import { buildBusinessDateTime, nowBusiness } from '../shared/utils';
+import { buildBusinessDateTime, formatBusinessDate, nowBusiness } from '../shared/utils';
 
 export async function runBookingDetailReveal() {
   const bookings = await prisma.booking.findMany({
@@ -12,7 +12,7 @@ export async function runBookingDetailReveal() {
 
   const now = nowBusiness();
   const due = bookings.filter((booking) => {
-    const bookingDate = booking.date.toISOString().slice(0, 10);
+    const bookingDate = formatBusinessDate(booking.date);
     const startTime = buildBusinessDateTime(bookingDate, booking.startTime);
     const revealTime = startTime.subtract(BUSINESS_RULES.COMPANION_DETAIL_REVEAL_HOURS, 'hour');
     return now.isAfter(revealTime) || now.isSame(revealTime);

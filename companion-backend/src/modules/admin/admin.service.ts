@@ -31,6 +31,33 @@ function determineMode(captainId?: string | null, viceCaptainId?: string | null)
   return AllocationMode.AUTO;
 }
 
+async function ensureCompanionActive(companionId: string, role: CompanionRole) {
+  const companion = await prisma.companion.findFirst({
+    where: {
+      id: companionId,
+      role,
+      isActive: true,
+      backgroundVerified: true,
+      penaltyStatus: { not: PenaltyStatus.PENALIZED },
+    },
+  });
+
+  if (!companion) {
+    throw new ConflictError('COMPANION_UNAVAILABLE', 'Specified companion is not available.');
+  }
+}
+
+async function findShiftId(companionId: string, date: Date) {
+  const shift = await prisma.shift.findFirst({
+    where: {
+      date,
+      status: { in: [ShiftStatus.SCHEDULED, ShiftStatus.ACTIVE] },
+      companionId,
+    },
+  });
+  return shift?.id ?? null;
+}
+
 async function assertCompanionAvailable(
   companionId: string,
   role: CompanionRole,
@@ -130,72 +157,120 @@ export async function createAdminBooking(
 
   const bookingDate = parseBusinessDate(payload.date).startOf('day').toDate();
 
-  let allocation;
   try {
-    allocation = await allocate(
-      {
+    const allocationMode = determineMode(payload.captainId, payload.viceCaptainId);
+    let captainId: string | null = null;
+    let viceCaptainId: string | null = null;
+    let captainShiftId: string | null = null;
+    let viceCaptainShiftId: string | null = null;
+
+    if (payload.captainId && !payload.viceCaptainId) {
+      await ensureCompanionActive(payload.captainId, CompanionRole.CAPTAIN);
+      const autoAllocation = await allocate(
+        {
+          venueId: venue.id,
+          date: bookingDate,
+          startTime: payload.startTime,
+          endTime,
+        },
+        prisma,
+      );
+      captainId = payload.captainId;
+      viceCaptainId = autoAllocation.viceCaptainId;
+      captainShiftId = await findShiftId(payload.captainId, bookingDate);
+      viceCaptainShiftId = autoAllocation.viceCaptainShiftId;
+    } else if (!payload.captainId && payload.viceCaptainId) {
+      await ensureCompanionActive(payload.viceCaptainId, CompanionRole.VICE_CAPTAIN);
+      const autoAllocation = await allocate(
+        {
+          venueId: venue.id,
+          date: bookingDate,
+          startTime: payload.startTime,
+          endTime,
+        },
+        prisma,
+      );
+      captainId = autoAllocation.captainId;
+      viceCaptainId = payload.viceCaptainId;
+      captainShiftId = autoAllocation.captainShiftId;
+      viceCaptainShiftId = await findShiftId(payload.viceCaptainId, bookingDate);
+    } else {
+      const allocation = await allocate(
+        {
+          venueId: venue.id,
+          date: bookingDate,
+          startTime: payload.startTime,
+          endTime,
+          captainId: payload.captainId ?? undefined,
+          viceCaptainId: payload.viceCaptainId ?? undefined,
+        },
+        prisma,
+      );
+      captainId = allocation.captainId;
+      viceCaptainId = allocation.viceCaptainId;
+      captainShiftId = allocation.captainShiftId;
+      viceCaptainShiftId = allocation.viceCaptainShiftId;
+    }
+
+    if (!captainId || !viceCaptainId) {
+      throw new ConflictError('SLOT_UNAVAILABLE', 'Specified companion is not available.');
+    }
+
+    const pricing = calculatePrice(venue.type);
+    const booking = await prisma.booking.create({
+      data: {
+        clientId: payload.clientId,
         venueId: venue.id,
+        captainId,
+        viceCaptainId,
+        allocationMode,
+        captainShiftId: captainShiftId ?? undefined,
+        viceCaptainShiftId: viceCaptainShiftId ?? undefined,
+        clientNicknameSnapshot: client.nickname,
+        duoStatus: 'PENDING',
+        duoQrCode: generateQrCode(),
+        duoPinCode: generateNumericCode(BUSINESS_RULES.DUO_PIN_LENGTH),
+        qrCode: generateQrCode(),
+        pinCode: generateNumericCode(BUSINESS_RULES.CLIENT_PIN_LENGTH),
         date: bookingDate,
         startTime: payload.startTime,
         endTime,
-        captainId: payload.captainId ?? undefined,
-        viceCaptainId: payload.viceCaptainId ?? undefined,
+        durationMinutes: BUSINESS_RULES.SESSION_DURATION_MINUTES,
+        status: BookingStatus.CONFIRMED,
+        baseRate: pricing.baseRate,
+        vatAmount: pricing.vatAmount,
+        serviceFee: pricing.serviceFee,
+        grandTotal: pricing.grandTotal,
+        paymentHoldStatus: PaymentHoldStatus.HELD,
+        paymentHoldAmount: pricing.grandTotal,
       },
-      prisma,
-    );
+    });
+
+    await prisma.client.update({
+      where: { id: client.id },
+      data: { currentBookingId: booking.id, bookingStatusCache: 'CONFIRMED' },
+    });
+
+    await prisma.bookingAuditLog.create({
+      data: {
+        bookingId: booking.id,
+        action: 'CREATED',
+        performedByType: ActorType.ADMIN,
+        performedById: adminId,
+        pricingEngineVersion: PRICING_ENGINE_VERSION,
+        allocationEngineVersion: ALLOCATION_ENGINE_VERSION,
+      },
+    });
+
+    return { booking, pricing };
   } catch (error: unknown) {
+    if (error instanceof ConflictError) {
+      throw error;
+    }
     const message = error instanceof Error ? error.message : '';
     const code = message === 'COMPANION_UNAVAILABLE' ? 'COMPANION_UNAVAILABLE' : 'SLOT_UNAVAILABLE';
     throw new ConflictError(code, 'Specified companion is not available.');
   }
-
-  const pricing = calculatePrice(venue.type);
-  const booking = await prisma.booking.create({
-    data: {
-      clientId: payload.clientId,
-      venueId: venue.id,
-      captainId: allocation.captainId,
-      viceCaptainId: allocation.viceCaptainId,
-      allocationMode: allocation.mode,
-      captainShiftId: allocation.captainShiftId,
-      viceCaptainShiftId: allocation.viceCaptainShiftId,
-      clientNicknameSnapshot: client.nickname,
-      duoStatus: 'PENDING',
-      duoQrCode: generateQrCode(),
-      duoPinCode: generateNumericCode(BUSINESS_RULES.DUO_PIN_LENGTH),
-      qrCode: generateQrCode(),
-      pinCode: generateNumericCode(BUSINESS_RULES.CLIENT_PIN_LENGTH),
-      date: bookingDate,
-      startTime: payload.startTime,
-      endTime,
-      durationMinutes: BUSINESS_RULES.SESSION_DURATION_MINUTES,
-      status: BookingStatus.CONFIRMED,
-      baseRate: pricing.baseRate,
-      vatAmount: pricing.vatAmount,
-      serviceFee: pricing.serviceFee,
-      grandTotal: pricing.grandTotal,
-      paymentHoldStatus: PaymentHoldStatus.HELD,
-      paymentHoldAmount: pricing.grandTotal,
-    },
-  });
-
-  await prisma.client.update({
-    where: { id: client.id },
-    data: { currentBookingId: booking.id, bookingStatusCache: 'CONFIRMED' },
-  });
-
-  await prisma.bookingAuditLog.create({
-    data: {
-      bookingId: booking.id,
-      action: 'CREATED',
-      performedByType: ActorType.ADMIN,
-      performedById: adminId,
-      pricingEngineVersion: PRICING_ENGINE_VERSION,
-      allocationEngineVersion: ALLOCATION_ENGINE_VERSION,
-    },
-  });
-
-  return { booking, pricing };
 }
 
 export async function cancelAdminBooking(adminId: string, bookingId: string, reason?: string) {

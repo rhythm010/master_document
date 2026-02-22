@@ -33,7 +33,7 @@ export function buildBusinessDateTime(date: string, time: string) {
 }
 
 export function nowBusiness() {
-  return dayjs().tz(BUSINESS_TIMEZONE);
+  return dayjs.utc().tz(BUSINESS_TIMEZONE);
 }
 
 export function calculateEndTime(startTime: string, durationMinutes: number): string {
@@ -91,6 +91,10 @@ export function subtractMinutesFromTime(time: string, minutes: number): string {
 
 export function parseBusinessDate(date: string) {
   return dayjs.tz(date, 'YYYY-MM-DD', BUSINESS_TIMEZONE);
+}
+
+export function formatBusinessDate(date: Date) {
+  return dayjs.utc(date).tz(BUSINESS_TIMEZONE).format('YYYY-MM-DD');
 }
 
 export function isDateWithinBookingWindow(date: string): boolean {

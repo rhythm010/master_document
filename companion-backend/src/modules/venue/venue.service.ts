@@ -11,7 +11,7 @@ export async function listVenues(params: VenueListParams) {
   const { q, latitude, longitude } = params;
 
   if (latitude !== undefined && longitude !== undefined) {
-    const searchTerm = q ? `%${q}%` : null;
+    const searchTerm = q ? `%${q}%` : '%';
     const results = await prisma.$queryRaw<
       Array<{
         id: string;
@@ -35,14 +35,14 @@ export async function listVenues(params: VenueListParams) {
         country,
         operating_hours_start as "operatingHoursStart",
         operating_hours_end as "operatingHoursEnd",
-        (6371 * acos(
-          cos(radians(${latitude})) * cos(radians(latitude)) *
-          cos(radians(longitude) - radians(${longitude})) +
-          sin(radians(${latitude})) * sin(radians(latitude))
-        )) AS "distanceKm"
+        (6371 * acos(least(1, greatest(-1,
+          cos(radians(${latitude})) * cos(radians(latitude::double precision)) *
+          cos(radians(longitude::double precision) - radians(${longitude})) +
+          sin(radians(${latitude})) * sin(radians(latitude::double precision))
+        )))) AS "distanceKm"
       FROM venues
       WHERE is_active = true
-        AND (${searchTerm} IS NULL OR name ILIKE ${searchTerm})
+        AND name ILIKE ${searchTerm}
       ORDER BY "distanceKm" ASC NULLS LAST;
     `);
     return results;

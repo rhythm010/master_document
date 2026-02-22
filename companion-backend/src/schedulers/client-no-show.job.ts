@@ -2,7 +2,7 @@ import { ActorType, BookingStatus, DuoStatus, PaymentHoldStatus } from '@prisma/
 import { prisma } from '../config/prisma';
 import { BUSINESS_RULES } from '../config/constants';
 import { logger } from '../config/logger';
-import { buildBusinessDateTime, nowBusiness } from '../shared/utils';
+import { buildBusinessDateTime, formatBusinessDate, nowBusiness } from '../shared/utils';
 import * as paymentService from '../services/payment.service';
 
 export async function runClientNoShow() {
@@ -16,7 +16,7 @@ export async function runClientNoShow() {
 
   const now = nowBusiness();
   for (const booking of bookings) {
-    const bookingDate = booking.date.toISOString().slice(0, 10);
+    const bookingDate = formatBusinessDate(booking.date);
     const startTime = buildBusinessDateTime(bookingDate, booking.startTime);
     const noShowTime = startTime.add(BUSINESS_RULES.CLIENT_NO_SHOW_MINUTES_AFTER_START, 'minute');
     if (now.isBefore(noShowTime)) {

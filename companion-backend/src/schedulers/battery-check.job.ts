@@ -1,7 +1,7 @@
 import { ActorType, NotificationType, ShiftStatus } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { logger } from '../config/logger';
-import { nowBusiness, buildBusinessDateTime } from '../shared/utils';
+import { nowBusiness, buildBusinessDateTime, formatBusinessDate } from '../shared/utils';
 import { sendNotification } from '../services/notification.service';
 
 export async function runBatteryCheck() {
@@ -17,7 +17,7 @@ export async function runBatteryCheck() {
   });
 
   const due = shifts.filter((shift) => {
-    const shiftDate = shift.date.toISOString().slice(0, 10);
+    const shiftDate = formatBusinessDate(shift.date);
     const shiftStart = buildBusinessDateTime(shiftDate, shift.startTime);
     return (shiftStart.isAfter(windowStart) || shiftStart.isSame(windowStart)) && shiftStart.isBefore(windowEnd);
   });

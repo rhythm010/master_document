@@ -19,6 +19,7 @@ import {
 import {
   buildBusinessDateTime,
   calculateEndTime,
+  formatBusinessDate,
   generateNumericCode,
   generateQrCode,
   hoursUntil,
@@ -47,6 +48,7 @@ const idempotencyStore = new Map<
   string,
   { response: BookingCreationResponse; expiresAt: number }
 >();
+const idempotencyInFlight = new Map<string, Promise<BookingCreationResponse>>();
 
 function getIdempotencyResponse(key?: string) {
   if (!key) return null;
@@ -95,11 +97,19 @@ export async function createBooking(
   payload: { venueId: string; date: string; startTime: string },
   context: { idempotencyKey?: string; deviceId?: string; clientLatitude?: number; clientLongitude?: number },
 ) {
-  const cached = getIdempotencyResponse(context.idempotencyKey);
+  const idempotencyKey = context.idempotencyKey ? `${clientId}:${context.idempotencyKey}` : undefined;
+  const cached = getIdempotencyResponse(idempotencyKey);
   if (cached) {
     return cached;
   }
+  if (idempotencyKey) {
+    const inFlight = idempotencyInFlight.get(idempotencyKey);
+    if (inFlight) {
+      return inFlight;
+    }
+  }
 
+  const bookingPromise = (async () => {
   const client = await prisma.client.findUnique({ where: { id: clientId } });
   if (!client) {
     throw new NotFoundError('Client');
@@ -135,107 +145,127 @@ export async function createBooking(
 
   const bookingDate = parseBusinessDate(payload.date).startOf('day').toDate();
 
-  const result = await withSerializableRetry(async () => {
-    return prisma.$transaction(
-      async (tx) => {
-        const freshClient = await tx.client.findUnique({ where: { id: clientId } });
-        if (!freshClient) {
-          throw new NotFoundError('Client');
-        }
-        if (freshClient.bookingStatusCache !== 'NONE') {
-          throw new ConflictError(
-            'ACTIVE_BOOKING_EXISTS',
-            'You already have an active booking. Cancel it before creating a new one.',
-            {
-              currentBookingId: freshClient.currentBookingId,
-              currentBookingStatus: freshClient.bookingStatusCache,
-            },
-          );
-        }
+  let result;
+  try {
+    result = await withSerializableRetry(async () => {
+      return prisma.$transaction(
+        async (tx) => {
+          const freshClient = await tx.client.findUnique({ where: { id: clientId } });
+          if (!freshClient) {
+            throw new NotFoundError('Client');
+          }
+          if (freshClient.bookingStatusCache !== 'NONE') {
+            throw new ConflictError(
+              'ACTIVE_BOOKING_EXISTS',
+              'You already have an active booking. Cancel it before creating a new one.',
+              {
+                currentBookingId: freshClient.currentBookingId,
+                currentBookingStatus: freshClient.bookingStatusCache,
+              },
+            );
+          }
 
-        let allocation;
-        try {
-          allocation = await allocate(
-            {
+          let allocation;
+          try {
+            allocation = await allocate(
+              {
+                venueId: venue.id,
+                date: bookingDate,
+                startTime: payload.startTime,
+                endTime,
+              },
+              tx,
+            );
+          } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : '';
+            if (message === 'SLOT_UNAVAILABLE') {
+              throw new ConflictError('SLOT_UNAVAILABLE', 'No companion duo is available for this slot.');
+            }
+            throw error;
+          }
+
+          const pricing = calculatePrice(venue.type);
+          const softLockExpiresAt = new Date(Date.now() + BUSINESS_RULES.SOFT_LOCK_MINUTES * 60 * 1000);
+
+          const booking = await tx.booking.create({
+            data: {
+              clientId,
               venueId: venue.id,
+              captainId: allocation.captainId,
+              viceCaptainId: allocation.viceCaptainId,
+              allocationMode: allocation.mode,
+              captainShiftId: allocation.captainShiftId,
+              viceCaptainShiftId: allocation.viceCaptainShiftId,
+              clientNicknameSnapshot: freshClient.nickname,
+              duoStatus: 'PENDING',
+              duoQrCode: generateQrCode(),
+              duoPinCode: generateNumericCode(BUSINESS_RULES.DUO_PIN_LENGTH),
+              qrCode: generateQrCode(),
+              pinCode: generateNumericCode(BUSINESS_RULES.CLIENT_PIN_LENGTH),
               date: bookingDate,
               startTime: payload.startTime,
               endTime,
+              durationMinutes: BUSINESS_RULES.SESSION_DURATION_MINUTES,
+              status: BookingStatus.PENDING,
+              baseRate: pricing.baseRate,
+              vatAmount: pricing.vatAmount,
+              serviceFee: pricing.serviceFee,
+              grandTotal: pricing.grandTotal,
+              paymentHoldStatus: PaymentHoldStatus.NONE,
+              softLockExpiresAt,
             },
-            tx,
-          );
-        } catch (error: unknown) {
-          const message = error instanceof Error ? error.message : '';
-          if (message === 'SLOT_UNAVAILABLE') {
-            throw new ConflictError('SLOT_UNAVAILABLE', 'No companion duo is available for this slot.');
-          }
-          throw error;
-        }
+          });
 
-        const pricing = calculatePrice(venue.type);
-        const softLockExpiresAt = new Date(Date.now() + BUSINESS_RULES.SOFT_LOCK_MINUTES * 60 * 1000);
+          await tx.client.update({
+            where: { id: clientId },
+            data: {
+              currentBookingId: booking.id,
+              bookingStatusCache: 'PENDING',
+            },
+          });
 
-        const booking = await tx.booking.create({
-          data: {
-            clientId,
-            venueId: venue.id,
-            captainId: allocation.captainId,
-            viceCaptainId: allocation.viceCaptainId,
-            allocationMode: allocation.mode,
-            captainShiftId: allocation.captainShiftId,
-            viceCaptainShiftId: allocation.viceCaptainShiftId,
-            clientNicknameSnapshot: freshClient.nickname,
-            duoStatus: 'PENDING',
-            duoQrCode: generateQrCode(),
-            duoPinCode: generateNumericCode(BUSINESS_RULES.DUO_PIN_LENGTH),
-            qrCode: generateQrCode(),
-            pinCode: generateNumericCode(BUSINESS_RULES.CLIENT_PIN_LENGTH),
-            date: bookingDate,
-            startTime: payload.startTime,
-            endTime,
-            durationMinutes: BUSINESS_RULES.SESSION_DURATION_MINUTES,
-            status: BookingStatus.PENDING,
-            baseRate: pricing.baseRate,
-            vatAmount: pricing.vatAmount,
-            serviceFee: pricing.serviceFee,
-            grandTotal: pricing.grandTotal,
-            paymentHoldStatus: PaymentHoldStatus.NONE,
-            softLockExpiresAt,
-          },
-        });
+          await tx.bookingAuditLog.create({
+            data: {
+              bookingId: booking.id,
+              action: 'CREATED',
+              performedByType: ActorType.CLIENT,
+              performedById: clientId,
+              deviceId: context.deviceId,
+              pricingEngineVersion: PRICING_ENGINE_VERSION,
+              allocationEngineVersion: ALLOCATION_ENGINE_VERSION,
+              clientLatitude: context.clientLatitude,
+              clientLongitude: context.clientLongitude,
+            },
+          });
 
-        await tx.client.update({
-          where: { id: clientId },
-          data: {
-            currentBookingId: booking.id,
-            bookingStatusCache: 'PENDING',
-          },
-        });
+          return {
+            booking,
+            pricing,
+          };
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
+    });
+  } catch (error: unknown) {
+    if (error instanceof ConflictError) {
+      throw error;
+    }
+    const code = (error as { code?: string })?.code;
+    const message = error instanceof Error ? error.message : '';
+    if (code === '40001' || code === 'P2034' || message === 'SERIALIZATION_RETRY_EXCEEDED') {
+      logger.warn({ err: error, clientId }, 'Booking allocation conflict detected');
+      throw new ConflictError('SLOT_UNAVAILABLE', 'No companion duo is available for this slot.');
+    }
+    throw error;
+  }
 
-        await tx.bookingAuditLog.create({
-          data: {
-            bookingId: booking.id,
-            action: 'CREATED',
-            performedByType: ActorType.CLIENT,
-            performedById: clientId,
-            deviceId: context.deviceId,
-            pricingEngineVersion: PRICING_ENGINE_VERSION,
-            allocationEngineVersion: ALLOCATION_ENGINE_VERSION,
-            clientLatitude: context.clientLatitude,
-            clientLongitude: context.clientLongitude,
-          },
-        });
-
-        return {
-          booking,
-          pricing,
-        };
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
-  });
-
-  await paymentService.holdAmount(result.pricing.grandTotal.toString());
+  try {
+    await paymentService.holdAmount(result.pricing.grandTotal.toString());
+  } catch (error: unknown) {
+    logger.error({ err: error, bookingId: result.booking.id }, 'Payment hold failed');
+    await failBooking(result.booking.id, 'Payment hold failed');
+    throw error;
+  }
   await confirmBooking(result.booking.id);
 
   const response = {
@@ -251,8 +281,22 @@ export async function createBooking(
     },
   };
 
-  setIdempotencyResponse(context.idempotencyKey, response);
   return response;
+  })();
+
+  if (idempotencyKey) {
+    idempotencyInFlight.set(idempotencyKey, bookingPromise);
+  }
+
+  try {
+    const response = await bookingPromise;
+    setIdempotencyResponse(idempotencyKey, response);
+    return response;
+  } finally {
+    if (idempotencyKey) {
+      idempotencyInFlight.delete(idempotencyKey);
+    }
+  }
 }
 
 export async function confirmBooking(bookingId: string) {
@@ -381,7 +425,7 @@ export async function getBookingDetails(clientId: string, bookingId: string) {
     throw new AppError(403, 'OWNERSHIP_MISMATCH', 'Access denied');
   }
 
-  const bookingDate = booking.date.toISOString().slice(0, 10);
+  const bookingDate = formatBusinessDate(booking.date);
   const startDateTime = buildBusinessDateTime(bookingDate, booking.startTime);
   const revealTime = startDateTime.subtract(30, 'minute');
   const now = nowBusiness();
@@ -398,7 +442,7 @@ export async function getBookingDetails(clientId: string, bookingId: string) {
       type: booking.venue.type,
       address: booking.venue.address,
     },
-    date: booking.date.toISOString().slice(0, 10),
+    date: bookingDate,
     startTime: booking.startTime,
     endTime: booking.endTime,
     pricing: {
@@ -436,7 +480,7 @@ export async function cancelBooking(
     throw new AppError(400, 'BOOKING_NOT_CANCELLABLE', 'This booking cannot be cancelled in its current state.');
   }
 
-  const hoursUntilStart = hoursUntil(booking.date.toISOString().slice(0, 10), booking.startTime);
+  const hoursUntilStart = hoursUntil(formatBusinessDate(booking.date), booking.startTime);
   const refund = calculateRefund(booking.grandTotal, hoursUntilStart);
 
   const refundPercentage = Number(refund.refundPercentage);
