@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  COMPANION
+}
+
+enum VenueType {
+  MALL
+  CLUB
+  RESTAURANT
+}
+
+enum RosterSlotStatus {
+  AVAILABLE
+  BOOKED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum CompanionDesignation {
+  CAPTAIN
+  VICE_CAPTAIN
+}
+
+enum PresenceStatus {
+  ASSIGNED
+  ARRIVED
+}
+
+enum SelfMatchStatus {
+  NOT_MATCHED
+  MATCHED
+}
+
+enum ClientMatchStatus {
+  WAITING_FOR_CLIENT
+  CLIENT_MATCHED
+}
+
+enum BookingRatingType {
+  CLIENT_RATING_DUO
+  COMPANION_RATING_CLIENT
+}
+
+model User {
+  id                   String   @id @default(uuid()) @db.Uuid
+  role                 UserRole
+  name                 String
+  nickname             String
+  email                String   @unique
+  passwordHash         String   @map("password_hash")
+  emailVerified        Boolean  @default(false) @map("email_verified")
+  biometricAuthEnabled Boolean  @default(false) @map("biometric_auth_enabled")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  companionProfile            CompanionProfile?
+  bookings                    Booking[]                    @relation("BookingClient")
+  rosterSlots                 RosterSlot[]                 @relation("RosterSlotCompanion")
+  bookingAssignments          BookingCompanionAssignment[] @relation("BookingCompanionAssignmentCompanion")
+  bookingRatings              BookingRating[]              @relation("BookingRatingRater")
+  companionVenueAssignments   CompanionVenueAssignment[]   @relation("CompanionVenueAssignmentCompanion")
+
+  @@index([role], map: "idx_users_role")
+  @@map("users")
+}
+
+model CompanionProfile {
+  id                String               @id @default(uuid()) @db.Uuid
+  userId            String               @unique @db.Uuid @map("user_id")
+  designation       CompanionDesignation @default(VICE_CAPTAIN)
+  isActive          Boolean              @default(true) @map("is_active")
+  languages         String[]             @default([]) @db.Text
+  profilePictureUrl String               @default("") @map("profile_picture_url")
+  averageRating     Decimal              @default(0.00) @map("average_rating") @db.Decimal(3, 2)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([designation], map: "idx_companion_profiles_designation")
+  @@index([isActive], map: "idx_companion_profiles_active")
+  @@map("companion_profiles")
+}
+
+model CompanionVenueAssignment {
+  companionId String   @db.Uuid @map("companion_id")
+  venueId     String   @db.Uuid @map("venue_id")
+  assignedAt  DateTime @default(now()) @map("assigned_at") @db.Timestamptz(6)
+
+  companion User  @relation("CompanionVenueAssignmentCompanion", fields: [companionId], references: [id])
+  venue     Venue @relation(fields: [venueId], references: [id])
+
+  @@id([companionId, venueId])
+  @@index([venueId], map: "idx_companion_venue_assignments_venue")
+  @@map("companion_venue_assignments")
+}
+
+model Venue {
+  id                  String   @id @default(uuid()) @db.Uuid
+  name                String
+  address             String
+  venueType           VenueType @map("venue_type")
+  latitude            Decimal  @db.Decimal(10, 7)
+  longitude           Decimal  @db.Decimal(10, 7)
+  operatingHoursStart DateTime @map("operating_hours_start") @db.Time(0)
+  operatingHoursEnd   DateTime @map("operating_hours_end") @db.Time(0)
+
+  bookings                  Booking[]
+  rosterSlots               RosterSlot[]
+  companionVenueAssignments CompanionVenueAssignment[]
+
+  @@index([venueType], map: "idx_venues_type")
+  @@map("venues")
+}
+
+model Booking {
+  id              String        @id @default(uuid()) @db.Uuid
+  clientId        String        @db.Uuid @map("client_id")
+  venueId         String        @db.Uuid @map("venue_id")
+  startAt         DateTime      @map("start_at") @db.Timestamptz(6)
+  endAt           DateTime      @map("end_at") @db.Timestamptz(6)
+  status          BookingStatus
+  qrCode          String        @map("qr_code")
+  pinCode         String        @map("pin_code")
+  bookingColor    String        @map("booking_color")
+  comMatchQrCode  String        @map("com_match_qr_code")
+  comMatchPinCode String        @map("com_match_pin_code")
+  extendedAt      DateTime?     @map("extended_at") @db.Timestamptz(6)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  client      User   @relation("BookingClient", fields: [clientId], references: [id])
+  venue       Venue  @relation(fields: [venueId], references: [id])
+  rosterSlots RosterSlot[]
+  assignments BookingCompanionAssignment[]
+  ratings     BookingRating[]
+
+  @@index([venueId, startAt], map: "idx_bookings_venue_time")
+  @@index([clientId, status], map: "idx_bookings_client_status")
+  @@map("bookings")
+}
+
+model RosterSlot {
+  id          String           @id @default(uuid()) @db.Uuid
+  venueId     String           @db.Uuid @map("venue_id")
+  companionId String           @db.Uuid @map("companion_id")
+  bookingId   String?          @db.Uuid @map("booking_id")
+  startAt     DateTime         @map("start_at") @db.Timestamptz(6)
+  endAt       DateTime         @map("end_at") @db.Timestamptz(6)
+  status      RosterSlotStatus
+
+  venue     Venue   @relation(fields: [venueId], references: [id])
+  companion User    @relation("RosterSlotCompanion", fields: [companionId], references: [id])
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+
+  @@unique([venueId, companionId, startAt, endAt], map: "uq_roster_slots_unique_slot")
+  @@index([venueId, startAt, status], map: "idx_roster_slots_lookup")
+  @@index([companionId, startAt], map: "idx_roster_slots_companion_time")
+  @@map("roster_slots")
+}
+
+model BookingCompanionAssignment {
+  id              String               @id @default(uuid()) @db.Uuid
+  bookingId       String               @db.Uuid @map("booking_id")
+  companionId     String               @db.Uuid @map("companion_id")
+  designation     CompanionDesignation
+  presenceStatus  PresenceStatus       @default(ASSIGNED) @map("presence_status")
+  selfMatchStatus SelfMatchStatus      @default(NOT_MATCHED) @map("self_match_status")
+  clientMatchStatus ClientMatchStatus  @default(WAITING_FOR_CLIENT) @map("client_match_status")
+
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  companion User    @relation("BookingCompanionAssignmentCompanion", fields: [companionId], references: [id])
+
+  @@unique([bookingId, designation], map: "uq_assignment_booking_designation")
+  @@unique([bookingId, companionId], map: "uq_assignment_booking_companion")
+  @@index([bookingId], map: "idx_assignments_booking")
+  @@index([companionId], map: "idx_assignments_companion")
+  @@map("booking_companion_assignments")
+}
+
+model BookingRating {
+  id         String            @id @default(uuid()) @db.Uuid
+  bookingId  String            @db.Uuid @map("booking_id")
+  raterUserId String           @db.Uuid @map("rater_user_id")
+  ratingType BookingRatingType @map("rating_type")
+  stars      Int
+  tags       String[]          @default([]) @db.Text
+  comment    String            @default("")
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  rater   User    @relation("BookingRatingRater", fields: [raterUserId], references: [id])
+
+  @@unique([bookingId, ratingType, raterUserId], map: "uq_booking_ratings_once")
+  @@map("booking_ratings")
+}

@@ -1,0 +1,30 @@
+import { Router } from "express";
+import rateLimit from "express-rate-limit";
+
+import { config } from "../../shared/config";
+import { ErrorCodes } from "../../shared/errors/errorCodes";
+import { authMiddleware } from "../../shared/middleware/auth";
+import { identityController } from "./identity.controller";
+
+const router = Router();
+
+const loginLimiter = rateLimit({
+  windowMs: config.loginRateLimitWindowMinutes * 60 * 1000,
+  max: config.loginRateLimitMaxAttempts,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res
+      .status(429)
+      .json({ code: ErrorCodes.TOO_MANY_ATTEMPTS, message: "Too many attempts" });
+  }
+});
+
+router.post("/auth/signup", identityController.signup);
+router.get("/auth/verify-email", identityController.verifyEmail);
+router.post("/auth/resend-verification", identityController.resendVerification);
+router.post("/auth/login", loginLimiter, identityController.login);
+router.get("/users/me", authMiddleware, identityController.getMe);
+router.patch("/users/me", authMiddleware, identityController.updateNickname);
+
+export { router as identityRouter };
