@@ -12,21 +12,25 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ) {
+  // Application errors already include a status and code.
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ code: err.code, message: err.message });
     return;
   }
 
+  // Zod validation errors map to a generic 400 response.
   if (err instanceof ZodError) {
     res.status(400).json({ code: ErrorCodes.VALIDATION_ERROR, message: "Invalid input" });
     return;
   }
 
+  // Normalize Multer upload errors into a validation response.
   if (err instanceof multer.MulterError) {
     res.status(400).json({ code: ErrorCodes.VALIDATION_ERROR, message: err.message });
     return;
   }
 
+  // Log unexpected failures and return a generic 500.
   logger.error({ err }, "unhandled error");
   res
     .status(500)

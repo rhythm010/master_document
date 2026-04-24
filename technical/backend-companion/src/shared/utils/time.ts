@@ -3,6 +3,7 @@ type TimeParts = {
   minutes: number;
 };
 
+// Merge a date with a time string/Date into a single Date instance.
 export function combineDateAndTime(date: Date, timeInput: string | Date) {
   const { hours, minutes } = getTimeParts(timeInput);
   const combined = new Date(date);
@@ -10,6 +11,7 @@ export function combineDateAndTime(date: Date, timeInput: string | Date) {
   return combined;
 }
 
+// Extract hours/minutes from a string or Date input.
 function getTimeParts(timeInput: string | Date): TimeParts {
   if (typeof timeInput === "string") {
     return parseTimeString(timeInput);
@@ -21,6 +23,7 @@ function getTimeParts(timeInput: string | Date): TimeParts {
   };
 }
 
+// Parse an HH:mm string into hours/minutes.
 function parseTimeString(value: string): TimeParts {
   const [rawHours, rawMinutes] = value.split(":");
   const hours = Number(rawHours ?? 0);

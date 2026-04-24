@@ -3,17 +3,20 @@ import nodemailer from "nodemailer";
 import { config } from "../config";
 import { buildVerifyEmailLinks } from "../utils/urls";
 
+// Shared SMTP transport for outbound email.
 const transporter = nodemailer.createTransport({
   host: config.smtpHost,
   port: config.smtpPort,
   auth: config.smtpUser ? { user: config.smtpUser, pass: config.smtpPass } : undefined
 });
 
+// Send an account verification email with deep link and web link variants.
 export async function sendVerificationEmail(input: {
   to: string;
   name: string;
   token: string;
 }) {
+  // Build both app and web verification links for the message body.
   const { deepLink, webLink } = buildVerifyEmailLinks(input.token);
   const text = [
     `Hi ${input.name},`,

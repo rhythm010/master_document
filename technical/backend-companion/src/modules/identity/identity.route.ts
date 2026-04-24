@@ -8,11 +8,13 @@ import { identityController } from "./identity.controller";
 
 const router = Router();
 
+// Throttle login attempts to mitigate brute-force retries.
 const loginLimiter = rateLimit({
   windowMs: config.loginRateLimitWindowMinutes * 60 * 1000,
   max: config.loginRateLimitMaxAttempts,
   standardHeaders: true,
   legacyHeaders: false,
+  // Send a consistent JSON error response when throttled.
   handler: (_req, res) => {
     res
       .status(429)
@@ -20,10 +22,12 @@ const loginLimiter = rateLimit({
   }
 });
 
+// Signup, verification, and login routes.
 router.post("/auth/signup", identityController.signup);
 router.get("/auth/verify-email", identityController.verifyEmail);
 router.post("/auth/resend-verification", identityController.resendVerification);
 router.post("/auth/login", loginLimiter, identityController.login);
+// Authenticated user profile routes.
 router.get("/users/me", authMiddleware, identityController.getMe);
 router.patch("/users/me", authMiddleware, identityController.updateNickname);
 

@@ -7,6 +7,7 @@ import { uploadProfilePicture } from "./companion-profile.upload";
 
 const router = Router();
 
+// Return the current companion profile.
 router.get(
   "/companion-profiles/me",
   authMiddleware,
@@ -14,6 +15,7 @@ router.get(
   companionProfileController.getMe
 );
 
+// Upload a profile picture for the current companion.
 router.post(
   "/companion-profiles/upload-picture",
   authMiddleware,
@@ -22,6 +24,7 @@ router.post(
   companionProfileController.uploadPicture
 );
 
+// Update profile attributes such as languages or picture URL.
 router.patch(
   "/companion-profiles/me",
   authMiddleware,
@@ -29,6 +32,7 @@ router.patch(
   companionProfileController.updateProfile
 );
 
+// Toggle the companion's availability for bookings.
 router.patch(
   "/companion-profiles/toggle-active",
   authMiddleware,
