@@ -1,0 +1,91 @@
+{
+  "testId": "MOD-IDENTITY-010",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P2",
+  "scenarioName": "Login Rate Limit After Failed Attempts",
+  "flowType": "negative",
+  "linkedRequirement": "identity/login",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-010-login-rate-limit.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate login rate limiting after 5 failed attempts within 15 minutes",
+  "preconditions": ["Verified user exists"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-verified",
+        "role": "CLIENT",
+        "email": "ratelimit@test.com",
+        "password": "CorrectPassword123!",
+        "passwordHash": "bcrypt_hashed_CorrectPassword123!",
+        "emailVerified": true
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "ratelimit@test.com",
+        "password": "WrongPassword1!"
+      },
+      "repeat": 5,
+      "description": "Attempt 5 failed logins"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "ratelimit@test.com",
+        "password": "CorrectPassword123!"
+      },
+      "description": "6th attempt with correct password should be rate limited"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 401,
+        "bodyFields": {
+          "code": "INVALID_CREDENTIALS"
+        }
+      },
+      {
+        "step": 2,
+        "statusCode": 429,
+        "bodyFields": {
+          "code": "TOO_MANY_ATTEMPTS"
+        },
+        "requiredKeys": ["code", "message"]
+      }
+    ],
+    "mustNotOccur": ["accessToken returned on step 2"]
+  },
+  "cleanup": ["Delete seeded user", "Clear rate limiter state"],
+  "passCriteria": [
+    "First 5 attempts return 401 INVALID_CREDENTIALS",
+    "6th attempt returns 429 TOO_MANY_ATTEMPTS",
+    "Rate limit enforced even with correct password",
+    "No token issued during rate limit period"
+  ]
+}

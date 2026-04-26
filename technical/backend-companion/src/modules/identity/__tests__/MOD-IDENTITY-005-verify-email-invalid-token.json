@@ -1,0 +1,83 @@
+{
+  "testId": "MOD-IDENTITY-005",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P2",
+  "scenarioName": "Email Verification Invalid Token",
+  "flowType": "negative",
+  "linkedRequirement": "identity/verify-email",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-005-verify-email-invalid-token.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate email verification rejects invalid/expired tokens",
+  "preconditions": ["Unverified user exists"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-unverified",
+        "role": "CLIENT",
+        "email": "unverified@test.com",
+        "passwordHash": "hashed",
+        "emailVerified": false
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "invalid.jwt.token"
+      }
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "field": "id",
+        "value": "user-unverified"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 401,
+        "bodyFields": {
+          "code": "INVALID_TOKEN"
+        }
+      }
+    ],
+    "db": [
+      {
+        "step": 2,
+        "table": "users",
+        "checks": ["row exists", "emailVerified=false"]
+      }
+    ],
+    "mustNotOccur": ["emailVerified changed to true"]
+  },
+  "cleanup": ["Delete seeded user"],
+  "passCriteria": [
+    "API returns 401 INVALID_TOKEN",
+    "User.emailVerified remains false",
+    "No state change in database"
+  ]
+}

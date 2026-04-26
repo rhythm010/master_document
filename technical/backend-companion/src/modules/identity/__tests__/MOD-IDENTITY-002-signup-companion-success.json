@@ -1,0 +1,178 @@
+{
+  "testId": "MOD-IDENTITY-002",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P1",
+  "scenarioName": "Signup COMPANION Successfully",
+  "flowType": "happy",
+  "linkedRequirement": "identity/signup",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-002-signup-companion-success.json",
+  "executionMode": "api+db+events",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Validate COMPANION signup creates user, companion profile, assigns designation, populates roster slots, sends verification email",
+  "preconditions": [
+    "Database seeded with venue records",
+    "Mailpit running on localhost:8025"
+  ],
+  "seedData": [
+    {
+      "entity": "venue",
+      "values": {
+        "id": "venue-001",
+        "name": "Test Mall",
+        "venueType": "MALL",
+        "operatingHoursStart": "09:00:00",
+        "operatingHoursEnd": "21:00:00"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 10,
+    "pollEveryMs": 500,
+    "retryCount": 20
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "COMPANION",
+        "name": "Test Companion",
+        "nickname": "testcompanion",
+        "email": "companion@test.com",
+        "password": "Test123!@#",
+        "biometricAuthEnabled": true
+      },
+      "storeResponseFields": ["id"]
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "idFromStep": 1,
+        "field": "id"
+      }
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "where": {
+        "idFromStep": 1,
+        "field": "user_id"
+      }
+    },
+    {
+      "step": 4,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "idFromStep": 1,
+        "field": "companion_id"
+      }
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Check verification email sent to Mailpit",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "companion@test.com"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 201,
+        "bodyFields": {
+          "role": "COMPANION",
+          "name": "Test Companion",
+          "nickname": "testcompanion",
+          "email": "companion@test.com",
+          "emailVerified": false,
+          "biometricAuthEnabled": true
+        },
+        "requiredKeys": ["id", "createdAt"]
+      }
+    ],
+    "db": [
+      {
+        "step": 2,
+        "table": "users",
+        "checks": [
+          "row exists",
+          "role=COMPANION",
+          "email=companion@test.com",
+          "emailVerified=false",
+          "biometricAuthEnabled=true",
+          "passwordHash is not null"
+        ]
+      },
+      {
+        "step": 3,
+        "table": "companion_profiles",
+        "checks": [
+          "row exists",
+          "userId matches step 1 id",
+          "designation in (CAPTAIN, VICE_CAPTAIN)",
+          "isActive=true",
+          "languages=[]",
+          "profilePictureUrl=''",
+          "averageRating=0.00"
+        ]
+      },
+      {
+        "step": 4,
+        "table": "roster_slots",
+        "checks": [
+          "at least 1 row exists",
+          "companionId matches step 1 id",
+          "status=AVAILABLE",
+          "bookingId=null",
+          "venueId exists"
+        ]
+      }
+    ],
+    "external": [
+      {
+        "step": 5,
+        "description": "Email sent to Mailpit",
+        "checks": [
+          "email exists",
+          "to=companion@test.com",
+          "contains verification token"
+        ]
+      }
+    ],
+    "mustNotOccur": ["duplicate user row", "duplicate companion_profiles row"]
+  },
+  "cleanup": [
+    "Delete roster_slots rows",
+    "Delete companion_profiles row",
+    "Delete user row",
+    "Clear Mailpit messages"
+  ],
+  "passCriteria": [
+    "API returns 201",
+    "User row exists with COMPANION role",
+    "Companion profile created with correct defaults",
+    "Designation assigned (CAPTAIN or VICE_CAPTAIN)",
+    "Roster slots populated for next 7 days",
+    "Verification email sent",
+    "Password is hashed"
+  ]
+}

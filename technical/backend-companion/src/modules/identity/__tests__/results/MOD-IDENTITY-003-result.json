@@ -1,0 +1,55 @@
+{
+  "runId": "RUN-20260425-205508-003",
+  "testId": "MOD-IDENTITY-003",
+  "status": "FAIL",
+  "startedAt": "2026-04-25T20:55:13.000Z",
+  "endedAt": "2026-04-25T20:55:13.200Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": false,
+    "issuesFound": [
+      "Test seed data attempted to create existing user, but signup was called with different email due to timestamp suffix"
+    ],
+    "autoCorrectionsApplied": []
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-25T20:55:13.050Z",
+      "endedAt": "2026-04-25T20:55:13.150Z",
+      "durationMs": 100,
+      "statusCode": 201,
+      "result": "UNEXPECTED"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "FAIL",
+      "observed": {
+        "statusCode": 201,
+        "expectedStatusCode": 409
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL",
+    "db": "NOT_EVALUATED"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "actions": ["Deleted seeded user"]
+  },
+  "failures": [
+    "**DATA ISSUE**: The test tried to seed user with email 'existing.{timestamp}.003@test.com', but the actual API call should use the SAME email to trigger duplicate detection. Test script error - timestamps were added to emails making them unique instead of duplicate."
+  ],
+  "finalSummary": "TEST DATA ISSUE: Test was designed to validate duplicate email rejection, but test execution used unique timestamped emails. The uniqueness constraint exists in DB. This is a TEST SCRIPT error, NOT an implementation issue. User guidance: Remove timestamp suffix from email in duplicate test scenarios."
+}

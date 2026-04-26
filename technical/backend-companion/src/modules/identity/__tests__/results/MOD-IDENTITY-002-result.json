@@ -1,0 +1,91 @@
+{
+  "runId": "RUN-20260425-205508-002",
+  "testId": "MOD-IDENTITY-002",
+  "status": "PARTIAL",
+  "startedAt": "2026-04-25T20:55:12Z",
+  "endedAt": "2026-04-25T20:55:13Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": true,
+    "issuesFound": [],
+    "autoCorrectionsApplied": [
+      "Created venue-test-20260425-205508 for roster slot creation requirement"
+    ]
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-25T20:55:12.100Z",
+      "endedAt": "2026-04-25T20:55:12.500Z",
+      "durationMs": 400,
+      "statusCode": 201,
+      "result": "PASS"
+    },
+    {
+      "step": 2,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-04-25T20:55:12.600Z",
+      "endedAt": "2026-04-25T20:55:12.650Z",
+      "durationMs": 50,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-04-25T20:55:12.700Z",
+      "endedAt": "2026-04-25T20:55:12.750Z",
+      "durationMs": 50,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "role": "COMPANION",
+        "emailVerified": false,
+        "biometricAuthEnabled": true
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "companionProfileCreated": true,
+        "count": 1
+      }
+    },
+    {
+      "step": 3,
+      "result": "FAIL",
+      "observed": {
+        "rosterSlotsCreated": false,
+        "count": 0
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PARTIAL",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "actions": ["Deleted companion profile", "Deleted user", "Deleted test venue"]
+  },
+  "failures": [
+    "Roster slots were not created automatically during COMPANION signup. This indicates roster slot creation logic may not be implemented yet, or requires additional triggers/services."
+  ],
+  "finalSummary": "COMPANION signup created user and companion_profile successfully, but roster_slots were not auto-created. This is a FEATURE IMPLEMENTATION issue, not a data issue. Test marked PARTIAL - core identity functionality works, but roster integration is missing."
+}

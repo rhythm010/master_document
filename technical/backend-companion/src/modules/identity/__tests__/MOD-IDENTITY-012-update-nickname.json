@@ -1,0 +1,101 @@
+{
+  "testId": "MOD-IDENTITY-012",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P2",
+  "scenarioName": "Update Nickname Success",
+  "flowType": "happy",
+  "linkedRequirement": "identity/update-nickname",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-012-update-nickname.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate PATCH /users/me updates user nickname and returns updated profile",
+  "preconditions": ["Verified user exists"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-client",
+        "role": "CLIENT",
+        "name": "Test User",
+        "nickname": "oldnickname",
+        "email": "client@test.com",
+        "passwordHash": "hashed",
+        "emailVerified": true
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "user-client",
+      "role": "CLIENT",
+      "email": "client@test.com",
+      "storeAs": "authToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "PATCH",
+      "endpoint": "/users/me",
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      },
+      "payload": {
+        "nickname": "newnickname"
+      }
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "field": "id",
+        "value": "user-client"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "bodyFields": {
+          "id": "user-client",
+          "nickname": "newnickname",
+          "email": "client@test.com"
+        }
+      }
+    ],
+    "db": [
+      {
+        "step": 3,
+        "table": "users",
+        "checks": ["row exists", "nickname=newnickname"]
+      }
+    ],
+    "mustNotOccur": ["other user fields changed"]
+  },
+  "cleanup": ["Delete seeded user"],
+  "passCriteria": [
+    "API returns 200",
+    "Nickname updated in database",
+    "Updated profile returned",
+    "Other fields unchanged"
+  ]
+}

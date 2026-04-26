@@ -1,0 +1,92 @@
+{
+  "testId": "MOD-IDENTITY-004",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P1",
+  "scenarioName": "Email Verification Success",
+  "flowType": "happy",
+  "linkedRequirement": "identity/verify-email",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-004-verify-email-success.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate email verification updates user.email_verified to true",
+  "preconditions": ["Unverified user exists", "Valid verification token generated"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-unverified",
+        "role": "CLIENT",
+        "email": "unverified@test.com",
+        "passwordHash": "hashed",
+        "emailVerified": false
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "EMAIL_VERIFY",
+      "userId": "user-unverified",
+      "email": "unverified@test.com",
+      "storeAs": "verificationToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{verificationToken}}"
+      }
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "field": "id",
+        "value": "user-unverified"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "VERIFIED"
+        }
+      }
+    ],
+    "db": [
+      {
+        "step": 3,
+        "table": "users",
+        "checks": ["row exists", "emailVerified=true"]
+      }
+    ],
+    "mustNotOccur": ["duplicate verification", "user data changed except emailVerified"]
+  },
+  "cleanup": ["Delete seeded user"],
+  "passCriteria": [
+    "API returns 200 with status VERIFIED",
+    "User.emailVerified updated to true",
+    "Idempotent: calling again returns 200"
+  ]
+}

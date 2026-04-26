@@ -3,10 +3,22 @@ version: "3.8"
 services:
   db:
     image: postgres:15
+    command: 
+      - "postgres"
+      - "-c"
+      - "log_statement=all"
+      - "-c"
+      - "log_duration=on"
+      - "-c"
+      - "log_line_prefix=%t [%p] %u@%d "
+      - "-c"
+      - "timezone=Asia/Dubai"
     environment:
       POSTGRES_USER: companion
       POSTGRES_PASSWORD: companion
       POSTGRES_DB: companion
+      TZ: Asia/Dubai
+      PGTZ: Asia/Dubai
     ports:
       - "5432:5432"
     volumes:

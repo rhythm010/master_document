@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { z } from "zod";
+import process from "node:process";
 
 dotenv.config();
 

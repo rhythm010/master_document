@@ -1,0 +1,75 @@
+{
+  "testId": "MOD-COMPANION-PROFILE-002",
+  "type": "module",
+  "moduleOwner": "companion-profile",
+  "priority": "P1",
+  "scenarioName": "Get Profile Rejects Non-Companion",
+  "flowType": "negative",
+  "linkedRequirement": "companion-profile/get-me",
+  "filePath": "src/modules/companion-profile/__tests__/MOD-COMPANION-PROFILE-002-get-profile-forbidden.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate GET /companion-profiles/me returns 403 for CLIENT role users",
+  "preconditions": ["CLIENT user exists"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-client",
+        "role": "CLIENT",
+        "email": "client@test.com",
+        "password_hash": "hashed",
+        "email_verified": true
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "user-client",
+      "role": "CLIENT",
+      "email": "client@test.com",
+      "storeAs": "authToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/companion-profiles/me",
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 403,
+        "bodyFields": {
+          "code": "FORBIDDEN"
+        }
+      }
+    ],
+    "mustNotOccur": ["profile data returned"]
+  },
+  "cleanup": ["Delete user row"],
+  "passCriteria": [
+    "API returns 403 FORBIDDEN",
+    "CLIENT users cannot access companion endpoints"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "runId": "RUN-20260425-006",
+  "testId": "MOD-COMPANION-PROFILE-006",
+  "status": "PASS",
+  "startedAt": "2026-04-25T12:48:43.184Z",
+  "endedAt": "2026-04-25T12:48:43.195Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/companion-profile-and-activation.feature-sds.md",
+    "/technical/backend-companion/src/modules/companion-profile/__tests__/mod-companion-profile-006.json"
+  ],
+  "testDataValidation": {
+    "designerDataValid": false,
+    "issuesFound": [
+      "seed user.id not UUID (user-client/user-companion)",
+      "seed user missing name/nickname/biometric_auth_enabled",
+      "seed companion_profile.id not UUID (profile-001)"
+    ],
+    "autoCorrectionsApplied": [
+      "generated UUIDs for user/profile ids",
+      "added name/nickname/biometricAuthEnabled=false"
+    ]
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "queue": "NOT_REQUIRED"
+  },
+  "serviceHitLog": [
+    {
+      "step": 2,
+      "target": "PATCH /companion-profiles/me",
+      "startedAt": "2026-04-25T12:48:43.190Z",
+      "endedAt": "2026-04-25T12:48:43.194Z",
+      "durationMs": 4,
+      "statusCode": 400,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS"
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "events": "NOT_REQUIRED",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS"
+  },
+  "failures": [],
+  "finalSummary": "Companion profile module test executed successfully.",
+  "testDataCreated": [
+    {
+      "entity": "user",
+      "id": "5eb0e1bb-894b-4862-988a-1221f3124e57",
+      "marker": "RUN-20260425-006"
+    },
+    {
+      "entity": "companion_profile",
+      "id": "f1fe9c79-3db5-4eed-9a72-838a7542e490",
+      "marker": "RUN-20260425-006"
+    }
+  ]
+}

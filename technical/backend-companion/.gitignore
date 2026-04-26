@@ -3,3 +3,7 @@ dist/
 .env
 uploads/
 prisma/*.db
+test-logs/
+*.log
+test-results.json
+.eslintcache

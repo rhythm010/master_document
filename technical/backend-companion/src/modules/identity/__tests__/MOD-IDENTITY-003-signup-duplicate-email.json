@@ -1,0 +1,88 @@
+{
+  "testId": "MOD-IDENTITY-003",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P1",
+  "scenarioName": "Signup Rejects Duplicate Email",
+  "flowType": "negative",
+  "linkedRequirement": "identity/signup",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-003-signup-duplicate-email.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate signup rejects duplicate email addresses",
+  "preconditions": ["User with email 'existing@test.com' exists"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-existing",
+        "role": "CLIENT",
+        "email": "existing@test.com",
+        "passwordHash": "hashed",
+        "emailVerified": true
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "CLIENT",
+        "name": "Duplicate User",
+        "nickname": "duplicate",
+        "email": "existing@test.com",
+        "password": "Test123!@#"
+      }
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "field": "email",
+        "value": "existing@test.com"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 409,
+        "bodyFields": {
+          "code": "EMAIL_ALREADY_EXISTS"
+        },
+        "requiredKeys": ["code", "message"]
+      }
+    ],
+    "db": [
+      {
+        "step": 2,
+        "table": "users",
+        "checks": ["exactly 1 row exists", "no new user created"]
+      }
+    ],
+    "mustNotOccur": ["new user row created", "verification email sent"]
+  },
+  "cleanup": ["Delete seeded user"],
+  "passCriteria": [
+    "API returns 409 EMAIL_ALREADY_EXISTS",
+    "No new user created in database",
+    "Original user unchanged"
+  ]
+}

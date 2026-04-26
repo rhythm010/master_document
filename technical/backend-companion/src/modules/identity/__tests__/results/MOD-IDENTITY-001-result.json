@@ -1,0 +1,92 @@
+{
+  "runId": "RUN-20260425-205150-001",
+  "testId": "MOD-IDENTITY-001",
+  "status": "PASS",
+  "startedAt": "2026-04-25T20:51:50.938086Z",
+  "endedAt": "2026-04-25T20:52:50.964330Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": true,
+    "issuesFound": [],
+    "autoCorrectionsApplied": []
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-25T20:51:50.938112Z",
+      "endedAt": "2026-04-25T20:51:54.537731Z",
+      "durationMs": 3599,
+      "statusCode": 201,
+      "result": "PASS"
+    },
+    {
+      "step": 2,
+      "target": "DB users query",
+      "startedAt": "2026-04-25T20:52:09.566514Z",
+      "endedAt": "2026-04-25T20:52:09.870165Z",
+      "durationMs": 304,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "Mailpit API /api/v1/messages",
+      "startedAt": "2026-04-25T20:52:24.053645Z",
+      "endedAt": "2026-04-25T20:52:24.069159Z",
+      "durationMs": 15,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "userId": "64902824-b018-4298-847f-b6777c403ec8",
+        "role": "CLIENT",
+        "emailVerified": false,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "userExists": true,
+        "companionProfileExists": false,
+        "passwordHashed": true
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "emailSent": true,
+        "containsToken": true
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "actions": [
+      "Deleted user from DB",
+      "Cleared Mailpit messages"
+    ]
+  },
+  "failures": [],
+  "finalSummary": "CLIENT signup flow executed successfully. API returned 201 with correct user data. User persisted in DB with hashed password and no companion profile. Verification email sent to Mailpit with token."
+}

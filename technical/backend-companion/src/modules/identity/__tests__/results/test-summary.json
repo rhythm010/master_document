@@ -1,0 +1,24 @@
+{
+  "timestamp": "20260425-205508",
+  "results": [
+    {
+      "testId": "MOD-IDENTITY-001",
+      "status": "PASS"
+    },
+    {
+      "testId": "MOD-IDENTITY-002",
+      "status": "FAIL",
+      "error": "Roster slots not created"
+    },
+    {
+      "testId": "MOD-IDENTITY-003",
+      "status": "FAIL",
+      "error": "Expected 409, got 201"
+    },
+    {
+      "testId": "MOD-IDENTITY-007",
+      "status": "FAIL",
+      "error": "Expected 200, got 401"
+    }
+  ]
+}

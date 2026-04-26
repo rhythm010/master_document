@@ -1,0 +1,86 @@
+{
+  "testId": "MOD-IDENTITY-006",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P2",
+  "scenarioName": "Resend Verification Email Success",
+  "flowType": "happy",
+  "linkedRequirement": "identity/resend-verification",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-006-resend-verification.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Validate resend verification email works for unverified users",
+  "preconditions": ["Unverified user exists"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-unverified",
+        "role": "CLIENT",
+        "email": "unverified@test.com",
+        "passwordHash": "hashed",
+        "emailVerified": false
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 10,
+    "pollEveryMs": 500,
+    "retryCount": 20
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/resend-verification",
+      "payload": {
+        "email": "unverified@test.com"
+      }
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Check verification email sent to Mailpit",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "unverified@test.com"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 200,
+        "bodyFields": {
+          "message": "Verification email sent"
+        }
+      }
+    ],
+    "external": [
+      {
+        "step": 2,
+        "description": "Email sent to Mailpit",
+        "checks": [
+          "email exists",
+          "to=unverified@test.com",
+          "contains verification token"
+        ]
+      }
+    ],
+    "mustNotOccur": ["emailVerified changed"]
+  },
+  "cleanup": ["Delete seeded user", "Clear Mailpit messages"],
+  "passCriteria": [
+    "API returns 200",
+    "New verification email sent",
+    "User state unchanged"
+  ]
+}

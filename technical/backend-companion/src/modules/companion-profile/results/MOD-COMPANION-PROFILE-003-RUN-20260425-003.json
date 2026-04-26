@@ -1,0 +1,81 @@
+{
+  "runId": "RUN-20260425-003",
+  "testId": "MOD-COMPANION-PROFILE-003",
+  "status": "PASS",
+  "startedAt": "2026-04-25T12:48:43.081Z",
+  "endedAt": "2026-04-25T12:48:43.111Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/companion-profile-and-activation.feature-sds.md",
+    "/technical/backend-companion/src/modules/companion-profile/__tests__/mod-companion-profile-003.json"
+  ],
+  "testDataValidation": {
+    "designerDataValid": false,
+    "issuesFound": [
+      "seed user.id not UUID (user-client/user-companion)",
+      "seed user missing name/nickname/biometric_auth_enabled",
+      "seed companion_profile.id not UUID (profile-001)",
+      "missing test-fixtures/sample-image.jpg"
+    ],
+    "autoCorrectionsApplied": [
+      "generated UUIDs for user/profile ids",
+      "added name/nickname/biometricAuthEnabled=false",
+      "created test-fixtures/sample-image.jpg for upload"
+    ]
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "queue": "NOT_REQUIRED"
+  },
+  "serviceHitLog": [
+    {
+      "step": 2,
+      "target": "POST /companion-profiles/upload-picture",
+      "startedAt": "2026-04-25T12:48:43.084Z",
+      "endedAt": "2026-04-25T12:48:43.109Z",
+      "durationMs": 25,
+      "statusCode": 200,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "profilePictureUrl": "http://localhost:3000/uploads/profiles/6a6aa2e9-cd7c-4662-a391-3099fdce5e93/picture_1777121323102.jpg"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "fileExists": true
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "events": "NOT_REQUIRED",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS"
+  },
+  "failures": [],
+  "finalSummary": "Companion profile module test executed successfully.",
+  "testDataCreated": [
+    {
+      "entity": "user",
+      "id": "6a6aa2e9-cd7c-4662-a391-3099fdce5e93",
+      "marker": "RUN-20260425-003"
+    },
+    {
+      "entity": "companion_profile",
+      "id": "38b2df07-8824-4a80-9c3c-b211aab00df8",
+      "marker": "RUN-20260425-003"
+    }
+  ]
+}

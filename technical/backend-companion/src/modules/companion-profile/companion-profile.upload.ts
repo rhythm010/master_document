@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import multer from "multer";
+import process from "node:process";
 
 import { AppError } from "../../shared/errors/appError";
 import { ErrorCodes } from "../../shared/errors/errorCodes";

@@ -12,6 +12,7 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ) {
+  void _next;
   // Application errors already include a status and code.
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ code: err.code, message: err.message });

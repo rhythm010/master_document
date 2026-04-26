@@ -1,0 +1,114 @@
+{
+  "testId": "MOD-COMPANION-PROFILE-004",
+  "type": "module",
+  "moduleOwner": "companion-profile",
+  "priority": "P1",
+  "scenarioName": "Update Profile Languages Success",
+  "flowType": "happy",
+  "linkedRequirement": "companion-profile/update-profile",
+  "filePath": "src/modules/companion-profile/__tests__/MOD-COMPANION-PROFILE-004-update-languages.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate PATCH /companion-profiles/me updates languages and deduplicates",
+  "preconditions": ["Companion user exists with profile"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-companion",
+        "role": "COMPANION",
+        "email": "companion@test.com",
+        "password_hash": "hashed",
+        "email_verified": true
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "profile-001",
+        "user_id": "user-companion",
+        "designation": "CAPTAIN",
+        "is_active": true,
+        "languages": [],
+        "profile_picture_url": "",
+        "average_rating": 0.0
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "user-companion",
+      "role": "COMPANION",
+      "email": "companion@test.com",
+      "storeAs": "authToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "PATCH",
+      "endpoint": "/companion-profiles/me",
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      },
+      "payload": {
+        "languages": ["ENGLISH", "ENGLISH", "ARABIC"]
+      }
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "where": {
+        "field": "user_id",
+        "value": "user-companion"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "bodyFields": {
+          "languages": ["ENGLISH", "ARABIC"]
+        }
+      }
+    ],
+    "db": [
+      {
+        "step": 3,
+        "table": "companion_profiles",
+        "checks": [
+          "row exists",
+          "languages contains ENGLISH",
+          "languages contains ARABIC",
+          "languages array length = 2"
+        ]
+      }
+    ],
+    "mustNotOccur": ["duplicate language values in array"]
+  },
+  "cleanup": ["Delete companion_profile row", "Delete user row"],
+  "passCriteria": [
+    "API returns 200",
+    "Languages updated in database",
+    "Duplicates removed",
+    "Array contains unique values only"
+  ]
+}

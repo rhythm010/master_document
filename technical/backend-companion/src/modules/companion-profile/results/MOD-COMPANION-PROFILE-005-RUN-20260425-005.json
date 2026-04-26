@@ -1,0 +1,76 @@
+{
+  "runId": "RUN-20260425-005",
+  "testId": "MOD-COMPANION-PROFILE-005",
+  "status": "PASS",
+  "startedAt": "2026-04-25T12:48:43.171Z",
+  "endedAt": "2026-04-25T12:48:43.180Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/companion-profile-and-activation.feature-sds.md",
+    "/technical/backend-companion/src/modules/companion-profile/__tests__/mod-companion-profile-005.json"
+  ],
+  "testDataValidation": {
+    "designerDataValid": false,
+    "issuesFound": [
+      "seed user.id not UUID (user-client/user-companion)",
+      "seed user missing name/nickname/biometric_auth_enabled",
+      "seed companion_profile.id not UUID (profile-001)"
+    ],
+    "autoCorrectionsApplied": [
+      "generated UUIDs for user/profile ids",
+      "added name/nickname/biometricAuthEnabled=false"
+    ]
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "queue": "NOT_REQUIRED"
+  },
+  "serviceHitLog": [
+    {
+      "step": 2,
+      "target": "PATCH /companion-profiles/me",
+      "startedAt": "2026-04-25T12:48:43.175Z",
+      "endedAt": "2026-04-25T12:48:43.179Z",
+      "durationMs": 4,
+      "statusCode": 200,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "profilePictureUrl": "https://storage.companion.app/profiles/user-companion/picture.jpg"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS"
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "events": "NOT_REQUIRED",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS"
+  },
+  "failures": [],
+  "finalSummary": "Companion profile module test executed successfully.",
+  "testDataCreated": [
+    {
+      "entity": "user",
+      "id": "527b30ba-c1e9-478d-998b-fa6302de0386",
+      "marker": "RUN-20260425-005"
+    },
+    {
+      "entity": "companion_profile",
+      "id": "2c04e8bb-10bf-43d3-a8e0-35f58576c682",
+      "marker": "RUN-20260425-005"
+    }
+  ]
+}

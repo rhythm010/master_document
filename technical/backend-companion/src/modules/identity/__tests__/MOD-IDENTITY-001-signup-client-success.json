@@ -1,0 +1,117 @@
+{
+  "testId": "MOD-IDENTITY-001",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P1",
+  "scenarioName": "Signup CLIENT Successfully",
+  "flowType": "happy",
+  "linkedRequirement": "identity/signup",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-001-signup-client-success.json",
+  "executionMode": "api+db+events",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Validate CLIENT signup creates user, sends verification email, returns correct response",
+  "preconditions": [
+    "Database seeded with no conflicting email",
+    "Mailpit running on localhost:8025"
+  ],
+  "seedData": [],
+  "waitPolicy": {
+    "maxSeconds": 10,
+    "pollEveryMs": 500,
+    "retryCount": 20
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "CLIENT",
+        "name": "Test Client",
+        "nickname": "testclient",
+        "email": "client@test.com",
+        "password": "Test123!@#",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": ["id"]
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "idFromStep": 1,
+        "field": "id"
+      }
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Check verification email sent to Mailpit",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "client@test.com"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 201,
+        "bodyFields": {
+          "role": "CLIENT",
+          "name": "Test Client",
+          "nickname": "testclient",
+          "email": "client@test.com",
+          "emailVerified": false,
+          "biometricAuthEnabled": false
+        },
+        "requiredKeys": ["id", "createdAt"]
+      }
+    ],
+    "db": [
+      {
+        "step": 2,
+        "table": "users",
+        "checks": [
+          "row exists",
+          "role=CLIENT",
+          "email=client@test.com",
+          "emailVerified=false",
+          "biometricAuthEnabled=false",
+          "passwordHash is not null"
+        ]
+      },
+      {
+        "step": 2,
+        "table": "companion_profiles",
+        "checks": ["no row exists for userId"]
+      }
+    ],
+    "external": [
+      {
+        "step": 3,
+        "description": "Email sent to Mailpit",
+        "checks": ["email exists", "to=client@test.com", "contains verification token"]
+      }
+    ],
+    "mustNotOccur": ["companion_profiles row created", "duplicate user row"]
+  },
+  "cleanup": ["Delete user row", "Clear Mailpit messages"],
+  "passCriteria": [
+    "API returns 201",
+    "User row exists with correct data",
+    "No companion profile created",
+    "Verification email sent",
+    "Password is hashed"
+  ]
+}

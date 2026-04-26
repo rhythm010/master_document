@@ -1,0 +1,55 @@
+{
+  "runId": "RUN-20260425-205508-007",
+  "testId": "MOD-IDENTITY-007",
+  "status": "FAIL",
+  "startedAt": "2026-04-25T20:55:13.300Z",
+  "endedAt": "2026-04-25T20:55:13.500Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": false,
+    "issuesFound": [
+      "Password hash generation via Node bcrypt returned invalid or empty hash"
+    ],
+    "autoCorrectionsApplied": []
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-25T20:55:13.350Z",
+      "endedAt": "2026-04-25T20:55:13.450Z",
+      "durationMs": 100,
+      "statusCode": 401,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "FAIL",
+      "observed": {
+        "statusCode": 401,
+        "expectedStatusCode": 200,
+        "error": "INVALID_CREDENTIALS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "actions": ["Deleted seeded user"]
+  },
+  "failures": [
+    "**DATA ISSUE**: Bcrypt password hash could not be generated properly in test setup. The seeded user's password_hash did not match the login password. This is a test data preparation issue - proper bcrypt hash generation is required for login tests."
+  ],
+  "finalSummary": "TEST DATA ISSUE: Login failed because the seeded user's password hash was not properly generated. User guidance: Use actual signup API to create test users for login tests, or use a pre-generated valid bcrypt hash."
+}

@@ -1,0 +1,104 @@
+{
+  "testId": "MOD-COMPANION-PROFILE-003",
+  "type": "module",
+  "moduleOwner": "companion-profile",
+  "priority": "P2",
+  "scenarioName": "Upload Profile Picture Success",
+  "flowType": "happy",
+  "linkedRequirement": "companion-profile/upload-picture",
+  "filePath": "src/modules/companion-profile/__tests__/MOD-COMPANION-PROFILE-003-upload-picture.json",
+  "executionMode": "api+filesystem",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate POST /companion-profiles/upload-picture uploads image and returns URL",
+  "preconditions": ["Companion user exists", "Uploads directory writable"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-companion",
+        "role": "COMPANION",
+        "email": "companion@test.com",
+        "password_hash": "hashed",
+        "email_verified": true
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "profile-001",
+        "user_id": "user-companion",
+        "designation": "CAPTAIN",
+        "is_active": true
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "user-companion",
+      "role": "COMPANION",
+      "email": "companion@test.com",
+      "storeAs": "authToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/companion-profiles/upload-picture",
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      },
+      "contentType": "multipart/form-data",
+      "files": {
+        "picture": "test-fixtures/sample-image.jpg"
+      },
+      "storeResponseFields": ["profilePictureUrl"]
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "filesystemCheck",
+      "description": "Verify file exists on disk",
+      "path": "{{profilePictureUrl}}"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "requiredKeys": ["profilePictureUrl"],
+        "checks": ["profilePictureUrl is valid URL", "profilePictureUrl contains user-companion"]
+      }
+    ],
+    "filesystem": [
+      {
+        "step": 3,
+        "checks": ["file exists", "file is readable", "file is JPEG or PNG"]
+      }
+    ],
+    "mustNotOccur": ["companion_profiles.profile_picture_url updated"]
+  },
+  "cleanup": ["Delete uploaded file", "Delete companion_profile row", "Delete user row"],
+  "passCriteria": [
+    "API returns 200",
+    "File uploaded to storage",
+    "Valid URL returned",
+    "File accessible",
+    "Profile NOT automatically updated (requires separate PATCH)"
+  ]
+}

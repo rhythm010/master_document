@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import process from "node:process";
 
 import { identityRouter } from "./modules/identity";
 import { companionProfileRouter } from "./modules/companion-profile";

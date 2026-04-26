@@ -1,3 +1,4 @@
+import { describe, test, expect, jest } from "@jest/globals";
 import { EmailRateLimiter } from "../rateLimiter";
 
 // Basic behavior tests for the in-memory email rate limiter.

@@ -1,0 +1,114 @@
+{
+  "runId": "RUN-20260425-201831",
+  "testId": "MOD-COMPANION-PROFILE-002",
+  "status": "PASS",
+  "startedAt": "2026-04-25T20:23:07.341Z",
+  "endedAt": "2026-04-25T20:23:07.644Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/companion-profile-and-activation.feature-sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": true,
+    "issuesFound": [],
+    "autoCorrectionsApplied": [
+      "Generated UUID for user ID: bfc9778f-3bcb-492a-8b24-acd0c768f041",
+      "Using run-specific email: client+RUN-20260425-201831@test.com",
+      "Will generate proper bcrypt hash instead of placeholder \"hashed\""
+    ]
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": "ENV_CHECK",
+      "target": "Environment validation",
+      "startedAt": "2026-04-25T20:23:07.342Z",
+      "endedAt": "2026-04-25T20:23:07.395Z",
+      "durationMs": 53,
+      "result": "PASS"
+    },
+    {
+      "step": "SETUP",
+      "target": "Prisma user.create",
+      "startedAt": "2026-04-25T20:23:07.395Z",
+      "endedAt": "2026-04-25T20:23:07.634Z",
+      "durationMs": 239,
+      "result": "PASS"
+    },
+    {
+      "step": 1,
+      "target": "Generate JWT token",
+      "startedAt": "2026-04-25T20:23:07.634Z",
+      "endedAt": "2026-04-25T20:23:07.636Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 2,
+      "target": "GET /companion-profiles/me",
+      "startedAt": "2026-04-25T20:23:07.636Z",
+      "endedAt": "2026-04-25T20:23:07.638Z",
+      "durationMs": 2,
+      "statusCode": 403,
+      "result": "PASS"
+    },
+    {
+      "step": "CLEANUP",
+      "target": "Prisma user.delete",
+      "startedAt": "2026-04-25T20:23:07.639Z",
+      "endedAt": "2026-04-25T20:23:07.644Z",
+      "durationMs": 5,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "tokenGenerated": true,
+        "tokenRole": "CLIENT"
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "statusCode": 403,
+        "responseBody": {
+          "code": "FORBIDDEN",
+          "message": "Forbidden"
+        }
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS"
+  },
+  "failures": [],
+  "finalSummary": "Negative test PASSED. API correctly returned 403 FORBIDDEN for CLIENT role user attempting to access companion-only endpoint. Authorization logic validated successfully.",
+  "apiResponse": {
+    "status": 403,
+    "data": {
+      "code": "FORBIDDEN",
+      "message": "Forbidden"
+    },
+    "headers": {
+      "x-powered-by": "Express",
+      "content-type": "application/json; charset=utf-8",
+      "content-length": "42",
+      "etag": "W/\"2a-+AcFI9xT7wljMd2muUERu/zk28E\"",
+      "date": "Sat, 25 Apr 2026 20:23:07 GMT",
+      "connection": "keep-alive",
+      "keep-alive": "timeout=5"
+    }
+  }
+}

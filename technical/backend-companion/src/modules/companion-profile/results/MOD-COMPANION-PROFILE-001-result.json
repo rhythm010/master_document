@@ -1,0 +1,81 @@
+{
+  "runId": "RUN-2026-04-25-590398",
+  "testId": "MOD-COMPANION-PROFILE-001",
+  "status": "PASS",
+  "startedAt": "2026-04-25T20:06:30.398Z",
+  "endedAt": "2026-04-25T20:06:30.493Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/companion-profile-and-activation.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": false,
+    "issuesFound": [
+      "Test data IDs already exist in database"
+    ],
+    "autoCorrectionsApplied": [
+      "Cleaned up existing test data before seeding"
+    ]
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "JWT Token Generation",
+      "startedAt": "2026-04-25T20:06:30.452Z",
+      "endedAt": "2026-04-25T20:06:30.454Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 2,
+      "target": "GET /companion-profiles/me",
+      "startedAt": "2026-04-25T20:06:30.454Z",
+      "endedAt": "2026-04-25T20:06:30.487Z",
+      "durationMs": 33,
+      "statusCode": 200,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "tokenGenerated": true
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "id": "a2a4f4b7-1b1f-4f0b-9dd1-1d8a0bb5b2b0",
+        "userId": "3b7a9e2a-7c8c-4b6b-9c1f-8d0f0bfb3f9a",
+        "designation": "CAPTAIN",
+        "isActive": true,
+        "languages": [
+          "ENGLISH"
+        ],
+        "profilePictureUrl": "https://example.com/pic.jpg",
+        "averageRating": 4.25
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "details": [
+      "Deleted companion_profile a2a4f4b7-1b1f-4f0b-9dd1-1d8a0bb5b2b0",
+      "Deleted user 3b7a9e2a-7c8c-4b6b-9c1f-8d0f0bfb3f9a"
+    ]
+  },
+  "failures": [],
+  "finalSummary": "All assertions passed. Profile data retrieved successfully with correct field types and values."
+}

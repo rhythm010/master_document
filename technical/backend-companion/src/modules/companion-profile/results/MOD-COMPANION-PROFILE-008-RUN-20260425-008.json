@@ -1,0 +1,76 @@
+{
+  "runId": "RUN-20260425-008",
+  "testId": "MOD-COMPANION-PROFILE-008",
+  "status": "PASS",
+  "startedAt": "2026-04-25T12:48:43.210Z",
+  "endedAt": "2026-04-25T12:48:43.221Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/companion-profile-and-activation.feature-sds.md",
+    "/technical/backend-companion/src/modules/companion-profile/__tests__/mod-companion-profile-008.json"
+  ],
+  "testDataValidation": {
+    "designerDataValid": false,
+    "issuesFound": [
+      "seed user.id not UUID (user-client/user-companion)",
+      "seed user missing name/nickname/biometric_auth_enabled",
+      "seed companion_profile.id not UUID (profile-001)"
+    ],
+    "autoCorrectionsApplied": [
+      "generated UUIDs for user/profile ids",
+      "added name/nickname/biometricAuthEnabled=false"
+    ]
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "queue": "NOT_REQUIRED"
+  },
+  "serviceHitLog": [
+    {
+      "step": 2,
+      "target": "PATCH /companion-profiles/toggle-active",
+      "startedAt": "2026-04-25T12:48:43.215Z",
+      "endedAt": "2026-04-25T12:48:43.219Z",
+      "durationMs": 4,
+      "statusCode": 200,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "isActive": true
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS"
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "events": "NOT_REQUIRED",
+    "mustNotOccur": "PASS"
+  },
+  "cleanup": {
+    "status": "PASS"
+  },
+  "failures": [],
+  "finalSummary": "Companion profile module test executed successfully.",
+  "testDataCreated": [
+    {
+      "entity": "user",
+      "id": "00d1c65c-bd73-4dd8-9086-a129efb0d193",
+      "marker": "RUN-20260425-008"
+    },
+    {
+      "entity": "companion_profile",
+      "id": "32752604-f768-4761-9583-2449f6c7b366",
+      "marker": "RUN-20260425-008"
+    }
+  ]
+}

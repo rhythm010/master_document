@@ -1,0 +1,97 @@
+{
+  "testId": "MOD-COMPANION-PROFILE-001",
+  "type": "module",
+  "moduleOwner": "companion-profile",
+  "priority": "P1",
+  "scenarioName": "Get Companion Profile Success",
+  "flowType": "happy",
+  "linkedRequirement": "companion-profile/get-me",
+  "filePath": "src/modules/companion-profile/__tests__/MOD-COMPANION-PROFILE-001-get-profile-success.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate GET /companion-profiles/me returns companion profile for authenticated companion",
+  "preconditions": ["Companion user exists with profile"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "3b7a9e2a-7c8c-4b6b-9c1f-8d0f0bfb3f9a",
+        "role": "COMPANION",
+        "name": "Test Companion",
+        "nickname": "testcomp",
+        "email": "companion@test.com",
+        "password_hash": "hashed",
+        "email_verified": true,
+        "biometric_auth_enabled": false
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "a2a4f4b7-1b1f-4f0b-9dd1-1d8a0bb5b2b0",
+        "user_id": "3b7a9e2a-7c8c-4b6b-9c1f-8d0f0bfb3f9a",
+        "designation": "CAPTAIN",
+        "is_active": true,
+        "languages": ["ENGLISH"],
+        "profile_picture_url": "https://example.com/pic.jpg",
+        "average_rating": 4.25
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "3b7a9e2a-7c8c-4b6b-9c1f-8d0f0bfb3f9a",
+      "role": "COMPANION",
+      "email": "companion@test.com",
+      "storeAs": "authToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/companion-profiles/me",
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "bodyFields": {
+          "id": "a2a4f4b7-1b1f-4f0b-9dd1-1d8a0bb5b2b0",
+          "userId": "3b7a9e2a-7c8c-4b6b-9c1f-8d0f0bfb3f9a",
+          "designation": "CAPTAIN",
+          "isActive": true,
+          "languages": ["ENGLISH"],
+          "profilePictureUrl": "https://example.com/pic.jpg",
+          "averageRating": 4.25
+        }
+      }
+    ],
+    "mustNotOccur": []
+  },
+  "cleanup": ["Delete companion_profile row", "Delete user row"],
+  "passCriteria": [
+    "API returns 200",
+    "Profile data matches database",
+    "Average rating converted to number"
+  ]
+}

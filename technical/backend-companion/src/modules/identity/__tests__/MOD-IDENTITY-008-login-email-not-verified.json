@@ -1,0 +1,69 @@
+{
+  "testId": "MOD-IDENTITY-008",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P1",
+  "scenarioName": "Login Rejects Unverified Email",
+  "flowType": "negative",
+  "linkedRequirement": "identity/login",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-008-login-email-not-verified.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate login rejects users with unverified email addresses",
+  "preconditions": ["Unverified user exists with correct password"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-unverified",
+        "role": "CLIENT",
+        "email": "unverified@test.com",
+        "password": "Test123!@#",
+        "passwordHash": "bcrypt_hashed_Test123!@#",
+        "emailVerified": false
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "unverified@test.com",
+        "password": "Test123!@#"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 403,
+        "bodyFields": {
+          "code": "EMAIL_NOT_VERIFIED"
+        },
+        "requiredKeys": ["code", "message"]
+      }
+    ],
+    "mustNotOccur": ["accessToken returned", "login success"]
+  },
+  "cleanup": ["Delete seeded user"],
+  "passCriteria": [
+    "API returns 403 EMAIL_NOT_VERIFIED",
+    "No access token issued",
+    "User cannot authenticate"
+  ]
+}

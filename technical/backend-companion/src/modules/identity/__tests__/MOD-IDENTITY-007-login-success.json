@@ -1,0 +1,102 @@
+{
+  "testId": "MOD-IDENTITY-007",
+  "type": "module",
+  "moduleOwner": "identity",
+  "priority": "P1",
+  "scenarioName": "Login Success with Valid Credentials",
+  "flowType": "happy",
+  "linkedRequirement": "identity/login",
+  "filePath": "src/modules/identity/__tests__/MOD-IDENTITY-007-login-success.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate login returns JWT token for verified user with correct credentials",
+  "preconditions": ["Verified user exists with known password"],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-verified",
+        "role": "CLIENT",
+        "email": "verified@test.com",
+        "password": "Test123!@#",
+        "passwordHash": "bcrypt_hashed_Test123!@#",
+        "emailVerified": true
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "verified@test.com",
+        "password": "Test123!@#"
+      },
+      "storeResponseFields": ["accessToken", "user.id"]
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "validateJWT",
+      "token": "{{accessToken}}",
+      "expectedClaims": {
+        "sub": "user-verified",
+        "role": "CLIENT",
+        "email": "verified@test.com"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 200,
+        "bodyFields": {
+          "tokenType": "Bearer",
+          "expiresInSeconds": 3600,
+          "user": {
+            "role": "CLIENT",
+            "email": "verified@test.com",
+            "emailVerified": true
+          }
+        },
+        "requiredKeys": ["accessToken", "tokenType", "expiresInSeconds", "user"]
+      }
+    ],
+    "jwt": [
+      {
+        "step": 2,
+        "checks": [
+          "token signature valid",
+          "sub=user-verified",
+          "role=CLIENT",
+          "email=verified@test.com",
+          "exp claim exists",
+          "token not expired"
+        ]
+      }
+    ],
+    "mustNotOccur": ["password returned in response", "password_hash exposed"]
+  },
+  "cleanup": ["Delete seeded user"],
+  "passCriteria": [
+    "API returns 200",
+    "Valid JWT access token returned",
+    "Token contains correct user claims",
+    "User profile included in response",
+    "Password never exposed"
+  ]
+}
