@@ -1,0 +1,691 @@
+{
+  "runId": "RUN-20260427170959-JRN-003",
+  "testId": "JRN-003",
+  "status": "FAIL",
+  "startedAt": "2026-04-27T17:09:59.418Z",
+  "endedAt": "2026-04-27T17:12:15.401Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-27T17:09:59.486Z",
+      "endedAt": "2026-04-27T17:09:59.488Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-27T17:09:59.488Z",
+      "endedAt": "2026-04-27T17:10:44.743Z",
+      "durationMs": 45255,
+      "result": "FAIL"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-27T17:10:44.743Z",
+      "endedAt": "2026-04-27T17:10:44.765Z",
+      "durationMs": 22,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-27T17:10:44.765Z",
+      "endedAt": "2026-04-27T17:10:44.770Z",
+      "durationMs": 5,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 5,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-27T17:10:44.770Z",
+      "endedAt": "2026-04-27T17:10:44.771Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 6,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-27T17:10:44.771Z",
+      "endedAt": "2026-04-27T17:11:30.042Z",
+      "durationMs": 45271,
+      "result": "FAIL"
+    },
+    {
+      "step": 7,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-27T17:11:30.042Z",
+      "endedAt": "2026-04-27T17:11:30.056Z",
+      "durationMs": 14,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 8,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-27T17:11:30.056Z",
+      "endedAt": "2026-04-27T17:11:30.060Z",
+      "durationMs": 4,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 9,
+      "target": "",
+      "startedAt": "2026-04-27T17:11:30.060Z",
+      "endedAt": "2026-04-27T17:11:30.060Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    },
+    {
+      "step": 10,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-27T17:11:30.061Z",
+      "endedAt": "2026-04-27T17:11:30.062Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 11,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-27T17:11:30.062Z",
+      "endedAt": "2026-04-27T17:12:15.335Z",
+      "durationMs": 45273,
+      "result": "FAIL"
+    },
+    {
+      "step": 12,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-27T17:12:15.336Z",
+      "endedAt": "2026-04-27T17:12:15.352Z",
+      "durationMs": 16,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 13,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-27T17:12:15.352Z",
+      "endedAt": "2026-04-27T17:12:15.355Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 14,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-04-27T17:12:15.355Z",
+      "endedAt": "2026-04-27T17:12:15.377Z",
+      "durationMs": 22,
+      "result": "FAIL"
+    },
+    {
+      "step": 15,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-04-27T17:12:15.377Z",
+      "endedAt": "2026-04-27T17:12:15.379Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 16,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-04-27T17:12:15.379Z",
+      "endedAt": "2026-04-27T17:12:15.381Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 17,
+      "target": "GET /availability",
+      "startedAt": "2026-04-27T17:12:15.381Z",
+      "endedAt": "2026-04-27T17:12:15.382Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 18,
+      "target": "POST /roster-slots/reserve",
+      "startedAt": "2026-04-27T17:12:15.382Z",
+      "endedAt": "2026-04-27T17:12:15.382Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 19,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-04-27T17:12:15.382Z",
+      "endedAt": "2026-04-27T17:12:15.398Z",
+      "durationMs": 16,
+      "result": "PASS"
+    },
+    {
+      "step": 20,
+      "target": "POST /roster-slots/release",
+      "startedAt": "2026-04-27T17:12:15.398Z",
+      "endedAt": "2026-04-27T17:12:15.399Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 21,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-04-27T17:12:15.399Z",
+      "endedAt": "2026-04-27T17:12:15.400Z",
+      "durationMs": 1,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT signs up",
+      "layman": "Create a new client account.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-27T17:09:59.486Z",
+        "endedAt": "2026-04-27T17:09:59.488Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 2,
+      "result": "FAIL",
+      "observed": {
+        "emailFound": false
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve CLIENT verification email from Mailpit and extract token",
+      "layman": "Confirm the verification email was sent and extract the verification token.",
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-27T17:09:59.488Z",
+        "endedAt": "2026-04-27T17:10:44.743Z",
+        "durationMs": 45255,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT verifies email",
+      "layman": "Verify the client email so login can succeed.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-27T17:10:44.743Z",
+        "endedAt": "2026-04-27T17:10:44.765Z",
+        "durationMs": 22,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT logs in",
+      "layman": "Log the client in and store the Bearer token for authenticated calls.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-27T17:10:44.765Z",
+        "endedAt": "2026-04-27T17:10:44.770Z",
+        "durationMs": 5,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION A signs up",
+      "layman": "Create the first companion account (system assigns CAPTAIN or VICE_CAPTAIN automatically).",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 5,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-27T17:10:44.770Z",
+        "endedAt": "2026-04-27T17:10:44.771Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 6,
+      "result": "FAIL",
+      "observed": {
+        "emailFound": false
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve COMPANION A verification email from Mailpit and extract token",
+      "layman": "Confirm the companion email was sent and extract the verification token.",
+      "serviceHit": {
+        "step": 6,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-27T17:10:44.771Z",
+        "endedAt": "2026-04-27T17:11:30.042Z",
+        "durationMs": 45271,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION A verifies email",
+      "layman": "Verify the companion email so login can succeed.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 7,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-27T17:11:30.042Z",
+        "endedAt": "2026-04-27T17:11:30.056Z",
+        "durationMs": 14,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION A logs in",
+      "layman": "Log companion A in and store its Bearer token.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 8,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-27T17:11:30.056Z",
+        "endedAt": "2026-04-27T17:11:30.060Z",
+        "durationMs": 4,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 9,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbExec",
+      "description": "Create booking row in DB (required for roster reserve FK)",
+      "layman": "Create a booking record so reserving roster slots can attach bookingId without a foreign-key error.",
+      "serviceHit": {
+        "step": 9,
+        "target": "",
+        "startedAt": "2026-04-27T17:11:30.060Z",
+        "endedAt": "2026-04-27T17:11:30.060Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION B signs up",
+      "layman": "Create the second companion account so the roster can form a CAPTAIN+VICE_CAPTAIN duo.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 10,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-27T17:11:30.061Z",
+        "endedAt": "2026-04-27T17:11:30.062Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 11,
+      "result": "FAIL",
+      "observed": {
+        "emailFound": false
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve COMPANION B verification email from Mailpit and extract token",
+      "layman": "Confirm the companion email was sent and extract the verification token.",
+      "serviceHit": {
+        "step": 11,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-27T17:11:30.062Z",
+        "endedAt": "2026-04-27T17:12:15.335Z",
+        "durationMs": 45273,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 12,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION B verifies email",
+      "layman": "Verify the companion email so login can succeed.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 12,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-27T17:12:15.336Z",
+        "endedAt": "2026-04-27T17:12:15.352Z",
+        "durationMs": 16,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 13,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION B logs in",
+      "layman": "Log companion B in and store its Bearer token.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 13,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-27T17:12:15.352Z",
+        "endedAt": "2026-04-27T17:12:15.355Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 14,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: COMPANION B has a companion_profile row",
+      "layman": "Confirm the system provisioned a companion profile for companion B during signup.",
+      "serviceHit": {
+        "step": 14,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-04-27T17:12:15.355Z",
+        "endedAt": "2026-04-27T17:12:15.377Z",
+        "durationMs": 22,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 15,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "description": "Assign venue to COMPANION A and populate roster slots",
+      "layman": "Link companion A to the venue and generate roster slots (internal operation).",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 15,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-04-27T17:12:15.377Z",
+        "endedAt": "2026-04-27T17:12:15.379Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 16,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "description": "Assign venue to COMPANION B and populate roster slots",
+      "layman": "Link companion B to the venue and generate roster slots (internal operation).",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 16,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-04-27T17:12:15.379Z",
+        "endedAt": "2026-04-27T17:12:15.381Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 17,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT checks availability for the seeded venue on the target date",
+      "layman": "Confirm the venue has at least one 2-hour start time available once companions are assigned.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 17,
+        "target": "GET /availability",
+        "startedAt": "2026-04-27T17:12:15.381Z",
+        "endedAt": "2026-04-27T17:12:15.382Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 18,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "description": "Reserve CAPTAIN+VICE_CAPTAIN roster duo for the booking window",
+      "layman": "Book a roster duo for a 2-hour window (internal booking integration step).",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 18,
+        "target": "POST /roster-slots/reserve",
+        "startedAt": "2026-04-27T17:12:15.382Z",
+        "endedAt": "2026-04-27T17:12:15.382Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 19,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 0
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: roster_slots rows exist with booking_id set",
+      "layman": "Confirm the booking reserved at least one slot in the database (should be 2 rows for a duo).",
+      "serviceHit": {
+        "step": 19,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-04-27T17:12:15.382Z",
+        "endedAt": "2026-04-27T17:12:15.398Z",
+        "durationMs": 16,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 20,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "description": "Release roster slots for the booking (cleanup)",
+      "layman": "Undo the reservation to keep the environment reusable for future runs.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 20,
+        "target": "POST /roster-slots/release",
+        "startedAt": "2026-04-27T17:12:15.398Z",
+        "endedAt": "2026-04-27T17:12:15.399Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 21,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 0
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: roster_slots rows no longer have booking_id",
+      "layman": "Confirm the release cleared booking_id (no rows should match).",
+      "serviceHit": {
+        "step": 21,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-04-27T17:12:15.399Z",
+        "endedAt": "2026-04-27T17:12:15.400Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL",
+    "db": "FAIL",
+    "external": "FAIL",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 2,
+      "reason": "Step failed",
+      "evidence": {
+        "emailFound": false
+      }
+    },
+    {
+      "step": 6,
+      "reason": "Step failed",
+      "evidence": {
+        "emailFound": false
+      }
+    },
+    {
+      "step": 9,
+      "reason": "Unsupported actionType",
+      "evidence": "dbExec"
+    },
+    {
+      "step": 9,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 11,
+      "reason": "Step failed",
+      "evidence": {
+        "emailFound": false
+      }
+    },
+    {
+      "step": 14,
+      "reason": "Step execution failed",
+      "evidence": "error: invalid input syntax for type uuid: \"{{companionBUserId}}\""
+    },
+    {
+      "step": 14,
+      "reason": "Step failed",
+      "evidence": {}
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

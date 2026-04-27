@@ -10,6 +10,7 @@
     "test": "jest --forceExit --detectOpenHandles",
     "test:ci": "jest --ci --json --outputFile=test-results.json",
     "test:validator": "./run_tests.sh",
+    "test:validator:node": "tsx src/test-runner/index.ts",
     "test:journey": "./run_tests.sh qa/JRN-*.json",
     "test:identity": "python3 test_runner.py src/modules/identity/__tests__/*.json",
     "lint": "eslint src/ --cache",
@@ -33,6 +34,7 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.5",
     "pino": "^9.9.1",
+    "pg": "^8.16.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {

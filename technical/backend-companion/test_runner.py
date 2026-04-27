@@ -209,8 +209,8 @@ class TestValidator:
                 if step_result["result"] != "PASS":
                     report["failures"].append(f"Step {step_num} failed: {step_result.get('error', 'Unknown')}")
                 
-                # Add delay after step 7 to avoid rate limiting on consecutive login attempts
-                if step_num == 7 and step.get("endpoint") == "/auth/login":
+                # Add delay after ANY login attempt to reduce flakiness from IP-based rate limiting
+                if step.get("endpoint") == "/auth/login":
                     print(f"[RATE_LIMIT_PROTECTION] Waiting 3 seconds before next step...")
                     time.sleep(3)
                     
@@ -338,6 +338,11 @@ class TestValidator:
                 db_result = self.execute_db_query(step, context, test_def)
                 result.update(db_result)
                 result["serviceHit"]["target"] = f"DB {step['target']} query"
+
+            elif step["actionType"] == "dbExec":
+                db_result = self.execute_db_exec(step, context, test_def)
+                result.update(db_result)
+                result["serviceHit"]["target"] = "DB exec"
 
             elif step["actionType"] == "externalCheck":
                 ext_result = self.execute_external_check(step, context, test_def)
@@ -478,6 +483,31 @@ class TestValidator:
             "result": "PASS" if result.returncode == 0 else "FAIL",
             "observed": {"dbResult": stdout, "dbError": stderr if stderr else None}
         }
+
+    def execute_db_exec(self, step: Dict, context: Dict, test_def: Dict) -> Dict:
+        """Execute an arbitrary SQL statement (INSERT/UPDATE/DELETE/etc)."""
+        sql = step.get("sql") or step.get("sqlTemplate")
+        if not sql:
+            return {"result": "FAIL", "error": "Missing sql for dbExec"}
+
+        rendered = self._render_template(sql, context)
+        result = self._db_exec(rendered)
+
+        stdout = (result.stdout or "").strip()
+        stderr = (result.stderr or "").strip()
+
+        print(f"  ✓ SQL: {rendered}")
+        if stdout:
+            print(f"  ✓ Result: {stdout}")
+        if stderr and result.returncode != 0:
+            print(f"  ❌ DB Error: {stderr}")
+
+        context[f"step{step['step']}_db_exec_stdout"] = stdout
+
+        if result.returncode != 0:
+            return {"result": "FAIL", "error": stderr or "dbExec failed", "observed": {"stdout": stdout, "stderr": stderr}}
+
+        return {"result": "PASS", "observed": {"stdout": stdout, "stderr": stderr if stderr else None}}
     
     def execute_external_check(self, step: Dict, context: Dict, test_def: Dict) -> Dict:
         """Execute external service check (e.g., Mailpit)"""
@@ -626,13 +656,18 @@ class TestValidator:
                 step_result = next((s for s in step_results if s["step"] == step_num), None)
                 db_result = (step_result or {}).get("observed", {}).get("dbResult", "")
                 checks = assertion.get("checks", []) or []
-                if any("no row exists" in c for c in checks):
+                has_no_row = any("no row exists" in c for c in checks)
+                has_at_least_one = any("at least 1 row exists" in c for c in checks)
+                has_row_exists = any("row exists" in c for c in checks)
+
+                # Make checks mutually exclusive ("no row exists" contains "row exists" as a substring).
+                if has_no_row:
                     if db_result:
                         db_pass = False
-                if any("row exists" in c for c in checks):
+                elif has_at_least_one:
                     if not db_result:
                         db_pass = False
-                if any("at least 1 row exists" in c for c in checks):
+                elif has_row_exists:
                     if not db_result:
                         db_pass = False
             summary["db"] = "PASS" if db_pass else "FAIL"

@@ -1,0 +1,679 @@
+{
+  "runId": "RUN-20260427-160001-JRN-003",
+  "testId": "JRN-003",
+  "status": "PASS",
+  "startedAt": "2026-04-27T16:00:01.795885Z",
+  "endedAt": "2026-04-27T16:00:16.790948Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": true,
+    "issuesFound": [],
+    "autoCorrectionsApplied": []
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-27T16:00:02.264806Z",
+      "endedAt": "2026-04-27T16:00:05.730435Z",
+      "durationMs": 3465,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-27T16:00:05.730475Z",
+      "endedAt": "2026-04-27T16:00:05.740399Z",
+      "durationMs": 9,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-27T16:00:05.740505Z",
+      "endedAt": "2026-04-27T16:00:05.756707Z",
+      "durationMs": 16,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-27T16:00:05.756756Z",
+      "endedAt": "2026-04-27T16:00:05.993001Z",
+      "durationMs": 236,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-27T16:00:08.993539Z",
+      "endedAt": "2026-04-27T16:00:09.269059Z",
+      "durationMs": 275,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 6,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-27T16:00:09.269075Z",
+      "endedAt": "2026-04-27T16:00:09.272580Z",
+      "durationMs": 3,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-27T16:00:09.272591Z",
+      "endedAt": "2026-04-27T16:00:09.275999Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-27T16:00:09.276013Z",
+      "endedAt": "2026-04-27T16:00:09.495259Z",
+      "durationMs": 219,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 9,
+      "target": "DB exec",
+      "startedAt": "2026-04-27T16:00:12.499324Z",
+      "endedAt": "2026-04-27T16:00:12.718092Z",
+      "durationMs": 218,
+      "result": "PASS"
+    },
+    {
+      "step": 10,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-27T16:00:12.718158Z",
+      "endedAt": "2026-04-27T16:00:12.974815Z",
+      "durationMs": 256,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 11,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-27T16:00:12.974838Z",
+      "endedAt": "2026-04-27T16:00:12.980615Z",
+      "durationMs": 5,
+      "result": "PASS"
+    },
+    {
+      "step": 12,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-27T16:00:12.980625Z",
+      "endedAt": "2026-04-27T16:00:12.985024Z",
+      "durationMs": 4,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 13,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-27T16:00:12.985035Z",
+      "endedAt": "2026-04-27T16:00:13.208116Z",
+      "durationMs": 223,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 14,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-04-27T16:00:16.213108Z",
+      "endedAt": "2026-04-27T16:00:16.428276Z",
+      "durationMs": 215,
+      "result": "PASS"
+    },
+    {
+      "step": 15,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-04-27T16:00:16.428318Z",
+      "endedAt": "2026-04-27T16:00:16.453139Z",
+      "durationMs": 24,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 16,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-04-27T16:00:16.453160Z",
+      "endedAt": "2026-04-27T16:00:16.468375Z",
+      "durationMs": 15,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 17,
+      "target": "GET /availability",
+      "startedAt": "2026-04-27T16:00:16.468408Z",
+      "endedAt": "2026-04-27T16:00:16.502809Z",
+      "durationMs": 34,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 18,
+      "target": "POST /roster-slots/reserve",
+      "startedAt": "2026-04-27T16:00:16.502838Z",
+      "endedAt": "2026-04-27T16:00:16.509900Z",
+      "durationMs": 7,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 19,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-04-27T16:00:16.509919Z",
+      "endedAt": "2026-04-27T16:00:16.661219Z",
+      "durationMs": 151,
+      "result": "PASS"
+    },
+    {
+      "step": 20,
+      "target": "POST /roster-slots/release",
+      "startedAt": "2026-04-27T16:00:16.661259Z",
+      "endedAt": "2026-04-27T16:00:16.665658Z",
+      "durationMs": 4,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 21,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-04-27T16:00:16.665671Z",
+      "endedAt": "2026-04-27T16:00:16.790711Z",
+      "durationMs": 125,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "2ffa3bcc-9c41-49cb-852a-8cefabb4a291",
+        "role": "CLIENT",
+        "name": "Journey Client 20260427160002",
+        "nickname": "journeyclient-jrn003-20260427160002",
+        "email": "client.jrn003+20260427160002@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-27T16:00:02.536Z"
+      },
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-27T16:00:02.264806Z",
+        "endedAt": "2026-04-27T16:00:05.730435Z",
+        "durationMs": 3465,
+        "result": "PASS",
+        "statusCode": 201
+      },
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-27T16:00:05.730475Z",
+        "endedAt": "2026-04-27T16:00:05.740399Z",
+        "durationMs": 9,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-27T16:00:05.740505Z",
+        "endedAt": "2026-04-27T16:00:05.756707Z",
+        "durationMs": 16,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZmZhM2JjYy05YzQxLTQ5Y2ItODUyYS04Y2VmYWJiNGEyOTEiLCJyb2xlIjoiQ0xJRU5UIiwiZW1haWwiOiJjbGllbnQuanJuMDAzKzIwMjYwNDI3MTYwMDAyQGpvdXJuZXkudGVzdCIsImlhdCI6MTc3NzMwNTYwNSwiZXhwIjoxNzc3MzA5MjA1fQ.ZySKgFzt3Hjsl-77n8yEiWvZ4v2m8dvpRD_7pG_XFNc",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "2ffa3bcc-9c41-49cb-852a-8cefabb4a291",
+          "role": "CLIENT",
+          "name": "Journey Client 20260427160002",
+          "nickname": "journeyclient-jrn003-20260427160002",
+          "email": "client.jrn003+20260427160002@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-04-27T16:00:02.536Z"
+        }
+      },
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-27T16:00:05.756756Z",
+        "endedAt": "2026-04-27T16:00:05.993001Z",
+        "durationMs": 236,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "id": "ead24ad7-35eb-4ab6-a9fc-13583ad27cba",
+        "role": "COMPANION",
+        "name": "Journey Companion 20260427160002",
+        "nickname": "journeycompanionA-jrn003-20260427160002",
+        "email": "companiona.jrn003+20260427160002@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": true,
+        "createdAt": "2026-04-27T16:00:09.251Z"
+      },
+      "serviceHit": {
+        "step": 5,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-27T16:00:08.993539Z",
+        "endedAt": "2026-04-27T16:00:09.269059Z",
+        "durationMs": 275,
+        "result": "PASS",
+        "statusCode": 201
+      },
+      "statusCode": 201
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "serviceHit": {
+        "step": 6,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-27T16:00:09.269075Z",
+        "endedAt": "2026-04-27T16:00:09.272580Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "serviceHit": {
+        "step": 7,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-27T16:00:09.272591Z",
+        "endedAt": "2026-04-27T16:00:09.275999Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlYWQyNGFkNy0zNWViLTRhYjYtYTlmYy0xMzU4M2FkMjdjYmEiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb25hLmpybjAwMysyMDI2MDQyNzE2MDAwMkBqb3VybmV5LnRlc3QiLCJpYXQiOjE3NzczMDU2MDksImV4cCI6MTc3NzMwOTIwOX0.vGzQlDFxU4dAJdT7mxTkpQl-ct91e2FOy84bM0kKh-A",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "ead24ad7-35eb-4ab6-a9fc-13583ad27cba",
+          "role": "COMPANION",
+          "name": "Journey Companion 20260427160002",
+          "nickname": "journeycompanionA-jrn003-20260427160002",
+          "email": "companiona.jrn003+20260427160002@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": true,
+          "createdAt": "2026-04-27T16:00:09.251Z"
+        }
+      },
+      "serviceHit": {
+        "step": 8,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-27T16:00:09.276013Z",
+        "endedAt": "2026-04-27T16:00:09.495259Z",
+        "durationMs": 219,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 9,
+      "result": "PASS",
+      "observed": {
+        "stdout": "INSERT 0 0",
+        "stderr": "time=\"2026-04-27T20:00:12+04:00\" level=warning msg=\"/Users/rhythmkhanna/Docs/COMPANION/master_document/technical/backend-companion/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion\""
+      },
+      "serviceHit": {
+        "step": 9,
+        "target": "DB exec",
+        "startedAt": "2026-04-27T16:00:12.499324Z",
+        "endedAt": "2026-04-27T16:00:12.718092Z",
+        "durationMs": 218,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "id": "a4cc503c-7d63-41f7-80ca-7b13bf72fa17",
+        "role": "COMPANION",
+        "name": "Journey Companion 20260427160002",
+        "nickname": "journeycompanionB-jrn003-20260427160002",
+        "email": "companionb.jrn003+20260427160002@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-27T16:00:12.959Z"
+      },
+      "serviceHit": {
+        "step": 10,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-27T16:00:12.718158Z",
+        "endedAt": "2026-04-27T16:00:12.974815Z",
+        "durationMs": 256,
+        "result": "PASS",
+        "statusCode": 201
+      },
+      "statusCode": 201
+    },
+    {
+      "step": 11,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "serviceHit": {
+        "step": 11,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-27T16:00:12.974838Z",
+        "endedAt": "2026-04-27T16:00:12.980615Z",
+        "durationMs": 5,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 12,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "serviceHit": {
+        "step": 12,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-27T16:00:12.980625Z",
+        "endedAt": "2026-04-27T16:00:12.985024Z",
+        "durationMs": 4,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 13,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNGNjNTAzYy03ZDYzLTQxZjctODBjYS03YjEzYmY3MmZhMTciLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb25iLmpybjAwMysyMDI2MDQyNzE2MDAwMkBqb3VybmV5LnRlc3QiLCJpYXQiOjE3NzczMDU2MTMsImV4cCI6MTc3NzMwOTIxM30.hkqKW6gA7wNYuEAhzgBvG3G99ygkzh9ud3wmfzOFvl0",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "a4cc503c-7d63-41f7-80ca-7b13bf72fa17",
+          "role": "COMPANION",
+          "name": "Journey Companion 20260427160002",
+          "nickname": "journeycompanionB-jrn003-20260427160002",
+          "email": "companionb.jrn003+20260427160002@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-04-27T16:00:12.959Z"
+        }
+      },
+      "serviceHit": {
+        "step": 13,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-27T16:00:12.985035Z",
+        "endedAt": "2026-04-27T16:00:13.208116Z",
+        "durationMs": 223,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 14,
+      "result": "PASS",
+      "observed": {
+        "dbResult": "9b12a21b-1fa2-4e32-b974-fa94580aaaa5|a4cc503c-7d63-41f7-80ca-7b13bf72fa17|VICE_CAPTAIN|t|{}||0.00",
+        "dbError": "time=\"2026-04-27T20:00:16+04:00\" level=warning msg=\"/Users/rhythmkhanna/Docs/COMPANION/master_document/technical/backend-companion/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion\""
+      },
+      "serviceHit": {
+        "step": 14,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-04-27T16:00:16.213108Z",
+        "endedAt": "2026-04-27T16:00:16.428276Z",
+        "durationMs": 215,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 15,
+      "result": "PASS",
+      "observed": {
+        "companionId": "ead24ad7-35eb-4ab6-a9fc-13583ad27cba",
+        "slotsCreated": 147
+      },
+      "serviceHit": {
+        "step": 15,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-04-27T16:00:16.428318Z",
+        "endedAt": "2026-04-27T16:00:16.453139Z",
+        "durationMs": 24,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 16,
+      "result": "PASS",
+      "observed": {
+        "companionId": "a4cc503c-7d63-41f7-80ca-7b13bf72fa17",
+        "slotsCreated": 147
+      },
+      "serviceHit": {
+        "step": 16,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-04-27T16:00:16.453160Z",
+        "endedAt": "2026-04-27T16:00:16.468375Z",
+        "durationMs": 15,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 17,
+      "result": "PASS",
+      "observed": {
+        "venueId": "8b7b85a8-1e31-4ed9-b4f4-d0b7be71e9ef",
+        "date": "2026-05-01",
+        "durationMinutes": 120,
+        "availableStartTimes": [
+          "2026-05-01T05:00:00.000Z",
+          "2026-05-01T05:30:00.000Z",
+          "2026-05-01T06:00:00.000Z",
+          "2026-05-01T06:30:00.000Z",
+          "2026-05-01T07:00:00.000Z",
+          "2026-05-01T07:30:00.000Z",
+          "2026-05-01T08:00:00.000Z",
+          "2026-05-01T08:30:00.000Z",
+          "2026-05-01T09:00:00.000Z",
+          "2026-05-01T09:30:00.000Z",
+          "2026-05-01T10:00:00.000Z",
+          "2026-05-01T10:30:00.000Z",
+          "2026-05-01T11:00:00.000Z",
+          "2026-05-01T11:30:00.000Z",
+          "2026-05-01T12:00:00.000Z",
+          "2026-05-01T12:30:00.000Z",
+          "2026-05-01T13:00:00.000Z",
+          "2026-05-01T13:30:00.000Z",
+          "2026-05-01T14:00:00.000Z",
+          "2026-05-01T14:30:00.000Z",
+          "2026-05-01T15:00:00.000Z"
+        ]
+      },
+      "serviceHit": {
+        "step": 17,
+        "target": "GET /availability",
+        "startedAt": "2026-04-27T16:00:16.468408Z",
+        "endedAt": "2026-04-27T16:00:16.502809Z",
+        "durationMs": 34,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 18,
+      "result": "PASS",
+      "observed": {
+        "reserved": true,
+        "captainSlotId": "f905891b-d71f-4daa-8369-612fa1cbff10",
+        "viceCaptainSlotId": "96a1c172-b6e0-476e-9f71-694cf14d48ac"
+      },
+      "serviceHit": {
+        "step": 18,
+        "target": "POST /roster-slots/reserve",
+        "startedAt": "2026-04-27T16:00:16.502838Z",
+        "endedAt": "2026-04-27T16:00:16.509900Z",
+        "durationMs": 7,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 19,
+      "result": "PASS",
+      "observed": {
+        "dbResult": "f905891b-d71f-4daa-8369-612fa1cbff10|8b7b85a8-1e31-4ed9-b4f4-d0b7be71e9ef|c050dc2a-896d-492b-bd95-e31ec936ea69|73f7d4d8-3db4-4a1e-8d62-8c93c23bb8c3|2026-05-01 09:00:00+04|2026-05-01 11:00:00+04|BOOKED\n96a1c172-b6e0-476e-9f71-694cf14d48ac|8b7b85a8-1e31-4ed9-b4f4-d0b7be71e9ef|433be2ce-fd78-447e-b931-007a1d474424|73f7d4d8-3db4-4a1e-8d62-8c93c23bb8c3|2026-05-01 09:00:00+04|2026-05-01 11:00:00+04|BOOKED",
+        "dbError": "time=\"2026-04-27T20:00:16+04:00\" level=warning msg=\"/Users/rhythmkhanna/Docs/COMPANION/master_document/technical/backend-companion/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion\""
+      },
+      "serviceHit": {
+        "step": 19,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-04-27T16:00:16.509919Z",
+        "endedAt": "2026-04-27T16:00:16.661219Z",
+        "durationMs": 151,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 20,
+      "result": "PASS",
+      "observed": {
+        "released": true,
+        "slotsReleased": 2
+      },
+      "serviceHit": {
+        "step": 20,
+        "target": "POST /roster-slots/release",
+        "startedAt": "2026-04-27T16:00:16.661259Z",
+        "endedAt": "2026-04-27T16:00:16.665658Z",
+        "durationMs": 4,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 21,
+      "result": "PASS",
+      "observed": {
+        "dbResult": "",
+        "dbError": "time=\"2026-04-27T20:00:16+04:00\" level=warning msg=\"/Users/rhythmkhanna/Docs/COMPANION/master_document/technical/backend-companion/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion\""
+      },
+      "serviceHit": {
+        "step": 21,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-04-27T16:00:16.665671Z",
+        "endedAt": "2026-04-27T16:00:16.790711Z",
+        "durationMs": 125,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "external": "PASS",
+    "db": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "testDataCreated": [
+    {
+      "entity": "user",
+      "id": "2ffa3bcc-9c41-49cb-852a-8cefabb4a291",
+      "marker": "RUN-20260427-160001-JRN-003"
+    },
+    {
+      "entity": "user",
+      "id": "ead24ad7-35eb-4ab6-a9fc-13583ad27cba",
+      "marker": "RUN-20260427-160001-JRN-003"
+    },
+    {
+      "entity": "user",
+      "id": "a4cc503c-7d63-41f7-80ca-7b13bf72fa17",
+      "marker": "RUN-20260427-160001-JRN-003"
+    },
+    {
+      "entity": "venue",
+      "id": "8b7b85a8-1e31-4ed9-b4f4-d0b7be71e9ef",
+      "marker": "RUN-20260427-160001-JRN-003"
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  },
+  "failures": [],
+  "finalSummary": "All test steps passed. API, DB, and external checks validated successfully. Test data NOT cleaned up (default behavior)."
+}
