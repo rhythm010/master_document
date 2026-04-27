@@ -1,0 +1,299 @@
+{
+  "testId": "MOD-ROSTER-004",
+  "type": "module",
+  "moduleOwner": "roster",
+  "priority": "P1",
+  "scenarioName": "POST /roster-slots/reserve then /release updates slot status and bookingId (internal)",
+  "flowType": "happy",
+  "linkedRequirement": "roster/reserve-slots",
+  "filePath": "src/modules/roster/__tests__/MOD-ROSTER-004-reserve-and-release-internal.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": false
+  },
+  "objective": "Reserve one CAPTAIN and one VICE_CAPTAIN slot for a venue/time window, then release them, validating DB status + booking_id set/cleared.",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Internal API token available as env var INTERNAL_API_TOKEN and injectable into request header via {{INTERNAL_API_TOKEN}}",
+    "Seed runner inserts seedData into DB before steps"
+  ],
+  "seedData": [
+    {
+      "entity": "venue",
+      "values": {
+        "id": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+        "name": "Reserve Venue",
+        "address": "1 Reserve Street, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.23,
+        "longitude": 55.3,
+        "operatingHoursStart": "09:00:00",
+        "operatingHoursEnd": "21:00:00"
+      }
+    },
+    {
+      "entity": "user",
+      "values": {
+        "id": "4ec72e3a-102b-4786-97b3-dc89ccd74554",
+        "role": "CLIENT",
+        "name": "Booking Client",
+        "nickname": "bookingclient1",
+        "email": "booking.client.001@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "booking",
+      "values": {
+        "id": "7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5",
+        "clientId": "4ec72e3a-102b-4786-97b3-dc89ccd74554",
+        "venueId": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+        "startAt": "2026-04-26T10:00:00.000Z",
+        "endAt": "2026-04-26T12:00:00.000Z",
+        "status": "CONFIRMED",
+        "qrCode": "qr_booking_roster_001",
+        "pinCode": "111111",
+        "bookingColor": "BLUE",
+        "comMatchQrCode": "com_qr_booking_roster_001",
+        "comMatchPinCode": "222222",
+        "extendedAt": null
+      }
+    },
+    {
+      "entity": "user",
+      "values": {
+        "id": "96d51d90-a7f6-4eb9-8214-fcad3e7503e9",
+        "role": "COMPANION",
+        "name": "Reserve Captain",
+        "nickname": "rescap1",
+        "email": "res.captain.001@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "3ecb5ee3-cf69-4258-b8f1-bd96756beddf",
+        "userId": "96d51d90-a7f6-4eb9-8214-fcad3e7503e9",
+        "designation": "CAPTAIN",
+        "isActive": true,
+        "languages": [],
+        "profilePictureUrl": "",
+        "averageRating": 0
+      }
+    },
+    {
+      "entity": "user",
+      "values": {
+        "id": "1ab29da9-a6ac-4c09-9536-3f0fb530b1de",
+        "role": "COMPANION",
+        "name": "Reserve Vice",
+        "nickname": "resvice1",
+        "email": "res.vice.001@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "f5a31616-894c-426f-a2dd-a70c41d230eb",
+        "userId": "1ab29da9-a6ac-4c09-9536-3f0fb530b1de",
+        "designation": "VICE_CAPTAIN",
+        "isActive": true,
+        "languages": [],
+        "profilePictureUrl": "",
+        "averageRating": 0
+      }
+    },
+    {
+      "entity": "roster_slot",
+      "values": {
+        "id": "f62a597b-da60-42a2-847e-be33ab24f5da",
+        "venueId": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+        "companionId": "96d51d90-a7f6-4eb9-8214-fcad3e7503e9",
+        "bookingId": null,
+        "startAt": "2026-04-26T10:00:00.000Z",
+        "endAt": "2026-04-26T12:00:00.000Z",
+        "status": "AVAILABLE"
+      }
+    },
+    {
+      "entity": "roster_slot",
+      "values": {
+        "id": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb",
+        "venueId": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+        "companionId": "1ab29da9-a6ac-4c09-9536-3f0fb530b1de",
+        "bookingId": null,
+        "startAt": "2026-04-26T10:00:00.000Z",
+        "endAt": "2026-04-26T12:00:00.000Z",
+        "status": "AVAILABLE"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 20,
+    "pollEveryMs": 500,
+    "retryCount": 40
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/reserve",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "venueId": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+        "startAt": "2026-04-26T10:00:00.000Z",
+        "endAt": "2026-04-26T12:00:00.000Z",
+        "bookingId": "7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5"
+      },
+      "storeResponseFields": ["captainSlotId", "viceCaptainSlotId"]
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "field": "id",
+        "value": "f62a597b-da60-42a2-847e-be33ab24f5da"
+      },
+      "description": "Verify CAPTAIN roster_slot row booked + booking_id set (query by seeded CAPTAIN roster_slot id)"
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "field": "id",
+        "value": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb"
+      },
+      "description": "Verify VICE_CAPTAIN roster_slot row booked + booking_id set (query by seeded VICE_CAPTAIN roster_slot id)"
+    },
+    {
+      "step": 4,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/release",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "bookingId": "7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5"
+      }
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "field": "id",
+        "value": "f62a597b-da60-42a2-847e-be33ab24f5da"
+      },
+      "description": "Verify CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded CAPTAIN roster_slot id)"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "field": "id",
+        "value": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb"
+      },
+      "description": "Verify VICE_CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded VICE_CAPTAIN roster_slot id)"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 200,
+        "requiredKeys": ["reserved", "captainSlotId", "viceCaptainSlotId"],
+        "bodyFields": {
+          "reserved": true,
+          "captainSlotId": "f62a597b-da60-42a2-847e-be33ab24f5da",
+          "viceCaptainSlotId": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb"
+        },
+        "checks": [
+          "captainSlotId is uuid",
+          "viceCaptainSlotId is uuid",
+          "captainSlotId != viceCaptainSlotId"
+        ]
+      },
+      {
+        "step": 4,
+        "statusCode": 200,
+        "requiredKeys": ["released", "slotsReleased"],
+        "bodyFields": {
+          "released": true,
+          "slotsReleased": 2
+        }
+      }
+    ],
+    "db": [
+      {
+        "step": 2,
+        "table": "roster_slots",
+        "checks": [
+          "row exists",
+          "status=BOOKED",
+          "booking_id=7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5",
+          "venue_id=b6e64090-73b1-42d3-b29b-8934c584c4d0"
+        ]
+      },
+      {
+        "step": 3,
+        "table": "roster_slots",
+        "checks": [
+          "row exists",
+          "status=BOOKED",
+          "booking_id=7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5",
+          "venue_id=b6e64090-73b1-42d3-b29b-8934c584c4d0"
+        ]
+      },
+      {
+        "step": 5,
+        "table": "roster_slots",
+        "checks": ["row exists", "status=AVAILABLE", "booking_id=null"]
+      },
+      {
+        "step": 6,
+        "table": "roster_slots",
+        "checks": ["row exists", "status=AVAILABLE", "booking_id=null"]
+      }
+    ],
+    "mustNotOccur": ["only one slot reserved", "slotsReleased != 2"]
+  },
+  "cleanup": [
+    "Delete roster_slots f62a597b-da60-42a2-847e-be33ab24f5da, df971cbd-9e92-4d3e-ba6a-4467c56b54bb (and any reserved rows)",
+    "Delete companion_profiles 3ecb5ee3-cf69-4258-b8f1-bd96756beddf, f5a31616-894c-426f-a2dd-a70c41d230eb",
+    "Delete users 96d51d90-a7f6-4eb9-8214-fcad3e7503e9, 1ab29da9-a6ac-4c09-9536-3f0fb530b1de",
+    "Delete booking 7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5",
+    "Delete user 4ec72e3a-102b-4786-97b3-dc89ccd74554",
+    "Delete venue b6e64090-73b1-42d3-b29b-8934c584c4d0"
+  ],
+  "passCriteria": [
+    "Reserve returns 200 reserved=true and 2 slot IDs (matching seeded CAPTAIN/VICE_CAPTAIN roster_slot ids)",
+    "Both referenced roster_slots are BOOKED and booking_id is set after reserve",
+    "Release returns 200 released=true and slotsReleased=2",
+    "Both roster_slots revert to AVAILABLE and booking_id cleared after release"
+  ]
+}

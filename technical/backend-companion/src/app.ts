@@ -4,6 +4,7 @@ import process from "node:process";
 
 import { identityRouter } from "./modules/identity";
 import { companionProfileRouter } from "./modules/companion-profile";
+import { rosterRouter } from "./modules/roster";
 import { errorHandler } from "./shared/middleware/errorHandler";
 
 export const app = express();
@@ -22,6 +23,7 @@ app.get("/health", (_req, res) => {
 // Register feature routers before the error handler.
 app.use(identityRouter);
 app.use(companionProfileRouter);
+app.use(rosterRouter);
 
 // Centralized error handling for all routes.
 app.use(errorHandler);

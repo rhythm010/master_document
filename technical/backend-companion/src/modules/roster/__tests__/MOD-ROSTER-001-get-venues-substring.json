@@ -1,0 +1,138 @@
+{
+  "testId": "MOD-ROSTER-001",
+  "type": "module",
+  "moduleOwner": "roster",
+  "priority": "P1",
+  "scenarioName": "GET /venues returns venues filtered by substring",
+  "flowType": "happy",
+  "linkedRequirement": "roster/get-venues",
+  "filePath": "src/modules/roster/__tests__/MOD-ROSTER-001-get-venues-substring.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": false
+  },
+  "objective": "Validate authenticated caller can search partnered venues by case-insensitive substring and receive >=2 matching venues.",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Seed runner inserts seedData into DB before steps",
+    "Caller has a valid Bearer token"
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "4e4f089c-8c40-4304-be6e-2463d74c2dbf",
+        "role": "CLIENT",
+        "name": "Roster Client",
+        "nickname": "rosterclient",
+        "email": "roster.client.001@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "venue",
+      "values": {
+        "id": "dfac1edc-3f4c-4f6f-b837-ab98893ab3d4",
+        "name": "Galaxy Plaza Mall",
+        "address": "1 Galaxy Road, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.204849,
+        "longitude": 55.270783,
+        "operatingHoursStart": "09:00:00",
+        "operatingHoursEnd": "21:00:00"
+      }
+    },
+    {
+      "entity": "venue",
+      "values": {
+        "id": "0feb1939-2486-4d47-90ef-6235ab25bb29",
+        "name": "Little Galaxy Lounge",
+        "address": "2 Galaxy Avenue, Dubai",
+        "venueType": "CLUB",
+        "latitude": 25.205,
+        "longitude": 55.271,
+        "operatingHoursStart": "10:00:00",
+        "operatingHoursEnd": "22:00:00"
+      }
+    },
+    {
+      "entity": "venue",
+      "values": {
+        "id": "c1ea67b6-46b7-4aee-92dc-764fb5012c0b",
+        "name": "Completely Different Place",
+        "address": "99 Other Street, Dubai",
+        "venueType": "RESTAURANT",
+        "latitude": 25.206,
+        "longitude": 55.272,
+        "operatingHoursStart": "08:00:00",
+        "operatingHoursEnd": "20:00:00"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 10,
+    "pollEveryMs": 500,
+    "retryCount": 20
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "4e4f089c-8c40-4304-be6e-2463d74c2dbf",
+      "role": "CLIENT",
+      "email": "roster.client.001@test.com",
+      "storeAs": "authToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/venues",
+      "queryParams": {
+        "q": "galaxy"
+      },
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      }
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "requiredKeys": [
+          "items"
+        ],
+        "checks": [
+          "items array length = 2",
+          "items[*].id contains dfac1edc-3f4c-4f6f-b837-ab98893ab3d4",
+          "items[*].id contains 0feb1939-2486-4d47-90ef-6235ab25bb29",
+          "items[*].name contains 'Galaxy' (case-insensitive)",
+          "items[*].address is present"
+        ]
+      }
+    ],
+    "mustNotOccur": [
+      "c1ea67b6-46b7-4aee-92dc-764fb5012c0b present in response items"
+    ]
+  },
+  "cleanup": [
+    "Delete venues dfac1edc-3f4c-4f6f-b837-ab98893ab3d4, 0feb1939-2486-4d47-90ef-6235ab25bb29, c1ea67b6-46b7-4aee-92dc-764fb5012c0b",
+    "Delete user 4e4f089c-8c40-4304-be6e-2463d74c2dbf"
+  ],
+  "passCriteria": [
+    "API returns 200",
+    "Response contains exactly the 2 venues whose names match substring 'galaxy'",
+    "Non-matching venue is excluded"
+  ]
+}

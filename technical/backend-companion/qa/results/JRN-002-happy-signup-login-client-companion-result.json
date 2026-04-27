@@ -1,0 +1,291 @@
+{
+  "runId": "RUN-20260426-164621-JRN-002",
+  "testId": "JRN-002",
+  "status": "PASS",
+  "startedAt": "2026-04-26T16:46:21.101291Z",
+  "endedAt": "2026-04-26T16:46:28.041067Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": true,
+    "issuesFound": [],
+    "autoCorrectionsApplied": []
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-26T16:46:21.345532Z",
+      "endedAt": "2026-04-26T16:46:24.262833Z",
+      "durationMs": 2917,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-26T16:46:24.262901Z",
+      "endedAt": "2026-04-26T16:46:24.549190Z",
+      "durationMs": 286,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 3,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-26T16:46:24.549209Z",
+      "endedAt": "2026-04-26T16:46:24.553473Z",
+      "durationMs": 4,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-26T16:46:24.553486Z",
+      "endedAt": "2026-04-26T16:46:24.557440Z",
+      "durationMs": 3,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-26T16:46:24.557453Z",
+      "endedAt": "2026-04-26T16:46:24.564074Z",
+      "durationMs": 6,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 6,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-26T16:46:24.564089Z",
+      "endedAt": "2026-04-26T16:46:24.566540Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 7,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-26T16:46:24.566550Z",
+      "endedAt": "2026-04-26T16:46:24.785293Z",
+      "durationMs": 218,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-26T16:46:27.790441Z",
+      "endedAt": "2026-04-26T16:46:28.040921Z",
+      "durationMs": 250,
+      "result": "PASS",
+      "statusCode": 200
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "1fff8e68-f47b-4359-b2f7-356b8fe36b42",
+        "role": "CLIENT",
+        "name": "Journey Client",
+        "nickname": "journeyclient-20260426164621",
+        "email": "client.jrn002+20260426164621@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-26T16:46:21.624Z"
+      },
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-26T16:46:21.345532Z",
+        "endedAt": "2026-04-26T16:46:24.262833Z",
+        "durationMs": 2917,
+        "result": "PASS",
+        "statusCode": 201
+      },
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "id": "f56a512a-1eee-44e4-89e7-ab5eaec89517",
+        "role": "COMPANION",
+        "name": "Journey Companion",
+        "nickname": "journeycompanion-20260426164621",
+        "email": "companion.jrn002+20260426164621@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": true,
+        "createdAt": "2026-04-26T16:46:24.521Z"
+      },
+      "serviceHit": {
+        "step": 2,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-26T16:46:24.262901Z",
+        "endedAt": "2026-04-26T16:46:24.549190Z",
+        "durationMs": 286,
+        "result": "PASS",
+        "statusCode": 201
+      },
+      "statusCode": 201
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "serviceHit": {
+        "step": 3,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-26T16:46:24.549209Z",
+        "endedAt": "2026-04-26T16:46:24.553473Z",
+        "durationMs": 4,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "serviceHit": {
+        "step": 4,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-26T16:46:24.553486Z",
+        "endedAt": "2026-04-26T16:46:24.557440Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "serviceHit": {
+        "step": 5,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-26T16:46:24.557453Z",
+        "endedAt": "2026-04-26T16:46:24.564074Z",
+        "durationMs": 6,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "serviceHit": {
+        "step": 6,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-26T16:46:24.564089Z",
+        "endedAt": "2026-04-26T16:46:24.566540Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZmZmOGU2OC1mNDdiLTQzNTktYjJmNy0zNTZiOGZlMzZiNDIiLCJyb2xlIjoiQ0xJRU5UIiwiZW1haWwiOiJjbGllbnQuanJuMDAyKzIwMjYwNDI2MTY0NjIxQGpvdXJuZXkudGVzdCIsImlhdCI6MTc3NzIyMTk4NCwiZXhwIjoxNzc3MjI1NTg0fQ.-gz_2qI5XLCZAE0gxpkA2NfNAw9Jzug3PeLmb2f6WCM",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "1fff8e68-f47b-4359-b2f7-356b8fe36b42",
+          "role": "CLIENT",
+          "name": "Journey Client",
+          "nickname": "journeyclient-20260426164621",
+          "email": "client.jrn002+20260426164621@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-04-26T16:46:21.624Z"
+        }
+      },
+      "serviceHit": {
+        "step": 7,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-26T16:46:24.566550Z",
+        "endedAt": "2026-04-26T16:46:24.785293Z",
+        "durationMs": 218,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNTZhNTEyYS0xZWVlLTQ0ZTQtODllNy1hYjVlYWVjODk1MTciLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb24uanJuMDAyKzIwMjYwNDI2MTY0NjIxQGpvdXJuZXkudGVzdCIsImlhdCI6MTc3NzIyMTk4OCwiZXhwIjoxNzc3MjI1NTg4fQ.cV2pOL_T4xBkzmTyUMealbPhiZHtd0DZmZK1yoHcNDE",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "f56a512a-1eee-44e4-89e7-ab5eaec89517",
+          "role": "COMPANION",
+          "name": "Journey Companion",
+          "nickname": "journeycompanion-20260426164621",
+          "email": "companion.jrn002+20260426164621@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": true,
+          "createdAt": "2026-04-26T16:46:24.521Z"
+        }
+      },
+      "serviceHit": {
+        "step": 8,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-26T16:46:27.790441Z",
+        "endedAt": "2026-04-26T16:46:28.040921Z",
+        "durationMs": 250,
+        "result": "PASS",
+        "statusCode": 200
+      },
+      "statusCode": 200
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "testDataCreated": [
+    {
+      "entity": "user",
+      "id": "1fff8e68-f47b-4359-b2f7-356b8fe36b42",
+      "marker": "RUN-20260426-164621-JRN-002"
+    },
+    {
+      "entity": "user",
+      "id": "f56a512a-1eee-44e4-89e7-ab5eaec89517",
+      "marker": "RUN-20260426-164621-JRN-002"
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  },
+  "failures": [],
+  "finalSummary": "All test steps passed. API, DB, and external checks validated successfully. Test data NOT cleaned up (default behavior)."
+}

@@ -1,0 +1,180 @@
+{
+  "testId": "MOD-ROSTER-003",
+  "type": "module",
+  "moduleOwner": "roster",
+  "priority": "P1",
+  "scenarioName": "POST /roster-slots/populate-for-companion creates assignments and roster slots (internal)",
+  "flowType": "happy",
+  "linkedRequirement": "roster/populate-for-companion",
+  "filePath": "src/modules/roster/__tests__/MOD-ROSTER-003-populate-for-companion-internal.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": false
+  },
+  "objective": "Validate populate-for-companion internal endpoint creates companion_venue_assignments rows and roster_slots rows for next 7 days.",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Internal API token available as env var INTERNAL_API_TOKEN and injectable into request header via {{INTERNAL_API_TOKEN}}",
+    "Seed runner inserts seedData into DB before steps"
+  ],
+  "seedData": [
+    {
+      "entity": "venue",
+      "values": {
+        "id": "79447dd5-8081-4e60-be76-8a579635370d",
+        "name": "Populate Venue One",
+        "address": "1 Populate Street, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.22,
+        "longitude": 55.29,
+        "operatingHoursStart": "09:00:00",
+        "operatingHoursEnd": "21:00:00"
+      }
+    },
+    {
+      "entity": "venue",
+      "values": {
+        "id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+        "name": "Populate Venue Two",
+        "address": "2 Populate Street, Dubai",
+        "venueType": "CLUB",
+        "latitude": 25.221,
+        "longitude": 55.291,
+        "operatingHoursStart": "10:00:00",
+        "operatingHoursEnd": "22:00:00"
+      }
+    },
+    {
+      "entity": "user",
+      "values": {
+        "id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+        "role": "COMPANION",
+        "name": "Populate Companion",
+        "nickname": "popcomp1",
+        "email": "pop.comp.001@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "4acbd5eb-9af6-4fa7-b466-003d2ca820a9",
+        "userId": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+        "designation": "CAPTAIN",
+        "isActive": true,
+        "languages": [],
+        "profilePictureUrl": "",
+        "averageRating": 0
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 30,
+    "pollEveryMs": 500,
+    "retryCount": 60
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "companionId": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+        "venueIds": [
+          "79447dd5-8081-4e60-be76-8a579635370d",
+          "e2da706c-a87a-41c3-9671-f0457bcad402"
+        ]
+      },
+      "storeResponseFields": [
+        "slotsCreated"
+      ]
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_venue_assignments",
+      "where": {
+        "field": "companion_id",
+        "value": "a54a9731-9ea6-48fc-8243-26e6245fcd68"
+      },
+      "description": "Verify companion_venue_assignments rows created"
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "field": "companion_id",
+        "value": "a54a9731-9ea6-48fc-8243-26e6245fcd68"
+      },
+      "description": "Verify roster_slots rows created"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 200,
+        "requiredKeys": [
+          "companionId",
+          "slotsCreated"
+        ],
+        "bodyFields": {
+          "companionId": "a54a9731-9ea6-48fc-8243-26e6245fcd68"
+        },
+        "checks": [
+          "slotsCreated > 0"
+        ]
+      }
+    ],
+    "db": [
+      {
+        "step": 2,
+        "table": "companion_venue_assignments",
+        "checks": [
+          "at least 2 rows exist",
+          "rows include venue_id=79447dd5-8081-4e60-be76-8a579635370d",
+          "rows include venue_id=e2da706c-a87a-41c3-9671-f0457bcad402"
+        ]
+      },
+      {
+        "step": 3,
+        "table": "roster_slots",
+        "checks": [
+          "at least 1 row exists",
+          "status=AVAILABLE",
+          "booking_id=null"
+        ]
+      }
+    ],
+    "mustNotOccur": [
+      "duplicate companion_venue_assignments rows for same (companion_id, venue_id)"
+    ]
+  },
+  "cleanup": [
+    "Delete roster_slots for a54a9731-9ea6-48fc-8243-26e6245fcd68",
+    "Delete companion_venue_assignments for a54a9731-9ea6-48fc-8243-26e6245fcd68",
+    "Delete companion_profile 4acbd5eb-9af6-4fa7-b466-003d2ca820a9",
+    "Delete user a54a9731-9ea6-48fc-8243-26e6245fcd68",
+    "Delete venues 79447dd5-8081-4e60-be76-8a579635370d, e2da706c-a87a-41c3-9671-f0457bcad402"
+  ],
+  "passCriteria": [
+    "API returns 200",
+    "At least one roster slot created",
+    "Two companion_venue_assignments created (one per venue)",
+    "Slots created are AVAILABLE with booking_id NULL"
+  ]
+}

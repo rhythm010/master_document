@@ -16,7 +16,6 @@ import type { UserRole, CompanionDesignation } from "../../shared/types/enums";
 import { identityRepository } from "./identity.repository";
 import { identityErrors } from "./identity.errors";
 import type { PublicUserDTO, CompanionProfileDTO } from "./identity.types";
-import { rosterService } from "../roster";
 
 // In-memory limiter for email-based login attempts.
 const emailRateLimiter = new EmailRateLimiter(
@@ -69,14 +68,14 @@ export const identityService = {
       });
 
       if (designation) {
-        // Provision companion profile and seed roster slots.
+        // Provision companion profile.
+        // Roster population and venue assignment are owned by the Roster module and are triggered
+        // by Companion Profile/Admin flows via POST /roster-slots/populate-for-companion.
         await identityRepository.createCompanionProfile(tx, {
           id: crypto.randomUUID(),
           userId: createdUser.id,
           designation
         });
-
-        await rosterService.populateForCompanion(tx, createdUser.id);
       }
 
       return createdUser;

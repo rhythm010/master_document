@@ -151,7 +151,7 @@ describe("identityService", () => {
     );
   });
 
-  test("signup creates a companion profile and populates roster", async () => {
+  test("signup creates a companion profile and does not populate roster", async () => {
     const { identityRepository } = requireMock("../identity.repository");
     const { rosterService } = requireMock("../../roster");
 
@@ -182,7 +182,7 @@ describe("identityService", () => {
       expect.any(Object),
       expect.objectContaining({ designation: "CAPTAIN" })
     );
-    expect(rosterService.populateForCompanion).toHaveBeenCalled();
+    expect(rosterService.populateForCompanion).not.toHaveBeenCalled();
   });
 
   test("signup rejects duplicate emails", async () => {

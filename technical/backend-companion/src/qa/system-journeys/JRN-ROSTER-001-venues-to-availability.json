@@ -1,0 +1,467 @@
+{
+  "testId": "JRN-ROSTER-001",
+  "type": "journey",
+  "priority": "P1",
+  "scenarioName": "End-to-end: seed venue -> signup client + 2 companions -> client searches venues -> client reads availability",
+  "flowType": "happy",
+  "linkedRequirements": [
+    "identity/signup",
+    "identity/verify-email",
+    "identity/login",
+    "roster/populate-for-companion",
+    "roster/get-venues",
+    "roster/get-availability"
+  ],
+  "filePath": "src/qa/system-journeys/JRN-ROSTER-001-venues-to-availability.json",
+  "executionMode": "api+db+external",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Validate client can authenticate, search venues, and see at least one available start time when two companions (CAPTAIN+VICE_CAPTAIN) are signed up and roster slots are populated for the venue.",
+  "preconditions": [
+    "Database has no pre-existing COMPANION rows (designation balancing rule deterministic for first two companions)",
+    "Mailpit running on localhost:8025",
+    "Internal API token available as env var INTERNAL_API_TOKEN and injectable into request header via {{INTERNAL_API_TOKEN}}"
+  ],
+  "seedData": [
+    {
+      "entity": "venue",
+      "values": {
+        "id": "e605aa8e-1de9-4471-b3dd-01f6383a0928",
+        "name": "Journey Galaxy Venue",
+        "address": "100 Journey Road, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.24,
+        "longitude": 55.31,
+        "operatingHoursStart": "09:00:00",
+        "operatingHoursEnd": "21:00:00"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 60,
+    "pollEveryMs": 500,
+    "retryCount": 120
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "CLIENT",
+        "name": "Journey Client",
+        "nickname": "journeyclient",
+        "email": "client.roster.jrn001@test.com",
+        "password": "ClientPass123!",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "clientUserId",
+      "description": "CLIENT signs up"
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve CLIENT verification email from Mailpit",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "client.roster.jrn001@test.com",
+      "extractTokenFromEmail": true,
+      "storeAs": "clientVerificationToken"
+    },
+    {
+      "step": 3,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{clientVerificationToken}}"
+      },
+      "description": "CLIENT verifies email"
+    },
+    {
+      "step": 4,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "client.roster.jrn001@test.com",
+        "password": "ClientPass123!"
+      },
+      "storeResponseFields": [
+        "accessToken"
+      ],
+      "storeAs": "clientAccessToken",
+      "description": "CLIENT logs in"
+    },
+    {
+      "step": 5,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "COMPANION",
+        "name": "Journey Companion One",
+        "nickname": "journeycomp1",
+        "email": "comp1.roster.jrn001@test.com",
+        "password": "CompanionPass123!",
+        "biometricAuthEnabled": true
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "companion1UserId",
+      "description": "COMPANION 1 signs up (expected CAPTAIN by balancing rule in empty DB)"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve COMPANION 1 verification email from Mailpit",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "comp1.roster.jrn001@test.com",
+      "extractTokenFromEmail": true,
+      "storeAs": "companion1VerificationToken"
+    },
+    {
+      "step": 7,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companion1VerificationToken}}"
+      },
+      "description": "COMPANION 1 verifies email"
+    },
+    {
+      "step": 8,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "COMPANION",
+        "name": "Journey Companion Two",
+        "nickname": "journeycomp2",
+        "email": "comp2.roster.jrn001@test.com",
+        "password": "CompanionPass123!",
+        "biometricAuthEnabled": true
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "companion2UserId",
+      "description": "COMPANION 2 signs up (expected VICE_CAPTAIN by balancing rule)"
+    },
+    {
+      "step": 9,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve COMPANION 2 verification email from Mailpit",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "comp2.roster.jrn001@test.com",
+      "extractTokenFromEmail": true,
+      "storeAs": "companion2VerificationToken"
+    },
+    {
+      "step": 10,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companion2VerificationToken}}"
+      },
+      "description": "COMPANION 2 verifies email"
+    },
+    {
+      "step": 11,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "where": {
+        "field": "user_id",
+        "value": "{{companion1UserId}}"
+      },
+      "description": "Verify COMPANION 1 designation = CAPTAIN"
+    },
+    {
+      "step": 12,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "where": {
+        "field": "user_id",
+        "value": "{{companion2UserId}}"
+      },
+      "description": "Verify COMPANION 2 designation = VICE_CAPTAIN"
+    },
+    {
+      "step": 13,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "companionId": "{{companion1UserId}}",
+        "venueIds": [
+          "e605aa8e-1de9-4471-b3dd-01f6383a0928"
+        ]
+      },
+      "description": "Populate roster for COMPANION 1 at venue"
+    },
+    {
+      "step": 14,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "companionId": "{{companion2UserId}}",
+        "venueIds": [
+          "e605aa8e-1de9-4471-b3dd-01f6383a0928"
+        ]
+      },
+      "description": "Populate roster for COMPANION 2 at venue"
+    },
+    {
+      "step": 15,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/venues",
+      "queryParams": {
+        "q": "Galaxy"
+      },
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "description": "CLIENT searches venues"
+    },
+    {
+      "step": 16,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/availability",
+      "queryParams": {
+        "venueId": "e605aa8e-1de9-4471-b3dd-01f6383a0928",
+        "date": "2026-04-26"
+      },
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "description": "CLIENT reads availability"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 201,
+        "bodyFields": {
+          "role": "CLIENT",
+          "email": "client.roster.jrn001@test.com",
+          "emailVerified": false
+        },
+        "requiredKeys": [
+          "id",
+          "createdAt"
+        ]
+      },
+      {
+        "step": 3,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "VERIFIED"
+        }
+      },
+      {
+        "step": 4,
+        "statusCode": 200,
+        "requiredKeys": [
+          "accessToken",
+          "user"
+        ],
+        "checks": [
+          "accessToken is non-empty string"
+        ]
+      },
+      {
+        "step": 5,
+        "statusCode": 201,
+        "bodyFields": {
+          "role": "COMPANION",
+          "email": "comp1.roster.jrn001@test.com",
+          "emailVerified": false
+        },
+        "requiredKeys": [
+          "id",
+          "createdAt"
+        ]
+      },
+      {
+        "step": 7,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "VERIFIED"
+        }
+      },
+      {
+        "step": 8,
+        "statusCode": 201,
+        "bodyFields": {
+          "role": "COMPANION",
+          "email": "comp2.roster.jrn001@test.com",
+          "emailVerified": false
+        },
+        "requiredKeys": [
+          "id",
+          "createdAt"
+        ]
+      },
+      {
+        "step": 10,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "VERIFIED"
+        }
+      },
+      {
+        "step": 13,
+        "statusCode": 200,
+        "requiredKeys": [
+          "companionId",
+          "slotsCreated"
+        ],
+        "checks": [
+          "slotsCreated > 0"
+        ]
+      },
+      {
+        "step": 14,
+        "statusCode": 200,
+        "requiredKeys": [
+          "companionId",
+          "slotsCreated"
+        ],
+        "checks": [
+          "slotsCreated > 0"
+        ]
+      },
+      {
+        "step": 15,
+        "statusCode": 200,
+        "requiredKeys": [
+          "items"
+        ],
+        "checks": [
+          "items array length >= 1",
+          "items[*].id contains e605aa8e-1de9-4471-b3dd-01f6383a0928"
+        ]
+      },
+      {
+        "step": 16,
+        "statusCode": 200,
+        "requiredKeys": [
+          "venueId",
+          "date",
+          "durationMinutes",
+          "availableStartTimes"
+        ],
+        "bodyFields": {
+          "venueId": "e605aa8e-1de9-4471-b3dd-01f6383a0928",
+          "date": "2026-04-26",
+          "durationMinutes": 120
+        },
+        "checks": [
+          "availableStartTimes array length >= 1"
+        ]
+      }
+    ],
+    "db": [
+      {
+        "step": 11,
+        "table": "companion_profiles",
+        "checks": [
+          "row exists",
+          "designation=CAPTAIN"
+        ]
+      },
+      {
+        "step": 12,
+        "table": "companion_profiles",
+        "checks": [
+          "row exists",
+          "designation=VICE_CAPTAIN"
+        ]
+      }
+    ],
+    "external": [
+      {
+        "step": 2,
+        "description": "CLIENT verification email received",
+        "checks": [
+          "email exists",
+          "to=client.roster.jrn001@test.com",
+          "contains verification token"
+        ]
+      },
+      {
+        "step": 6,
+        "description": "COMPANION 1 verification email received",
+        "checks": [
+          "email exists",
+          "to=comp1.roster.jrn001@test.com",
+          "contains verification token"
+        ]
+      },
+      {
+        "step": 9,
+        "description": "COMPANION 2 verification email received",
+        "checks": [
+          "email exists",
+          "to=comp2.roster.jrn001@test.com",
+          "contains verification token"
+        ]
+      }
+    ],
+    "mustNotOccur": [
+      "availability returned empty despite CAPTAIN+VICE_CAPTAIN populated for venue"
+    ]
+  },
+  "cleanup": [
+    "Delete roster_slots for companion1UserId and companion2UserId",
+    "Delete companion_venue_assignments for companion1UserId and companion2UserId",
+    "Delete companion_profiles for companion1UserId and companion2UserId",
+    "Delete users clientUserId, companion1UserId, companion2UserId",
+    "Delete venue e605aa8e-1de9-4471-b3dd-01f6383a0928",
+    "Clear Mailpit messages"
+  ],
+  "passCriteria": [
+    "Client signup, verify, login succeed",
+    "Two companion signups yield CAPTAIN then VICE_CAPTAIN (balancing rule)",
+    "Roster population succeeds for both companions at the venue",
+    "GET /venues returns seeded venue",
+    "GET /availability returns at least one availableStartTime"
+  ]
+}

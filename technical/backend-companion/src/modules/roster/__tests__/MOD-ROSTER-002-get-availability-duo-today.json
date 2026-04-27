@@ -1,0 +1,207 @@
+{
+  "testId": "MOD-ROSTER-002",
+  "type": "module",
+  "moduleOwner": "roster",
+  "priority": "P1",
+  "scenarioName": "GET /availability returns at least one start time when CAPTAIN+VICE_CAPTAIN duo exists",
+  "flowType": "happy",
+  "linkedRequirement": "roster/get-availability",
+  "filePath": "src/modules/roster/__tests__/MOD-ROSTER-002-get-availability-duo-today.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": false
+  },
+  "objective": "Validate availability computation returns at least one availableStartTime for the requested date when one CAPTAIN and one VICE_CAPTAIN are assigned to venue.",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Seed runner inserts seedData into DB before steps",
+    "Availability endpoint backfills missing roster slots using companion_venue_assignments"
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "45b632cb-ad71-4da6-a6ae-ca70c9ba1d77",
+        "role": "CLIENT",
+        "name": "Roster Client 2",
+        "nickname": "rosterclient2",
+        "email": "roster.client.002@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "venue",
+      "values": {
+        "id": "86f3716d-bde5-49c0-8617-7c611b0c95aa",
+        "name": "Availability Venue",
+        "address": "10 Availability Blvd, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.21,
+        "longitude": 55.28,
+        "operatingHoursStart": "09:00:00",
+        "operatingHoursEnd": "21:00:00"
+      }
+    },
+    {
+      "entity": "user",
+      "values": {
+        "id": "d5ae0605-b3b6-4975-91ed-23823eb57a46",
+        "role": "COMPANION",
+        "name": "Captain Companion",
+        "nickname": "captain1",
+        "email": "captain.001@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "cd156ac4-1691-4799-aec9-365f870653b2",
+        "userId": "d5ae0605-b3b6-4975-91ed-23823eb57a46",
+        "designation": "CAPTAIN",
+        "isActive": true,
+        "languages": [],
+        "profilePictureUrl": "",
+        "averageRating": 0
+      }
+    },
+    {
+      "entity": "user",
+      "values": {
+        "id": "51ed2074-4bf4-4cc9-9862-274ef0f62fe3",
+        "role": "COMPANION",
+        "name": "Vice Companion",
+        "nickname": "vice1",
+        "email": "vice.001@test.com",
+        "passwordHash": "seeded_hash_not_used",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "c979ecc1-6b73-4b50-98c9-4e13562034d2",
+        "userId": "51ed2074-4bf4-4cc9-9862-274ef0f62fe3",
+        "designation": "VICE_CAPTAIN",
+        "isActive": true,
+        "languages": [],
+        "profilePictureUrl": "",
+        "averageRating": 0
+      }
+    },
+    {
+      "entity": "companion_venue_assignment",
+      "values": {
+        "companionId": "d5ae0605-b3b6-4975-91ed-23823eb57a46",
+        "venueId": "86f3716d-bde5-49c0-8617-7c611b0c95aa"
+      }
+    },
+    {
+      "entity": "companion_venue_assignment",
+      "values": {
+        "companionId": "51ed2074-4bf4-4cc9-9862-274ef0f62fe3",
+        "venueId": "86f3716d-bde5-49c0-8617-7c611b0c95aa"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 20,
+    "pollEveryMs": 500,
+    "retryCount": 40
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "45b632cb-ad71-4da6-a6ae-ca70c9ba1d77",
+      "role": "CLIENT",
+      "email": "roster.client.002@test.com",
+      "storeAs": "authToken"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/availability",
+      "queryParams": {
+        "venueId": "86f3716d-bde5-49c0-8617-7c611b0c95aa",
+        "date": "2026-04-26"
+      },
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      }
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "field": "venue_id",
+        "value": "86f3716d-bde5-49c0-8617-7c611b0c95aa"
+      },
+      "description": "Verify backfill created roster_slots for venue/date (at least some rows exist)"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "requiredKeys": [
+          "venueId",
+          "date",
+          "durationMinutes",
+          "availableStartTimes"
+        ],
+        "bodyFields": {
+          "venueId": "86f3716d-bde5-49c0-8617-7c611b0c95aa",
+          "date": "2026-04-26",
+          "durationMinutes": 120
+        },
+        "checks": [
+          "availableStartTimes array length >= 1",
+          "availableStartTimes[*] are ISO-8601 timestamps"
+        ]
+      }
+    ],
+    "db": [
+      {
+        "step": 3,
+        "table": "roster_slots",
+        "checks": [
+          "at least 1 row exists",
+          "venue_id=86f3716d-bde5-49c0-8617-7c611b0c95aa"
+        ]
+      }
+    ],
+    "mustNotOccur": [
+      "availableStartTimes empty when CAPTAIN+VICE_CAPTAIN assigned"
+    ]
+  },
+  "cleanup": [
+    "Delete roster_slots for 86f3716d-bde5-49c0-8617-7c611b0c95aa",
+    "Delete companion_venue_assignments for 86f3716d-bde5-49c0-8617-7c611b0c95aa",
+    "Delete companion_profiles cd156ac4-1691-4799-aec9-365f870653b2, c979ecc1-6b73-4b50-98c9-4e13562034d2",
+    "Delete users 45b632cb-ad71-4da6-a6ae-ca70c9ba1d77, d5ae0605-b3b6-4975-91ed-23823eb57a46, 51ed2074-4bf4-4cc9-9862-274ef0f62fe3",
+    "Delete venue 86f3716d-bde5-49c0-8617-7c611b0c95aa"
+  ],
+  "passCriteria": [
+    "API returns 200",
+    "availableStartTimes contains at least one start time",
+    "durationMinutes=120",
+    "Roster backfill creates roster_slots rows (or pre-existing rows exist)"
+  ]
+}
