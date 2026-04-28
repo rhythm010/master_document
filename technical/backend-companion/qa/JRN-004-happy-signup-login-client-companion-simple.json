@@ -1,0 +1,326 @@
+{
+  "testId": "JRN-004",
+  "type": "journey",
+  "priority": "P1",
+  "scenarioName": "Happy path (simple): CLIENT signup/verify/login -> COMPANION signup/verify/login",
+  "flowType": "happy",
+  "linkedRequirements": [
+    "identity/signup",
+    "identity/verify-email",
+    "identity/login"
+  ],
+  "filePath": "qa/JRN-004-happy-signup-login-client-companion-simple.json",
+  "executionMode": "api+db+external",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Validate the simplest end-to-end happy flow for both roles (CLIENT and COMPANION): signup triggers a verification email, token can be extracted via Mailpit, email verification succeeds, and login returns an access token.",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Mailpit running on localhost:8025",
+    "DATABASE_URL set for the test runner and points to the test database",
+    "No existing users with the generated emails (RUN_ID-suffixed)"
+  ],
+  "testData": {
+    "runIdPlaceholder": "{{RUN_ID}}",
+    "emails": {
+      "clientEmail": "client.jrn004+{{RUN_ID}}@journey.test",
+      "companionEmail": "companion.jrn004+{{RUN_ID}}@journey.test"
+    },
+    "credentialStrategy": {
+      "clientPassword": "Generate a strong password and store as clientPassword; reuse for client login",
+      "companionPassword": "Generate a strong password and store as companionPassword; reuse for companion login"
+    }
+  },
+  "waitPolicy": {
+    "maxSeconds": 30,
+    "pollEveryMs": 500,
+    "retryCount": 60
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "storeResponseFields": ["id"],
+      "storeAs": "clientUserId",
+      "description": "CLIENT signs up",
+      "layman": "Create a brand new client account so we can verify email and log in.",
+      "requiredPayloadFields": [
+        "role",
+        "name",
+        "nickname",
+        "email",
+        "password",
+        "biometricAuthEnabled"
+      ],
+      "payloadRules": {
+        "role": "CLIENT",
+        "nameTemplate": "journey client {{RUN_ID}}",
+        "nicknameTemplate": "journeyclient-jrn004-{{RUN_ID}}",
+        "emailTemplate": "client.jrn004+{{RUN_ID}}@journey.test",
+        "passwordRule": "Generate strong password and store for reuse",
+        "passwordStoreAs": "clientPassword",
+        "biometricAuthEnabled": false,
+        "emailNormalizationNote": "Use lowercase; system normalizes emails to lowercase"
+      }
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve CLIENT verification email from Mailpit and extract token",
+      "layman": "Confirm the client verification email was sent and extract the verify-email token from it.",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "client.jrn004+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "clientVerificationToken"
+    },
+    {
+      "step": 3,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{clientVerificationToken}}"
+      },
+      "description": "CLIENT verifies email",
+      "layman": "Mark the client email as verified so login can succeed."
+    },
+    {
+      "step": 4,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "storeResponseFields": ["accessToken"],
+      "storeAs": "clientAccessToken",
+      "description": "CLIENT logs in",
+      "layman": "Log the client in and store the access token for potential authenticated calls.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadRules": {
+        "emailTemplate": "client.jrn004+{{RUN_ID}}@journey.test",
+        "passwordRule": "Reuse the same password generated during signup",
+        "passwordFromStoreKey": "clientPassword"
+      }
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "field": "id",
+        "value": "{{clientUserId}}"
+      },
+      "description": "DB verification: CLIENT user row exists",
+      "layman": "Confirm the client user exists in the database after signup + verification."
+    },
+    {
+      "step": 6,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "storeResponseFields": ["id"],
+      "storeAs": "companionUserId",
+      "description": "COMPANION signs up",
+      "layman": "Create a brand new companion account so we can verify email and log in.",
+      "requiredPayloadFields": [
+        "role",
+        "name",
+        "nickname",
+        "email",
+        "password",
+        "biometricAuthEnabled"
+      ],
+      "payloadRules": {
+        "role": "COMPANION",
+        "nameTemplate": "journey companion {{RUN_ID}}",
+        "nicknameTemplate": "journeycompanion-jrn004-{{RUN_ID}}",
+        "emailTemplate": "companion.jrn004+{{RUN_ID}}@journey.test",
+        "passwordRule": "Generate strong password and store for reuse",
+        "passwordStoreAs": "companionPassword",
+        "biometricAuthEnabled": false,
+        "emailNormalizationNote": "Use lowercase; system normalizes emails to lowercase"
+      }
+    },
+    {
+      "step": 7,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve COMPANION verification email from Mailpit and extract token",
+      "layman": "Confirm the companion verification email was sent and extract the verify-email token from it.",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "companion.jrn004+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "companionVerificationToken"
+    },
+    {
+      "step": 8,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companionVerificationToken}}"
+      },
+      "description": "COMPANION verifies email",
+      "layman": "Mark the companion email as verified so login can succeed."
+    },
+    {
+      "step": 9,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "storeResponseFields": ["accessToken"],
+      "storeAs": "companionAccessToken",
+      "description": "COMPANION logs in",
+      "layman": "Log the companion in and store the access token.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadRules": {
+        "emailTemplate": "companion.jrn004+{{RUN_ID}}@journey.test",
+        "passwordRule": "Reuse the same password generated during signup",
+        "passwordFromStoreKey": "companionPassword"
+      }
+    },
+    {
+      "step": 10,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "users",
+      "where": {
+        "field": "id",
+        "value": "{{companionUserId}}"
+      },
+      "description": "DB verification: COMPANION user row exists",
+      "layman": "Confirm the companion user exists in the database after signup + verification."
+    },
+    {
+      "step": 11,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "where": {
+        "field": "user_id",
+        "value": "{{companionUserId}}"
+      },
+      "description": "DB verification: COMPANION has a companion_profile row",
+      "layman": "Confirm the system provisioned a companion profile for the companion account."
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 1,
+        "statusCode": 201,
+        "requiredKeys": ["id"],
+        "bodyFields": {
+          "role": "CLIENT",
+          "email": "client.jrn004+{{RUN_ID}}@journey.test",
+          "emailVerified": false
+        }
+      },
+      {
+        "step": 3,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "VERIFIED"
+        }
+      },
+      {
+        "step": 4,
+        "statusCode": 200,
+        "requiredKeys": ["accessToken", "tokenType", "user"],
+        "bodyFields": {
+          "tokenType": "Bearer",
+          "user": {
+            "role": "CLIENT",
+            "email": "client.jrn004+{{RUN_ID}}@journey.test",
+            "emailVerified": true
+          }
+        }
+      },
+      {
+        "step": 6,
+        "statusCode": 201,
+        "requiredKeys": ["id"],
+        "bodyFields": {
+          "role": "COMPANION",
+          "email": "companion.jrn004+{{RUN_ID}}@journey.test",
+          "emailVerified": false
+        }
+      },
+      {
+        "step": 8,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "VERIFIED"
+        }
+      },
+      {
+        "step": 9,
+        "statusCode": 200,
+        "requiredKeys": ["accessToken", "tokenType", "user"],
+        "bodyFields": {
+          "tokenType": "Bearer",
+          "user": {
+            "role": "COMPANION",
+            "email": "companion.jrn004+{{RUN_ID}}@journey.test",
+            "emailVerified": true
+          }
+        }
+      }
+    ],
+    "external": [
+      {
+        "step": 2,
+        "description": "CLIENT verification email received and token extracted",
+        "checks": [
+          "email exists",
+          "to=client.jrn004+{{RUN_ID}}@journey.test",
+          "contains verification token"
+        ]
+      },
+      {
+        "step": 7,
+        "description": "COMPANION verification email received and token extracted",
+        "checks": [
+          "email exists",
+          "to=companion.jrn004+{{RUN_ID}}@journey.test",
+          "contains verification token"
+        ]
+      }
+    ],
+    "db": [
+      {
+        "step": 5,
+        "description": "CLIENT user exists in users table",
+        "checks": ["row exists", "role=CLIENT", "emailVerified=true"]
+      },
+      {
+        "step": 10,
+        "description": "COMPANION user exists in users table",
+        "checks": ["row exists", "role=COMPANION", "emailVerified=true"]
+      },
+      {
+        "step": 11,
+        "description": "COMPANION has companion_profiles row",
+        "checks": ["row exists"]
+      }
+    ],
+    "mustNotOccur": [
+      "password returned in any API response",
+      "login succeeds before email verification",
+      "duplicate user rows for the same email"
+    ]
+  }
+}

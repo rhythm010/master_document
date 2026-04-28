@@ -1,0 +1,347 @@
+{
+  "runId": "RUN-20260428024336-JRN-004",
+  "testId": "JRN-004",
+  "status": "PASS",
+  "startedAt": "2026-04-28T02:43:36.723Z",
+  "endedAt": "2026-04-28T02:43:41.145Z",
+
+  "inputs": {
+    "designFile": "technical/backend-companion/qa/JRN-004-happy-signup-login-client-companion-simple.json",
+    "materializedFile": "technical/backend-companion/qa/tmp/JRN-004-materialized.json"
+  },
+
+  "outputs": {
+    "runnerResultFile": "technical/backend-companion/results/JRN-004-materialized-result.json",
+    "enrichedResultFile": "technical/backend-companion/results/JRN-004-materialized-enriched-result.json"
+  },
+
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+
+  "materializationNotes": {
+    "runSuffixResolved": "20260428024336",
+    "passwordHandling": {
+      "clientPassword": "<redacted>",
+      "companionPassword": "<redacted>",
+      "source": "Generated at runtime and passed via env vars clientPassword / companionPassword; referenced in payloads as {{clientPassword}}/{{companionPassword}}"
+    },
+    "tokenRedaction": "Verification tokens extracted from Mailpit are not persisted in runner output; redacted in materializedRequest as <redacted>."
+  },
+
+  "steps": [
+    {
+      "step": 1,
+      "layman": "Create a brand new client account so we can verify email and log in.",
+      "actionType": "apiRequest",
+      "materializedRequest": {
+        "method": "POST",
+        "url": "http://localhost:3000/auth/signup",
+        "headers": { "Content-Type": "application/json" },
+        "payload": {
+          "role": "CLIENT",
+          "name": "journey client 20260428024336",
+          "nickname": "journeyclient-jrn004-20260428024336",
+          "email": "client.jrn004+20260428024336@journey.test",
+          "password": "<redacted>",
+          "biometricAuthEnabled": false
+        }
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:36.848Z",
+        "endedAt": "2026-04-28T02:43:40.406Z",
+        "durationMs": 3558,
+        "target": "POST /auth/signup",
+        "statusCode": 201
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "id": "87184469-fdd0-40c3-85c5-d74cf4fe55b4",
+        "role": "CLIENT",
+        "email": "client.jrn004+20260428024336@journey.test",
+        "emailVerified": false
+      }
+    },
+    {
+      "step": 2,
+      "layman": "Confirm the client verification email was sent and extract the verify-email token from it.",
+      "actionType": "externalCheck",
+      "materializedRequest": {
+        "method": "GET",
+        "url": "http://localhost:8025/api/v1/messages",
+        "validateEmailTo": "client.jrn004+20260428024336@journey.test",
+        "extractTokenFromEmail": true
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.406Z",
+        "endedAt": "2026-04-28T02:43:40.420Z",
+        "durationMs": 14,
+        "target": "http://localhost:8025/api/v1/messages"
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "emailFound": true,
+        "tokenExtracted": true
+      }
+    },
+    {
+      "step": 3,
+      "layman": "Mark the client email as verified so login can succeed.",
+      "actionType": "apiRequest",
+      "materializedRequest": {
+        "method": "GET",
+        "url": "http://localhost:3000/auth/verify-email?token=<redacted>"
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.420Z",
+        "endedAt": "2026-04-28T02:43:40.432Z",
+        "durationMs": 12,
+        "target": "GET /auth/verify-email",
+        "statusCode": 200
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "status": "VERIFIED"
+      }
+    },
+    {
+      "step": 4,
+      "layman": "Log the client in and store the access token for potential authenticated calls.",
+      "actionType": "apiRequest",
+      "materializedRequest": {
+        "method": "POST",
+        "url": "http://localhost:3000/auth/login",
+        "headers": { "Content-Type": "application/json" },
+        "payload": {
+          "email": "client.jrn004+20260428024336@journey.test",
+          "password": "<redacted>"
+        }
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.432Z",
+        "endedAt": "2026-04-28T02:43:40.665Z",
+        "durationMs": 233,
+        "target": "POST /auth/login",
+        "statusCode": 200
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "accessToken": "<redacted>",
+        "tokenType": "Bearer",
+        "user": {
+          "id": "87184469-fdd0-40c3-85c5-d74cf4fe55b4",
+          "role": "CLIENT",
+          "email": "client.jrn004+20260428024336@journey.test",
+          "emailVerified": true
+        }
+      }
+    },
+    {
+      "step": 5,
+      "layman": "Confirm the client user exists in the database after signup + verification.",
+      "actionType": "dbQuery",
+      "materializedRequest": {
+        "table": "users",
+        "where": { "id": "87184469-fdd0-40c3-85c5-d74cf4fe55b4" }
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.665Z",
+        "endedAt": "2026-04-28T02:43:40.669Z",
+        "durationMs": 4,
+        "target": "DB users query"
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "rowCount": 1,
+        "rowExcerpt": {
+          "id": "87184469-fdd0-40c3-85c5-d74cf4fe55b4",
+          "role": "CLIENT",
+          "email": "client.jrn004+20260428024336@journey.test",
+          "email_verified": true,
+          "password_hash": "<redacted>"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "layman": "Create a brand new companion account so we can verify email and log in.",
+      "actionType": "apiRequest",
+      "materializedRequest": {
+        "method": "POST",
+        "url": "http://localhost:3000/auth/signup",
+        "headers": { "Content-Type": "application/json" },
+        "payload": {
+          "role": "COMPANION",
+          "name": "journey companion 20260428024336",
+          "nickname": "journeycompanion-jrn004-20260428024336",
+          "email": "companion.jrn004+20260428024336@journey.test",
+          "password": "<redacted>",
+          "biometricAuthEnabled": false
+        }
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.669Z",
+        "endedAt": "2026-04-28T02:43:40.917Z",
+        "durationMs": 248,
+        "target": "POST /auth/signup",
+        "statusCode": 201
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+        "role": "COMPANION",
+        "email": "companion.jrn004+20260428024336@journey.test",
+        "emailVerified": false
+      }
+    },
+    {
+      "step": 7,
+      "layman": "Confirm the companion verification email was sent and extract the verify-email token from it.",
+      "actionType": "externalCheck",
+      "materializedRequest": {
+        "method": "GET",
+        "url": "http://localhost:8025/api/v1/messages",
+        "validateEmailTo": "companion.jrn004+20260428024336@journey.test",
+        "extractTokenFromEmail": true
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.917Z",
+        "endedAt": "2026-04-28T02:43:40.921Z",
+        "durationMs": 4,
+        "target": "http://localhost:8025/api/v1/messages"
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "emailFound": true,
+        "tokenExtracted": true
+      }
+    },
+    {
+      "step": 8,
+      "layman": "Mark the companion email as verified so login can succeed.",
+      "actionType": "apiRequest",
+      "materializedRequest": {
+        "method": "GET",
+        "url": "http://localhost:3000/auth/verify-email?token=<redacted>"
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.921Z",
+        "endedAt": "2026-04-28T02:43:40.924Z",
+        "durationMs": 3,
+        "target": "GET /auth/verify-email",
+        "statusCode": 200
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "status": "VERIFIED"
+      }
+    },
+    {
+      "step": 9,
+      "layman": "Log the companion in and store the access token.",
+      "actionType": "apiRequest",
+      "materializedRequest": {
+        "method": "POST",
+        "url": "http://localhost:3000/auth/login",
+        "headers": { "Content-Type": "application/json" },
+        "payload": {
+          "email": "companion.jrn004+20260428024336@journey.test",
+          "password": "<redacted>"
+        }
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:40.924Z",
+        "endedAt": "2026-04-28T02:43:41.141Z",
+        "durationMs": 217,
+        "target": "POST /auth/login",
+        "statusCode": 200
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "accessToken": "<redacted>",
+        "tokenType": "Bearer",
+        "user": {
+          "id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+          "role": "COMPANION",
+          "email": "companion.jrn004+20260428024336@journey.test",
+          "emailVerified": true
+        }
+      }
+    },
+    {
+      "step": 10,
+      "layman": "Confirm the companion user exists in the database after signup + verification.",
+      "actionType": "dbQuery",
+      "materializedRequest": {
+        "table": "users",
+        "where": { "id": "ffb02350-e500-4927-b9b6-74545d6b21e9" }
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:41.141Z",
+        "endedAt": "2026-04-28T02:43:41.143Z",
+        "durationMs": 2,
+        "target": "DB users query"
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "rowCount": 1,
+        "rowExcerpt": {
+          "id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+          "role": "COMPANION",
+          "email": "companion.jrn004+20260428024336@journey.test",
+          "email_verified": true,
+          "password_hash": "<redacted>"
+        }
+      }
+    },
+    {
+      "step": 11,
+      "layman": "Confirm the system provisioned a companion profile for the companion account.",
+      "actionType": "dbQuery",
+      "materializedRequest": {
+        "table": "companion_profiles",
+        "where": { "user_id": "ffb02350-e500-4927-b9b6-74545d6b21e9" }
+      },
+      "serviceHit": {
+        "startedAt": "2026-04-28T02:43:41.143Z",
+        "endedAt": "2026-04-28T02:43:41.145Z",
+        "durationMs": 2,
+        "target": "DB companion_profiles query"
+      },
+      "result": "PASS",
+      "observedResponse": {
+        "rowCount": 1,
+        "rowExcerpt": {
+          "id": "436a2538-77f6-4c5f-8125-69e9b07bb345",
+          "user_id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+          "designation": "CAPTAIN",
+          "is_active": true
+        }
+      }
+    }
+  ],
+
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+
+  "failures": [],
+
+  "notes": {
+    "materializedRequestsDerivedFrom": [
+      "qa/tmp/JRN-004-materialized.json",
+      "runner stepResults observed data"
+    ],
+    "redactions": [
+      "password fields",
+      "verification tokens",
+      "access tokens",
+      "password_hash"
+    ]
+  }
+}

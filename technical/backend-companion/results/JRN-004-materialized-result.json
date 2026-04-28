@@ -1,0 +1,420 @@
+{
+  "runId": "RUN-20260428024336-JRN-004",
+  "testId": "JRN-004",
+  "status": "PASS",
+  "startedAt": "2026-04-28T02:43:36.723Z",
+  "endedAt": "2026-04-28T02:43:41.145Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-28T02:43:36.848Z",
+      "endedAt": "2026-04-28T02:43:40.406Z",
+      "durationMs": 3558,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-28T02:43:40.406Z",
+      "endedAt": "2026-04-28T02:43:40.420Z",
+      "durationMs": 14,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-28T02:43:40.420Z",
+      "endedAt": "2026-04-28T02:43:40.432Z",
+      "durationMs": 12,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-28T02:43:40.432Z",
+      "endedAt": "2026-04-28T02:43:40.665Z",
+      "durationMs": 233,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "DB users query",
+      "startedAt": "2026-04-28T02:43:40.665Z",
+      "endedAt": "2026-04-28T02:43:40.669Z",
+      "durationMs": 4,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-28T02:43:40.669Z",
+      "endedAt": "2026-04-28T02:43:40.917Z",
+      "durationMs": 248,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 7,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-28T02:43:40.917Z",
+      "endedAt": "2026-04-28T02:43:40.921Z",
+      "durationMs": 4,
+      "result": "PASS"
+    },
+    {
+      "step": 8,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-28T02:43:40.921Z",
+      "endedAt": "2026-04-28T02:43:40.924Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 9,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-28T02:43:40.924Z",
+      "endedAt": "2026-04-28T02:43:41.141Z",
+      "durationMs": 217,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 10,
+      "target": "DB users query",
+      "startedAt": "2026-04-28T02:43:41.141Z",
+      "endedAt": "2026-04-28T02:43:41.143Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 11,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-04-28T02:43:41.143Z",
+      "endedAt": "2026-04-28T02:43:41.145Z",
+      "durationMs": 2,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "87184469-fdd0-40c3-85c5-d74cf4fe55b4",
+        "role": "CLIENT",
+        "name": "journey client 20260428024336",
+        "nickname": "journeyclient-jrn004-20260428024336",
+        "email": "client.jrn004+20260428024336@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-28T02:43:37.174Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT signs up",
+      "layman": "Create a brand new client account so we can verify email and log in.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-28T02:43:36.848Z",
+        "endedAt": "2026-04-28T02:43:40.406Z",
+        "durationMs": 3558,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve CLIENT verification email from Mailpit and extract token",
+      "layman": "Confirm the client verification email was sent and extract the verify-email token from it.",
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-28T02:43:40.406Z",
+        "endedAt": "2026-04-28T02:43:40.420Z",
+        "durationMs": 14,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT verifies email",
+      "layman": "Mark the client email as verified so login can succeed.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-28T02:43:40.420Z",
+        "endedAt": "2026-04-28T02:43:40.432Z",
+        "durationMs": 12,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NzE4NDQ2OS1mZGQwLTQwYzMtODVjNS1kNzRjZjRmZTU1YjQiLCJyb2xlIjoiQ0xJRU5UIiwiZW1haWwiOiJjbGllbnQuanJuMDA0KzIwMjYwNDI4MDI0MzM2QGpvdXJuZXkudGVzdCIsImlhdCI6MTc3NzM0NDIyMCwiZXhwIjoxNzc3MzQ3ODIwfQ.ChdVWO-j-xUNeZGHB4eMvKOxBrIAiUOuotSKQd55wAs",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "87184469-fdd0-40c3-85c5-d74cf4fe55b4",
+          "role": "CLIENT",
+          "name": "journey client 20260428024336",
+          "nickname": "journeyclient-jrn004-20260428024336",
+          "email": "client.jrn004+20260428024336@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-04-28T02:43:37.174Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT logs in",
+      "layman": "Log the client in and store the access token for potential authenticated calls.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-28T02:43:40.432Z",
+        "endedAt": "2026-04-28T02:43:40.665Z",
+        "durationMs": 233,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "87184469-fdd0-40c3-85c5-d74cf4fe55b4",
+            "role": "CLIENT",
+            "name": "journey client 20260428024336",
+            "nickname": "journeyclient-jrn004-20260428024336",
+            "email": "client.jrn004+20260428024336@journey.test",
+            "password_hash": "$2b$12$0fOfu7xaKmzYcrKdXmlFf.P7SnYSbxmCaRS/JLEk3WhQemOPRsw8S",
+            "email_verified": true,
+            "biometric_auth_enabled": false,
+            "created_at": "2026-04-28T02:43:37.174Z"
+          }
+        ],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: CLIENT user row exists",
+      "layman": "Confirm the client user exists in the database after signup + verification.",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB users query",
+        "startedAt": "2026-04-28T02:43:40.665Z",
+        "endedAt": "2026-04-28T02:43:40.669Z",
+        "durationMs": 4,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+        "role": "COMPANION",
+        "name": "journey companion 20260428024336",
+        "nickname": "journeycompanion-jrn004-20260428024336",
+        "email": "companion.jrn004+20260428024336@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-28T02:43:40.895Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION signs up",
+      "layman": "Create a brand new companion account so we can verify email and log in.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 6,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-28T02:43:40.669Z",
+        "endedAt": "2026-04-28T02:43:40.917Z",
+        "durationMs": 248,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve COMPANION verification email from Mailpit and extract token",
+      "layman": "Confirm the companion verification email was sent and extract the verify-email token from it.",
+      "serviceHit": {
+        "step": 7,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-28T02:43:40.917Z",
+        "endedAt": "2026-04-28T02:43:40.921Z",
+        "durationMs": 4,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION verifies email",
+      "layman": "Mark the companion email as verified so login can succeed.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 8,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-28T02:43:40.921Z",
+        "endedAt": "2026-04-28T02:43:40.924Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 9,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZmIwMjM1MC1lNTAwLTQ5MjctYjliNi03NDU0NWQ2YjIxZTkiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb24uanJuMDA0KzIwMjYwNDI4MDI0MzM2QGpvdXJuZXkudGVzdCIsImlhdCI6MTc3NzM0NDIyMSwiZXhwIjoxNzc3MzQ3ODIxfQ.Rl0-tLlzwAwb_qjy4tcdSeIYyJ9UbzCaPHAPdMJ8wCs",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+          "role": "COMPANION",
+          "name": "journey companion 20260428024336",
+          "nickname": "journeycompanion-jrn004-20260428024336",
+          "email": "companion.jrn004+20260428024336@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-04-28T02:43:40.895Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION logs in",
+      "layman": "Log the companion in and store the access token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 9,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-28T02:43:40.924Z",
+        "endedAt": "2026-04-28T02:43:41.141Z",
+        "durationMs": 217,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+            "role": "COMPANION",
+            "name": "journey companion 20260428024336",
+            "nickname": "journeycompanion-jrn004-20260428024336",
+            "email": "companion.jrn004+20260428024336@journey.test",
+            "password_hash": "$2b$12$IfDv2vA5RicR5jZu9dv6AuRwG/3rsjI6l7VwUkVZ6pAAeW7x8ca.6",
+            "email_verified": true,
+            "biometric_auth_enabled": false,
+            "created_at": "2026-04-28T02:43:40.895Z"
+          }
+        ],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: COMPANION user row exists",
+      "layman": "Confirm the companion user exists in the database after signup + verification.",
+      "serviceHit": {
+        "step": 10,
+        "target": "DB users query",
+        "startedAt": "2026-04-28T02:43:41.141Z",
+        "endedAt": "2026-04-28T02:43:41.143Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 11,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "436a2538-77f6-4c5f-8125-69e9b07bb345",
+            "user_id": "ffb02350-e500-4927-b9b6-74545d6b21e9",
+            "designation": "CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "0.00"
+          }
+        ],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: COMPANION has a companion_profile row",
+      "layman": "Confirm the system provisioned a companion profile for the companion account.",
+      "serviceHit": {
+        "step": 11,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-04-28T02:43:41.143Z",
+        "endedAt": "2026-04-28T02:43:41.145Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
