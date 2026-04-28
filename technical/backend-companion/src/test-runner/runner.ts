@@ -18,7 +18,8 @@ import {
   makeRunSuffix,
   nowIso,
   parseArgs,
-  substitute
+  substitute,
+  todayYmd
 } from "./utils";
 
 const API_BASE = "http://localhost:3000";
@@ -116,6 +117,9 @@ export async function runTestFile(
   for (const [key, value] of Object.entries(process.env)) {
     context[key] = value;
   }
+  if (context["TODAY_DATE_YMD"] === undefined || context["TODAY_DATE_YMD"] === null) {
+    context["TODAY_DATE_YMD"] = todayYmd(process.env.TZ);
+  }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -152,6 +156,8 @@ export async function runTestFile(
 
     for (const step of testDef.steps) {
       const stepStartedAt = nowIso();
+      const stepNumber = step.step;
+      const stepActionType = (step as { actionType?: unknown }).actionType;
       const stepResult = buildStepBase(step);
       let target = "";
       try {
@@ -183,11 +189,11 @@ export async function runTestFile(
           };
         } else {
           stepResult.result = "FAIL";
-          recordFailure(result.failures, step.step, "Unsupported actionType", step.actionType);
+          recordFailure(result.failures, stepNumber, "Unsupported actionType", stepActionType);
         }
       } catch (error) {
         stepResult.result = "FAIL";
-        recordFailure(result.failures, step.step, "Step execution failed", String(error));
+        recordFailure(result.failures, stepNumber, "Step execution failed", String(error));
       }
 
       const stepEndedAt = nowIso();

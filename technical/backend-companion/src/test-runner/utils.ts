@@ -18,6 +18,18 @@ export function makeRunSuffix(): string {
   return new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
 }
 
+/** Return today's date as YYYY-MM-DD in the provided time zone (defaults to UTC). */
+export function todayYmd(timeZone?: string): string {
+  const tz = timeZone && String(timeZone).trim() ? String(timeZone).trim() : "UTC";
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+  return formatter.format(new Date());
+}
+
 /** Render {{TOKEN}} placeholders in a string using context values. */
 export function renderTemplate(value: string, context: RunContext): string {
   if (!value.includes("{{")) {

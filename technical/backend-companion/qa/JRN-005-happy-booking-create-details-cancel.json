@@ -1,0 +1,460 @@
+{
+  "testId": "JRN-005",
+  "type": "journey",
+  "priority": "P1",
+  "scenarioName": "Happy path: create CAPTAIN+VICE roster -> CLIENT booking create -> details -> cancel (idempotent)",
+  "flowType": "happy",
+  "linkedRequirements": [
+    "identity/signup",
+    "identity/verify-email",
+    "identity/login",
+    "roster/populate-for-companion",
+    "roster/get-availability",
+    "booking/create",
+    "booking/details",
+    "booking/cancel"
+  ],
+  "filePath": "qa/JRN-005-happy-booking-create-details-cancel.json",
+  "executionMode": "api+db+external",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Prove a client can create a booking that allocates a CAPTAIN+VICE duo (via roster), then fetch booking details, then cancel the booking (and cancelling again is idempotent).",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Mailpit running on localhost:8025",
+    "INTERNAL_API_TOKEN exported in shell running test-validator",
+    "Test DB should be reasonably clean so companion designation balancing yields at least one CAPTAIN and one VICE_CAPTAIN among the created companions"
+  ],
+  "testData": {
+    "runIdPlaceholder": "{{RUN_ID}}",
+    "venue": {
+      "venueId": "c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a",
+      "name": "Journey Venue - Booking",
+      "operatingHoursStart": "00:00:00",
+      "operatingHoursEnd": "23:59:59"
+    },
+    "emails": {
+      "clientEmail": "client.jrn005+{{RUN_ID}}@journey.test",
+      "companionAEmail": "companiona.jrn005+{{RUN_ID}}@journey.test",
+      "companionBEmail": "companionb.jrn005+{{RUN_ID}}@journey.test"
+    },
+    "dateRules": {
+      "TODAY_DATE_YMD": "Provided automatically by the JS runner as {{TODAY_DATE_YMD}} (computed using process.env.TZ, default UTC)."
+    },
+    "bookingRules": {
+      "startAt": "Use the first availableStartTime returned by the availability call",
+      "endAt": "Server derives endAt = startAt + 2 hours"
+    }
+  },
+  "seedData": [
+    {
+      "entity": "venue",
+      "values": {
+        "id": "c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a",
+        "name": "Journey Venue - Booking",
+        "address": "500 Booking Road, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.2048,
+        "longitude": 55.2708,
+        "operatingHoursStart": "00:00:00",
+        "operatingHoursEnd": "23:59:59"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 60,
+    "pollEveryMs": 500,
+    "retryCount": 120
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "storeResponseFields": ["id"],
+      "storeAs": "companionAUserId",
+      "description": "COMPANION A signs up",
+      "layman": "Create the first companion account.",
+      "requiredPayloadFields": [
+        "role",
+        "name",
+        "nickname",
+        "email",
+        "password",
+        "biometricAuthEnabled"
+      ],
+      "payloadRules": {
+        "role": "COMPANION",
+        "nameTemplate": "journey companion A {{RUN_ID}}",
+        "nicknameTemplate": "journeycompanionA-jrn005-{{RUN_ID}}",
+        "emailTemplate": "companiona.jrn005+{{RUN_ID}}@journey.test",
+        "passwordRule": "Generate strong password and store for reuse",
+        "passwordStoreAs": "companionAPassword",
+        "biometricAuthEnabled": false,
+        "emailNormalizationNote": "Use lowercase; system normalizes emails to lowercase"
+      }
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "companiona.jrn005+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "companionAVerificationToken",
+      "description": "Extract COMPANION A verification token from Mailpit",
+      "layman": "Confirm the verification email arrived and grab the token."
+    },
+    {
+      "step": 3,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companionAVerificationToken}}"
+      },
+      "description": "Verify COMPANION A email",
+      "layman": "Verify the companion email so they can log in."
+    },
+    {
+      "step": 4,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "storeResponseFields": ["accessToken"],
+      "storeAs": "companionAAccessToken",
+      "description": "Login COMPANION A",
+      "layman": "Log the companion in and store their access token.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadRules": {
+        "emailTemplate": "companiona.jrn005+{{RUN_ID}}@journey.test",
+        "passwordFromStoreKey": "companionAPassword",
+        "passwordRule": "Reuse the same password from signup"
+      }
+    },
+    {
+      "step": 5,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "storeResponseFields": ["id"],
+      "storeAs": "companionBUserId",
+      "description": "COMPANION B signs up",
+      "layman": "Create the second companion account.",
+      "requiredPayloadFields": [
+        "role",
+        "name",
+        "nickname",
+        "email",
+        "password",
+        "biometricAuthEnabled"
+      ],
+      "payloadRules": {
+        "role": "COMPANION",
+        "nameTemplate": "journey companion B {{RUN_ID}}",
+        "nicknameTemplate": "journeycompanionB-jrn005-{{RUN_ID}}",
+        "emailTemplate": "companionb.jrn005+{{RUN_ID}}@journey.test",
+        "passwordRule": "Generate strong password and store for reuse",
+        "passwordStoreAs": "companionBPassword",
+        "biometricAuthEnabled": false,
+        "emailNormalizationNote": "Use lowercase; system normalizes emails to lowercase"
+      }
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "companionb.jrn005+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "companionBVerificationToken",
+      "description": "Extract COMPANION B verification token from Mailpit",
+      "layman": "Confirm the second verification email arrived and grab the token."
+    },
+    {
+      "step": 7,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companionBVerificationToken}}"
+      },
+      "description": "Verify COMPANION B email",
+      "layman": "Verify the second companion email so they can log in."
+    },
+    {
+      "step": 8,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "storeResponseFields": ["accessToken"],
+      "storeAs": "companionBAccessToken",
+      "description": "Login COMPANION B",
+      "layman": "Log the second companion in and store their access token.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadRules": {
+        "emailTemplate": "companionb.jrn005+{{RUN_ID}}@journey.test",
+        "passwordFromStoreKey": "companionBPassword",
+        "passwordRule": "Reuse the same password from signup"
+      }
+    },
+    {
+      "step": 9,
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "description": "Populate roster for COMPANION A at venue",
+      "layman": "Attach companion A to the venue and generate their roster slots.",
+      "requiredPayloadFields": ["companionId", "venueIds"],
+      "payloadRules": {
+        "companionIdFromStoreKey": "companionAUserId",
+        "venueIds": ["c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a"]
+      }
+    },
+    {
+      "step": 10,
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "description": "Populate roster for COMPANION B at venue",
+      "layman": "Attach companion B to the venue and generate their roster slots.",
+      "requiredPayloadFields": ["companionId", "venueIds"],
+      "payloadRules": {
+        "companionIdFromStoreKey": "companionBUserId",
+        "venueIds": ["c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a"]
+      }
+    },
+    {
+      "step": 11,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "storeResponseFields": ["id"],
+      "storeAs": "clientUserId",
+      "description": "CLIENT signs up",
+      "layman": "Create the client account that will make the booking.",
+      "requiredPayloadFields": [
+        "role",
+        "name",
+        "nickname",
+        "email",
+        "password",
+        "biometricAuthEnabled"
+      ],
+      "payloadRules": {
+        "role": "CLIENT",
+        "nameTemplate": "journey client {{RUN_ID}}",
+        "nicknameTemplate": "journeyclient-jrn005-{{RUN_ID}}",
+        "emailTemplate": "client.jrn005+{{RUN_ID}}@journey.test",
+        "passwordRule": "Generate strong password and store for reuse",
+        "passwordStoreAs": "clientPassword",
+        "biometricAuthEnabled": false,
+        "emailNormalizationNote": "Use lowercase; system normalizes emails to lowercase"
+      }
+    },
+    {
+      "step": 12,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "client.jrn005+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "clientVerificationToken",
+      "description": "Extract CLIENT verification token from Mailpit",
+      "layman": "Confirm the client verification email arrived and grab the token."
+    },
+    {
+      "step": 13,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{clientVerificationToken}}"
+      },
+      "description": "Verify CLIENT email",
+      "layman": "Verify the client email so login can succeed."
+    },
+    {
+      "step": 14,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "storeResponseFields": ["accessToken"],
+      "storeAs": "clientAccessToken",
+      "description": "Login CLIENT",
+      "layman": "Log the client in and store their access token.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadRules": {
+        "emailTemplate": "client.jrn005+{{RUN_ID}}@journey.test",
+        "passwordFromStoreKey": "clientPassword",
+        "passwordRule": "Reuse the same password from signup"
+      }
+    },
+    {
+      "step": 15,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/availability",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "queryParams": {
+        "venueId": "c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a",
+        "date": "{{TODAY_DATE_YMD}}"
+      },
+      "storeResponseFields": ["availableStartTimes"],
+      "storeAs": "availableStartTimes",
+      "description": "Get today's availability at the venue",
+      "layman": "Ask the system what booking start times are available today at this venue."
+    },
+    {
+      "step": 16,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "storeResponseFields": ["id"],
+      "storeAs": "bookingId",
+      "description": "Create booking for first availableStartTime",
+      "layman": "Create a booking at the first available start time. The backend should allocate a CAPTAIN+VICE companion duo.",
+      "requiredPayloadFields": ["venueId", "startAt"],
+      "payloadRules": {
+        "venueId": "c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a",
+        "startAtFromStoreArrayKey": "availableStartTimes",
+        "startAtPickStrategy": "first"
+      }
+    },
+    {
+      "step": 17,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/{{bookingId}}/details",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "description": "Fetch booking details",
+      "layman": "Confirm the booking exists and retrieve its details."
+    },
+    {
+      "step": 18,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/cancel",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "description": "Cancel booking (first time)",
+      "layman": "Cancel the booking. The backend should release the reserved roster slots."
+    },
+    {
+      "step": 19,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/cancel",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "description": "Cancel booking (second time, idempotent)",
+      "layman": "Cancelling again should still succeed and keep the booking cancelled."
+    },
+    {
+      "step": 20,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "bookings",
+      "where": {
+        "field": "id",
+        "value": "{{bookingId}}"
+      },
+      "description": "DB check: booking row exists and is CANCELLED",
+      "layman": "Verify in the database that the booking status is CANCELLED."
+    },
+    {
+      "step": 21,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "where": {
+        "field": "booking_id",
+        "value": "{{bookingId}}"
+      },
+      "description": "DB check: no roster_slots still reference this booking",
+      "layman": "Verify the roster slots were released (no slot should still point to this booking id)."
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 16,
+        "statusCode": 201,
+        "requiredKeys": ["id", "status", "clientId", "venueId", "startAt", "endAt", "createdAt"],
+        "bodyFields": {
+          "status": "CONFIRMED",
+          "venueId": "c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a"
+        }
+      },
+      {
+        "step": 17,
+        "statusCode": 200,
+        "requiredKeys": ["id", "status", "clientId", "venueId", "startAt", "endAt", "createdAt"],
+        "bodyFields": {
+          "venueId": "c2c5b5e1-607f-4c6a-a2fb-9c5c1d4c7b2a"
+        }
+      },
+      {
+        "step": 18,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "CANCELLED"
+        }
+      },
+      {
+        "step": 19,
+        "statusCode": 200,
+        "bodyFields": {
+          "status": "CANCELLED"
+        }
+      }
+    ],
+    "db": [
+      {
+        "step": 20,
+        "checks": ["row exists", "status=CANCELLED"]
+      },
+      {
+        "step": 21,
+        "checks": ["no row exists"]
+      }
+    ]
+  }
+}

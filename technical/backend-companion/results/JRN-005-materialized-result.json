@@ -1,0 +1,716 @@
+{
+  "runId": "RUN-20260428033248-JRN-005-materialized",
+  "testId": "JRN-005-materialized",
+  "status": "FAIL",
+  "startedAt": "2026-04-28T03:32:48.324Z",
+  "endedAt": "2026-04-28T03:32:52.859Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-28T03:32:48.408Z",
+      "endedAt": "2026-04-28T03:32:51.829Z",
+      "durationMs": 3421,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-28T03:32:51.829Z",
+      "endedAt": "2026-04-28T03:32:51.839Z",
+      "durationMs": 10,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-28T03:32:51.839Z",
+      "endedAt": "2026-04-28T03:32:51.847Z",
+      "durationMs": 8,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-28T03:32:51.847Z",
+      "endedAt": "2026-04-28T03:32:52.089Z",
+      "durationMs": 242,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-28T03:32:52.089Z",
+      "endedAt": "2026-04-28T03:32:52.324Z",
+      "durationMs": 235,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 6,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-28T03:32:52.324Z",
+      "endedAt": "2026-04-28T03:32:52.329Z",
+      "durationMs": 5,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-28T03:32:52.329Z",
+      "endedAt": "2026-04-28T03:32:52.332Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-28T03:32:52.332Z",
+      "endedAt": "2026-04-28T03:32:52.547Z",
+      "durationMs": 215,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 9,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-04-28T03:32:52.548Z",
+      "endedAt": "2026-04-28T03:32:52.588Z",
+      "durationMs": 40,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 10,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-04-28T03:32:52.588Z",
+      "endedAt": "2026-04-28T03:32:52.609Z",
+      "durationMs": 21,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 11,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-04-28T03:32:52.609Z",
+      "endedAt": "2026-04-28T03:32:52.846Z",
+      "durationMs": 237,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 12,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-04-28T03:32:52.846Z",
+      "endedAt": "2026-04-28T03:32:52.849Z",
+      "durationMs": 3,
+      "result": "PASS"
+    },
+    {
+      "step": 13,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-04-28T03:32:52.849Z",
+      "endedAt": "2026-04-28T03:32:52.851Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 14,
+      "target": "POST /auth/login",
+      "startedAt": "2026-04-28T03:32:52.851Z",
+      "endedAt": "2026-04-28T03:32:52.851Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 429
+    },
+    {
+      "step": 15,
+      "target": "GET /availability",
+      "startedAt": "2026-04-28T03:32:52.851Z",
+      "endedAt": "2026-04-28T03:32:52.852Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 16,
+      "target": "POST /bookings",
+      "startedAt": "2026-04-28T03:32:52.852Z",
+      "endedAt": "2026-04-28T03:32:52.852Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 17,
+      "target": "GET /bookings/{{step16_id}}/details",
+      "startedAt": "2026-04-28T03:32:52.852Z",
+      "endedAt": "2026-04-28T03:32:52.853Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 18,
+      "target": "POST /bookings/{{step16_id}}/cancel",
+      "startedAt": "2026-04-28T03:32:52.853Z",
+      "endedAt": "2026-04-28T03:32:52.853Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 19,
+      "target": "POST /bookings/{{step16_id}}/cancel",
+      "startedAt": "2026-04-28T03:32:52.853Z",
+      "endedAt": "2026-04-28T03:32:52.853Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 20,
+      "target": "DB bookings query",
+      "startedAt": "2026-04-28T03:32:52.853Z",
+      "endedAt": "2026-04-28T03:32:52.854Z",
+      "durationMs": 1,
+      "result": "FAIL"
+    },
+    {
+      "step": 21,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-04-28T03:32:52.855Z",
+      "endedAt": "2026-04-28T03:32:52.859Z",
+      "durationMs": 4,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "85bd2a76-e2be-4141-babb-3171c1d31985",
+        "role": "COMPANION",
+        "name": "journey companion A 20260428033248",
+        "nickname": "journeycompanionA-jrn005-20260428033248",
+        "email": "companiona.jrn005+20260428033248@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-28T03:32:48.633Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION A signs up",
+      "layman": "Create the first companion account.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-28T03:32:48.408Z",
+        "endedAt": "2026-04-28T03:32:51.829Z",
+        "durationMs": 3421,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract COMPANION A verification token from Mailpit",
+      "layman": "Confirm the verification email arrived and grab the token.",
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-28T03:32:51.829Z",
+        "endedAt": "2026-04-28T03:32:51.839Z",
+        "durationMs": 10,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify COMPANION A email",
+      "layman": "Verify the companion email so they can log in.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-28T03:32:51.839Z",
+        "endedAt": "2026-04-28T03:32:51.847Z",
+        "durationMs": 8,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NWJkMmE3Ni1lMmJlLTQxNDEtYmFiYi0zMTcxYzFkMzE5ODUiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb25hLmpybjAwNSsyMDI2MDQyODAzMzI0OEBqb3VybmV5LnRlc3QiLCJpYXQiOjE3NzczNDcxNzIsImV4cCI6MTc3NzM1MDc3Mn0.2F9Zu-5bqjYAnaozG1IqQDx2hj-suJLBNBebxSW28pA",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "85bd2a76-e2be-4141-babb-3171c1d31985",
+          "role": "COMPANION",
+          "name": "journey companion A 20260428033248",
+          "nickname": "journeycompanionA-jrn005-20260428033248",
+          "email": "companiona.jrn005+20260428033248@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-04-28T03:32:48.633Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Login COMPANION A",
+      "layman": "Log the companion in and store their access token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-28T03:32:51.847Z",
+        "endedAt": "2026-04-28T03:32:52.089Z",
+        "durationMs": 242,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "id": "89ca9fe9-727c-40be-9f79-78035edbab71",
+        "role": "COMPANION",
+        "name": "journey companion B 20260428033248",
+        "nickname": "journeycompanionB-jrn005-20260428033248",
+        "email": "companionb.jrn005+20260428033248@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-28T03:32:52.310Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION B signs up",
+      "layman": "Create the second companion account.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 5,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-28T03:32:52.089Z",
+        "endedAt": "2026-04-28T03:32:52.324Z",
+        "durationMs": 235,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract COMPANION B verification token from Mailpit",
+      "layman": "Confirm the second verification email arrived and grab the token.",
+      "serviceHit": {
+        "step": 6,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-28T03:32:52.324Z",
+        "endedAt": "2026-04-28T03:32:52.329Z",
+        "durationMs": 5,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify COMPANION B email",
+      "layman": "Verify the second companion email so they can log in.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 7,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-28T03:32:52.329Z",
+        "endedAt": "2026-04-28T03:32:52.332Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OWNhOWZlOS03MjdjLTQwYmUtOWY3OS03ODAzNWVkYmFiNzEiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb25iLmpybjAwNSsyMDI2MDQyODAzMzI0OEBqb3VybmV5LnRlc3QiLCJpYXQiOjE3NzczNDcxNzIsImV4cCI6MTc3NzM1MDc3Mn0.1Z3ZnF0QxueS0lzVyAf0CiZOtWdM531JCPw2vNzP2c4",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "89ca9fe9-727c-40be-9f79-78035edbab71",
+          "role": "COMPANION",
+          "name": "journey companion B 20260428033248",
+          "nickname": "journeycompanionB-jrn005-20260428033248",
+          "email": "companionb.jrn005+20260428033248@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-04-28T03:32:52.310Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Login COMPANION B",
+      "layman": "Log the second companion in and store their access token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 8,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-28T03:32:52.332Z",
+        "endedAt": "2026-04-28T03:32:52.547Z",
+        "durationMs": 215,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 9,
+      "result": "PASS",
+      "observed": {
+        "companionId": "85bd2a76-e2be-4141-babb-3171c1d31985",
+        "slotsCreated": 308
+      },
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "description": "Populate roster for COMPANION A at venue",
+      "layman": "Attach companion A to the venue and generate their roster slots.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 9,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-04-28T03:32:52.548Z",
+        "endedAt": "2026-04-28T03:32:52.588Z",
+        "durationMs": 40,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "companionId": "89ca9fe9-727c-40be-9f79-78035edbab71",
+        "slotsCreated": 308
+      },
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "description": "Populate roster for COMPANION B at venue",
+      "layman": "Attach companion B to the venue and generate their roster slots.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 10,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-04-28T03:32:52.588Z",
+        "endedAt": "2026-04-28T03:32:52.609Z",
+        "durationMs": 21,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 11,
+      "result": "PASS",
+      "observed": {
+        "id": "3cac0011-958c-4a40-8e64-0f33a4c0f71b",
+        "role": "CLIENT",
+        "name": "journey client 20260428033248",
+        "nickname": "journeyclient-jrn005-20260428033248",
+        "email": "client.jrn005+20260428033248@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-04-28T03:32:52.836Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT signs up",
+      "layman": "Create the client account that will make the booking.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 11,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-04-28T03:32:52.609Z",
+        "endedAt": "2026-04-28T03:32:52.846Z",
+        "durationMs": 237,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 12,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract CLIENT verification token from Mailpit",
+      "layman": "Confirm the client verification email arrived and grab the token.",
+      "serviceHit": {
+        "step": 12,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-04-28T03:32:52.846Z",
+        "endedAt": "2026-04-28T03:32:52.849Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 13,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify CLIENT email",
+      "layman": "Verify the client email so login can succeed.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 13,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-04-28T03:32:52.849Z",
+        "endedAt": "2026-04-28T03:32:52.851Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 14,
+      "result": "PASS",
+      "observed": {
+        "code": "TOO_MANY_ATTEMPTS",
+        "message": "Too many attempts"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Login CLIENT",
+      "layman": "Log the client in and store their access token.",
+      "statusCode": 429,
+      "serviceHit": {
+        "step": 14,
+        "target": "POST /auth/login",
+        "startedAt": "2026-04-28T03:32:52.851Z",
+        "endedAt": "2026-04-28T03:32:52.851Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 429
+      }
+    },
+    {
+      "step": 15,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Get today's availability at the venue",
+      "layman": "Ask the system what booking start times are available today at this venue.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 15,
+        "target": "GET /availability",
+        "startedAt": "2026-04-28T03:32:52.851Z",
+        "endedAt": "2026-04-28T03:32:52.852Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 16,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Create booking for first availableStartTime",
+      "layman": "Create a booking at the first available start time. The backend should allocate a CAPTAIN+VICE companion duo.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 16,
+        "target": "POST /bookings",
+        "startedAt": "2026-04-28T03:32:52.852Z",
+        "endedAt": "2026-04-28T03:32:52.852Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 17,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Fetch booking details",
+      "layman": "Confirm the booking exists and retrieve its details.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 17,
+        "target": "GET /bookings/{{step16_id}}/details",
+        "startedAt": "2026-04-28T03:32:52.852Z",
+        "endedAt": "2026-04-28T03:32:52.853Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 18,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Cancel booking (first time)",
+      "layman": "Cancel the booking. The backend should release the reserved roster slots.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 18,
+        "target": "POST /bookings/{{step16_id}}/cancel",
+        "startedAt": "2026-04-28T03:32:52.853Z",
+        "endedAt": "2026-04-28T03:32:52.853Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 19,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Cancel booking (second time, idempotent)",
+      "layman": "Cancelling again should still succeed and keep the booking cancelled.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 19,
+        "target": "POST /bookings/{{step16_id}}/cancel",
+        "startedAt": "2026-04-28T03:32:52.853Z",
+        "endedAt": "2026-04-28T03:32:52.853Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 20,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB check: booking row exists and is CANCELLED",
+      "layman": "Verify in the database that the booking status is CANCELLED.",
+      "serviceHit": {
+        "step": 20,
+        "target": "DB bookings query",
+        "startedAt": "2026-04-28T03:32:52.853Z",
+        "endedAt": "2026-04-28T03:32:52.854Z",
+        "durationMs": 1,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 21,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB check: no roster_slots still reference this booking",
+      "layman": "Verify the roster slots were released (no slot should still point to this booking id).",
+      "serviceHit": {
+        "step": 21,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-04-28T03:32:52.855Z",
+        "endedAt": "2026-04-28T03:32:52.859Z",
+        "durationMs": 4,
+        "result": "FAIL"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL",
+    "db": "FAIL",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 20,
+      "reason": "Step execution failed",
+      "evidence": "error: invalid input syntax for type uuid: \"{{step16_id}}\""
+    },
+    {
+      "step": 20,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 21,
+      "reason": "Step execution failed",
+      "evidence": "error: invalid input syntax for type uuid: \"{{step16_id}}\""
+    },
+    {
+      "step": 21,
+      "reason": "Step failed",
+      "evidence": {}
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
