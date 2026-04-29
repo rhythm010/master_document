@@ -1,6 +1,6 @@
 Feature: Venues & Availability (Roster)
 Version: 1.1.0
-Status: Current
+Status: Archived
 Previous Version: venues-and-availability-roster.feature-sds.v1.0.0.md
 Change Type: MINOR
 Change Summary: Add GET /venues/{venueId} (Bearer auth) returning same fields as venue list item.

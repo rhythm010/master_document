@@ -1,11 +1,11 @@
 Feature: Booking & Allocation
-Version: 1.2.0
+Version: 2.0.0
 Status: Current
-Previous Version: booking-and-allocation.feature-sds.v1.1.1.md
-Change Type: MINOR
-Change Summary: Add GET /bookings/{id}/details client-only endpoint with timed companion reveal (T-5h) per master-document/1.3
-Created At: 2026-04-28T16:00:00Z
-Last Edited At: 2026-04-29T04:15:09Z
+Previous Version: booking-and-allocation.feature-sds.v1.2.0.md
+Change Type: MAJOR
+Change Summary: Remove timed companion reveal entirely; update GET /bookings/{id}/details to always return companion public info (2 companions, ordered CAPTAIN then VICE_CAPTAIN) for all booking statuses.
+Created At: 2026-04-24T03:10:02Z
+Last Edited At: 2026-04-29T15:16:52Z
 Owner: Booking & Allocation Module
 
 Feature: Booking & Allocation
@@ -13,7 +13,7 @@ Module: Booking & Allocation
 
 1. Purpose
 
-Implement booking creation and allocation of a companion duo (Captain + Vice Captain) from a venue-based roster, enforce the "one non-terminal booking per client" rule, support cancellation (pre-session and in-session) with roster release, and provide client-only booking details retrieval with timed companion reveal.
+Implement booking creation and allocation of a companion duo (Captain + Vice Captain) from a venue-based roster, enforce the "one non-terminal booking per client" rule, support cancellation (pre-session and in-session) with roster release, and provide client-only booking details retrieval with always-available companion public info (no timed reveal).
 
 Additionally, support INTERNAL ONLY edits of an existing booking in CONFIRMED state to:
 - change `venueId` and/or `startAt` (with fixed duration), and
@@ -30,7 +30,7 @@ Source: `master-document/1.2_Booking_And_Allocation_Flow.md`, `master-document/1
 Alignment:
 - `SDS/core_sds.md` (Booking lifecycle + invariants)
 - `SDS/data-model/schema.md` (`bookings`, `roster_slots`, `booking_companion_assignments`, partial unique index enforcing one non-terminal booking)
-- Clarity artifact: `SDS/artifacts/TASK-20260428-002-clarity.json`
+- Clarity artifact: `SDS/artifacts/TASK-20260429-001-clarity.json`
 
 2. API Contract
 
@@ -51,9 +51,8 @@ On success, the edit operation MUST be atomic:
 Booking artifacts stability rule:
 - `qrCode`, `pinCode`, `comMatchQrCode`, `comMatchPinCode`, and `bookingColor` MUST remain unchanged across edits, even if companions change.
 
-
 D. `GET /bookings/{id}/details`
-Retrieves booking details for the authenticated client. Returns booking metadata with conditionally revealed companion information based on timing rules (T-5h before startAt).
+Retrieves booking details for the authenticated booking owner client. Returns booking metadata with companion public info ALWAYS present (no timing-based reveal).
 
 3. Input
 
@@ -87,10 +86,10 @@ Companion reassignment rule:
 Duration invariant on edit:
 - `endAt` is derived by server as `endAt = startAt + 2 hours` using the (possibly updated) `startAt`.
 
-
 D. `GET /bookings/{id}/details`
 - Path parameter: `{id}` — booking uuid
 - No request body
+- Callable anytime (no timing-based restrictions)
 
 4. Output
 
@@ -129,7 +128,6 @@ Returns updated booking summary. Same shape as `POST /bookings` response is acce
 }
 ```
 
-
 D. `GET /bookings/{id}/details` (200)
 ```json
 {
@@ -142,25 +140,29 @@ D. `GET /bookings/{id}/details` (200)
   "createdAt": "ISO-8601",
   "companions": [
     {
+      "companionId": "uuid",
       "designation": "CAPTAIN" | "VICE_CAPTAIN",
       "displayName": "string",
-      "languages": ["string"],
+      "languages": ["ENGLISH", "ARABIC"],
       "profilePictureUrl": "string",
       "averageRating": 0.00
     }
-  ] | null
+  ]
 }
 ```
 
 Response field rules:
 - `companions`:
-  - `null` when current time < (startAt - 5 hours) OR booking status is `CANCELLED` OR booking status is `COMPLETED`
-  - Array of exactly 2 companion objects when current time >= (startAt - 5 hours) AND booking status is `CONFIRMED` or `ACTIVE`
-  - Array is ordered: [CAPTAIN, VICE_CAPTAIN]
-  - Each companion object contains:
+  - ALWAYS present (never `null`).
+  - ALWAYS an array of exactly 2 companion objects.
+  - Array MUST be ordered: `[CAPTAIN, VICE_CAPTAIN]`.
+  - Exactly one element per designation.
+  - Companions MUST be returned for ALL booking statuses, including `CANCELLED` and `COMPLETED`.
+  - Each companion object contains ONLY public non-PII fields:
+    - `companionId`: from `booking_companion_assignments.companion_id` (== `users.id`)
     - `designation`: from `booking_companion_assignments.designation`
     - `displayName`: from `users.nickname` (NO PII: no full name, email, or phone)
-    - `languages`: from `companion_profiles.languages`
+    - `languages`: from `companion_profiles.languages` (allowed values: `ENGLISH`, `ARABIC`)
     - `profilePictureUrl`: from `companion_profiles.profile_picture_url`
     - `averageRating`: from `companion_profiles.average_rating`
 
@@ -184,6 +186,11 @@ Error envelope (per Core SDS):
   - Requires internalAuth ONLY using header `X-Internal-Token`.
   - Client Bearer tokens MUST NOT authorize this endpoint (this endpoint is not part of the public Bearer-authenticated surface).
   - Caller is restricted to internal services / admin tooling only.
+- `GET /bookings/{id}/details`:
+  - Requires Bearer token
+  - Only `role=CLIENT`
+  - Only the booking owner client may call: `bookings.client_id == auth.userId`
+  - Explicitly NOT allowed for companions (even if assigned)
 
 6. Preconditions
 
@@ -233,6 +240,13 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
   - `viceCaptainCompanionId` must reference a COMPANION with designation `VICE_CAPTAIN`.
 - Availability requirement (target booking window at target venue):
   - The target duo (either existing duo if not manually reassigned, or specified duo) must each have AVAILABLE `roster_slots` for the exact window `[startAt, endAt)` at the target venue.
+
+D. `GET /bookings/{id}/details`
+- Authenticated user exists.
+- Authenticated user `role == CLIENT`.
+- Booking exists.
+- Booking is owned by authenticated client (`bookings.client_id == auth.userId`).
+- Endpoint is callable regardless of booking status (including `CANCELLED` and `COMPLETED`).
 
 7. Data Access Mapping
 
@@ -361,9 +375,7 @@ Goal: apply requested edits and (re)allocate roster slots/assignments atomically
         - `viceCaptainCompanionId` must have designation `VICE_CAPTAIN`.
      3) Set `targetCaptainId = captainCompanionId`, `targetViceCaptainId = viceCaptainCompanionId`.
    - Else (no manual reassignment):
-     - Keep existing duo:
-       - `targetCaptainId = currentCaptainId`
-       - `targetViceCaptainId = currentViceCaptainId`
+     - Keep existing duo.
 
 10. Release currently reserved roster slots for the booking:
    - Update all `roster_slots` where `booking_id = bookings.id`:
@@ -373,54 +385,34 @@ Goal: apply requested edits and (re)allocate roster slots/assignments atomically
    - This MUST occur inside the same transaction as reservation of the new slots.
 
 11. Reserve new roster slots for the target duo for the edited window (deadlock-safe):
-   - Lock BOTH target roster slots in a single statement (must return exactly 2 rows):
-     - Find rows matching:
-       - `venue_id=targetVenueId`, `start_at=targetStartAt`, `end_at=targetEndAt`, `status='AVAILABLE'`
-       - `companion_id IN (targetCaptainId, targetViceCaptainId)`
-     - Lock using `FOR UPDATE SKIP LOCKED`.
-   - If fewer than 2 rows are returned (missing/unavailable/locked): rollback and return 409 `NO_DUO_AVAILABLE`.
-   - Book both locked slots:
-     - set `status='BOOKED'`, `booking_id=bookings.id`
-   - Row-count guard:
-     - The BOOK update MUST affect exactly 2 rows; otherwise rollback and return 409 `NO_DUO_AVAILABLE`.
+   - Lock BOTH target roster slots in a single statement (must return exactly 2 rows) using `FOR UPDATE SKIP LOCKED`.
+   - If fewer than 2 rows are returned: rollback and return 409 `NO_DUO_AVAILABLE`.
+   - Book both locked slots; row-count guard MUST be exactly 2.
 
-12. Update booking time/venue fields (artifacts unchanged):
-   - Update `bookings.venue_id = targetVenueId` (if changed)
-   - Update `bookings.start_at = targetStartAt` and `bookings.end_at = targetEndAt` (if changed)
-   - MUST NOT change: `qr_code`, `pin_code`, `com_match_qr_code`, `com_match_pin_code`, `booking_color`.
+12. Update booking time/venue fields (artifacts unchanged).
 
-13. Update `booking_companion_assignments` to match target duo:
-   - Ensure exactly one CAPTAIN assignment and one VICE_CAPTAIN assignment remain for the booking.
-   - Update the CAPTAIN assignment row `companion_id = targetCaptainId`.
-   - Update the VICE_CAPTAIN assignment row `companion_id = targetViceCaptainId`.
-   - If a companion id changed for a designation, reset that row’s match-related statuses to defaults:
-     - `presence_status='ASSIGNED'`
-     - `self_match_status='NOT_MATCHED'`
-     - `client_match_status='WAITING_FOR_CLIENT'`
+13. Update `booking_companion_assignments` to match target duo.
+   - If a companion id changed for a designation, reset that row’s match-related statuses to defaults.
 
 14. Commit transaction.
 
 15. Return updated booking summary (status remains `CONFIRMED`).
 
-
 D. `GET /bookings/{id}/details`
 1. Authenticate and authorize `role==CLIENT`.
 2. Fetch booking by id.
-3. Authorize owner:
-   - require `bookings.client_id == caller.userId`.
-4. Compute reveal time:
-   - `revealTime = bookings.start_at - 5 hours`.
-5. Determine whether to reveal companions:
-   - If `current_time < revealTime`: companions = null
-   - If `bookings.status == 'CANCELLED'`: companions = null
-   - If `bookings.status == 'COMPLETED'`: companions = null
-   - Else (status is `CONFIRMED` or `ACTIVE` AND current_time >= revealTime): reveal companions
-6. If companions should be revealed:
-   - Load exactly two assignment rows for the booking (CAPTAIN + VICE_CAPTAIN)
-   - Join to `users.nickname` and `companion_profiles` for the assigned companions
-   - Return companions array with exactly 2 elements, ordered: [CAPTAIN, VICE_CAPTAIN]
-7. If companions should NOT be revealed:
-   - Set companions field to `null`
+3. Authorize owner: require `bookings.client_id == caller.userId`.
+4. Load exactly two assignment rows for the booking (CAPTAIN + VICE_CAPTAIN).
+   - Data integrity check: MUST return exactly 2 rows, containing one `CAPTAIN` and one `VICE_CAPTAIN`.
+   - If violated: return 500 `INTERNAL_ERROR`.
+5. Join to companion public info sources (NO PII):
+   - `users.nickname` for `displayName`
+   - `companion_profiles.languages`, `profile_picture_url`, `average_rating`
+6. Return companions array with exactly 2 elements, ordered: [CAPTAIN, VICE_CAPTAIN].
+
+Notes:
+- No timing-based reveal; companions are ALWAYS returned.
+- Companions are returned for all booking statuses, including `CANCELLED` and `COMPLETED`.
 
 9. State Changes
 
@@ -434,155 +426,39 @@ D. `GET /bookings/{id}/details`
 - RosterSlot status:
   - On create: `AVAILABLE → BOOKED` (for the two selected slots)
   - On cancel: `BOOKED → AVAILABLE` (for slots linked to the cancelled booking)
-  - On internal edit (PATCH /bookings/{id}):
-    - release currently reserved slots: `BOOKED → AVAILABLE` (for slots linked to the booking)
-    - reserve new slots for target duo/window: `AVAILABLE → BOOKED`
-    - both operations must be atomic within a transaction
+  - On internal edit (PATCH /bookings/{id}`): release+reserve atomic within a transaction.
 
 - BookingCompanionAssignment:
   - Created during booking creation.
-  - On internal edit (PATCH /bookings/{id}):
-    - `companion_id` may change for CAPTAIN and/or VICE_CAPTAIN designations.
-    - If changed, reset the affected assignment’s `presence_status/self_match_status/client_match_status` back to defaults.
+  - On internal edit: `companion_id` may change; if changed reset match statuses to defaults.
 
 10. DB Operations
 
 A. `POST /bookings`
-- Pre-check (optional but recommended for clear error):
-  - `SELECT id FROM bookings WHERE client_id = $1 AND status IN ('CONFIRMED','ACTIVE') LIMIT 1`
-
-- Allocate two roster slots (must return two rows for two different companions):
-  - Example (exact SQL may vary):
-    - Select 1 Captain slot:
-      - `SELECT rs.id, rs.companion_id
-         FROM roster_slots rs
-         JOIN companion_profiles cp ON cp.user_id = rs.companion_id
-         WHERE rs.venue_id = $1
-           AND rs.start_at = $2
-           AND rs.end_at = $3
-           AND rs.status = 'AVAILABLE'
-           AND cp.designation = 'CAPTAIN'
-         ORDER BY rs.id ASC
-         LIMIT 1
-         FOR UPDATE SKIP LOCKED`
-
-    - Select 1 Vice Captain slot:
-      - `SELECT rs.id, rs.companion_id
-         FROM roster_slots rs
-         JOIN companion_profiles cp ON cp.user_id = rs.companion_id
-         WHERE rs.venue_id = $1
-           AND rs.start_at = $2
-           AND rs.end_at = $3
-           AND rs.status = 'AVAILABLE'
-           AND cp.designation = 'VICE_CAPTAIN'
-         ORDER BY rs.id ASC
-         LIMIT 1
-         FOR UPDATE SKIP LOCKED`
-
-- Insert booking:
-  - `INSERT INTO bookings (id, client_id, venue_id, start_at, end_at, status, qr_code, pin_code, booking_color, com_match_qr_code, com_match_pin_code, extended_at)
-     VALUES ($id, $clientId, $venueId, $startAt, $endAt, 'CONFIRMED', $qrCode, $pinCode, $bookingColor, $comQr, $comPin, NULL)`
-
-- Reserve roster slots:
-  - `UPDATE roster_slots
-     SET status = 'BOOKED', booking_id = $bookingId
-     WHERE id IN ($slot1, $slot2) AND status = 'AVAILABLE'`
-
-- Insert assignments (2 rows):
-  - `INSERT INTO booking_companion_assignments (id, booking_id, companion_id, designation)
-     VALUES ($a1, $bookingId, $companion1, 'CAPTAIN'), ($a2, $bookingId, $companion2, 'VICE_CAPTAIN')`
-
-Notes:
-- The DB enforces:
-  - one non-terminal booking per client via `uq_bookings_one_non_terminal_per_client`
-  - no two assignments with same designation per booking and no duplicate companion assignment per booking via unique constraints
+- Pre-check (optional): `SELECT id FROM bookings WHERE client_id = $1 AND status IN ('CONFIRMED','ACTIVE') LIMIT 1`
+- Allocate two roster slots (CAPTAIN + VICE_CAPTAIN) using `FOR UPDATE SKIP LOCKED`.
+- Insert booking.
+- Reserve roster slots.
+- Insert two assignments.
 
 B. `POST /bookings/{id}/cancel`
-- Lock booking for update:
-  - `SELECT id, status, client_id FROM bookings WHERE id = $1 FOR UPDATE`
-- If caller role=COMPANION, authorization check:
-  - `SELECT 1 FROM booking_companion_assignments WHERE booking_id = $1 AND companion_id = $2 LIMIT 1`
-- Update booking status:
-  - `UPDATE bookings SET status = 'CANCELLED' WHERE id = $1`
-- Release roster slots:
-  - `UPDATE roster_slots SET status = 'AVAILABLE', booking_id = NULL WHERE booking_id = $1`
+- Lock booking.
+- If caller role=COMPANION, authorization check via `booking_companion_assignments`.
+- Update booking status.
+- Release roster slots.
 
 C. `PATCH /bookings/{id}` (INTERNAL ONLY)
-- Lock booking:
-  - `SELECT id, status, client_id, venue_id, start_at, end_at, extended_at, created_at
-     FROM bookings
-     WHERE id = $1
-     FOR UPDATE`
-
-- Validate booking is CONFIRMED in application logic (else 400 INVALID_STATE_TRANSITION).
-
-- Load and lock current duo (prevents races with match/presence updates):
-  - `SELECT designation, companion_id, presence_status, self_match_status, client_match_status
-     FROM booking_companion_assignments
-     WHERE booking_id = $1
-     FOR UPDATE`
-
-- If venueId provided, validate venue:
-  - `SELECT id FROM venues WHERE id = $1 LIMIT 1`
-
-- If manual reassignment requested, validate designations:
-  - Captain:
-    - `SELECT 1 FROM companion_profiles WHERE user_id = $1 AND designation = 'CAPTAIN' LIMIT 1`
-  - Vice Captain:
-    - `SELECT 1 FROM companion_profiles WHERE user_id = $1 AND designation = 'VICE_CAPTAIN' LIMIT 1`
-
-- Release existing reservations for the booking:
-  - `UPDATE roster_slots
-     SET status = 'AVAILABLE', booking_id = NULL
-     WHERE booking_id = $1`
-  - Guard: this SHOULD release exactly 2 rows for a CONFIRMED, non-extended booking; otherwise treat as data-integrity failure.
-
-- Reserve target duo slots for target window (deadlock-safe):
-  - Lock BOTH slots in one query:
-    - `SELECT id, companion_id FROM roster_slots
-       WHERE venue_id = $1
-         AND start_at = $2
-         AND end_at = $3
-         AND status = 'AVAILABLE'
-         AND companion_id IN ($targetCaptainId, $targetViceCaptainId)
-       FOR UPDATE SKIP LOCKED`
-  - Guard: MUST return exactly 2 rows; else rollback and return 409 NO_DUO_AVAILABLE.
-
-  - Book both slots:
-    - `UPDATE roster_slots
-       SET status = 'BOOKED', booking_id = $bookingId
-       WHERE id IN ($slotId1, $slotId2) AND status = 'AVAILABLE'`
-  - Guard: MUST update exactly 2 rows; else rollback and return 409 NO_DUO_AVAILABLE.
-
-- Update booking fields (do NOT update code artifacts):
-  - `UPDATE bookings
-     SET venue_id = $targetVenueId,
-         start_at = $targetStartAt,
-         end_at = $targetEndAt
-     WHERE id = $bookingId`
-
-- Update assignments to match target duo:
-  - `UPDATE booking_companion_assignments
-     SET companion_id = $targetCaptainId,
-         presence_status = CASE WHEN companion_id <> $targetCaptainId THEN 'ASSIGNED' ELSE presence_status END,
-         self_match_status = CASE WHEN companion_id <> $targetCaptainId THEN 'NOT_MATCHED' ELSE self_match_status END,
-         client_match_status = CASE WHEN companion_id <> $targetCaptainId THEN 'WAITING_FOR_CLIENT' ELSE client_match_status END
-     WHERE booking_id = $bookingId AND designation = 'CAPTAIN'`
-
-  - `UPDATE booking_companion_assignments
-     SET companion_id = $targetViceCaptainId,
-         presence_status = CASE WHEN companion_id <> $targetViceCaptainId THEN 'ASSIGNED' ELSE presence_status END,
-         self_match_status = CASE WHEN companion_id <> $targetViceCaptainId THEN 'NOT_MATCHED' ELSE self_match_status END,
-         client_match_status = CASE WHEN companion_id <> $targetViceCaptainId THEN 'WAITING_FOR_CLIENT' ELSE client_match_status END
-     WHERE booking_id = $bookingId AND designation = 'VICE_CAPTAIN'`
-
+- Lock booking + lock assignment rows.
+- Release existing reservations.
+- Lock and reserve the two target slots (deadlock-safe).
+- Update booking fields (artifacts unchanged).
+- Update assignment rows to match target duo.
 
 D. `GET /bookings/{id}/details`
 - Fetch booking core fields:
   - `SELECT id, status, client_id, venue_id, start_at, end_at, created_at FROM bookings WHERE id = $1 LIMIT 1`
-
-- If companions are revealed, fetch companion public info (no PII):
-  - `SELECT bca.designation, u.nickname, cp.languages, cp.profile_picture_url, cp.average_rating
+- Fetch companion public info (no PII) (MUST return exactly 2 rows):
+  - `SELECT bca.companion_id, bca.designation, u.nickname, cp.languages, cp.profile_picture_url, cp.average_rating
      FROM booking_companion_assignments bca
      JOIN users u ON u.id = bca.companion_id
      JOIN companion_profiles cp ON cp.user_id = bca.companion_id
@@ -591,125 +467,72 @@ D. `GET /bookings/{id}/details`
 
 11. Transaction Boundaries
 
-A. `POST /bookings`
-- Must be a single DB transaction to guarantee atomicity:
-  - enforce one-booking rule
-  - allocate roster slots
-  - create booking
-  - reserve slots
-  - create assignments
+A. `POST /bookings`: MUST be a single DB transaction (allocate → create booking → reserve → assignments).
 
-B. `POST /bookings/{id}/cancel`
-- Must be a single DB transaction to guarantee atomicity:
-  - update booking status
-  - release roster slots
+B. `POST /bookings/{id}/cancel`: MUST be a single DB transaction (status update + release).
 
-C. `PATCH /bookings/{id}` (INTERNAL ONLY)
-- MUST be a single DB transaction to guarantee atomicity across:
-  - booking status validation (CONFIRMED only)
-  - optional venue validation
-  - release of existing roster slots for the booking
-  - reservation of the target duo’s roster slots for the target window
-  - update of booking time/venue fields
-  - update of booking_companion_assignments to match the target duo
+C. `PATCH /bookings/{id}` (INTERNAL ONLY): MUST be a single DB transaction.
+
+D. `GET /bookings/{id}/details`: read-only; no transaction required.
 
 12. Constraints
 
 - Fixed duration:
   - `endAt = startAt + 2 hours` at creation.
-  - On internal edit, `endAt` MUST be recalculated from the (possibly updated) `startAt` as `startAt + 2 hours`.
+  - On internal edit, `endAt` MUST be recalculated from `startAt`.
 
-- One non-terminal booking per client:
-  - Enforced by DB partial unique index on `bookings(client_id)` where status in (`CONFIRMED`,`ACTIVE`).
+- One non-terminal booking per client: enforced by partial unique index.
 
-- Exactly two companion assignments per booking:
-  - Must be created at booking creation time: one CAPTAIN and one VICE_CAPTAIN.
-  - On internal edit, assignments MUST remain exactly one CAPTAIN and one VICE_CAPTAIN.
+- Exactly two companion assignments per booking: one CAPTAIN and one VICE_CAPTAIN.
 
-- Venue-based roster:
-  - Allocation/reservation is based on `roster_slots` filtered by `venue_id`.
-
-- Booking artifacts stability on internal edit:
-  - `qrCode`, `pinCode`, `comMatchQrCode`, `comMatchPinCode`, and `bookingColor` MUST remain unchanged across `PATCH /bookings/{id}` even if companions change.
-
-- Code Generation (Booking + Matching Artifacts):
-  - `qrCode`:
-    - Opaque random string (UUIDv4 acceptable), generated via cryptographically secure RNG.
-    - Stored in `bookings.qr_code`.
-  - `pinCode`:
-    - 6-character string, digits only, leading zeros allowed.
-    - Generated via cryptographically secure RNG.
-    - Stored in `bookings.pin_code`.
-  - `bookingColor`:
-    - Selected from a fixed palette of identifiers:
-      - `["RED","BLUE","GREEN","YELLOW","PURPLE","ORANGE","PINK","TEAL","INDIGO","LIME","AMBER","CYAN"]`
-    - Must be stable per booking.
-    - Best-effort uniqueness rule: pick the first color from the palette not currently used by another non-terminal booking (status in CONFIRMED/ACTIVE) at the same venue; if all are taken, pick `RED`.
-    - Stored in `bookings.booking_color`.
-  - `comMatchQrCode`:
-    - Opaque random string (UUIDv4 acceptable), generated via cryptographically secure RNG.
-    - Stored in `bookings.com_match_qr_code`.
-  - `comMatchPinCode`:
-    - 6-character string, digits only, leading zeros allowed.
-    - Generated via cryptographically secure RNG.
-    - Stored in `bookings.com_match_pin_code`.
-
-- Roster Slot Provisioning:
-  - On companion signup, roster slots for the coming week (next 7 days) are created for that companion per venue roster rules.
-  - New roster slots are created with `status='AVAILABLE'`, `booking_id=NULL`.
-  - Booking creation reserves existing matching slots by setting `status='BOOKED'` and `booking_id=booking.id`.
+- Booking artifacts stability on internal edit: codes/colors MUST remain unchanged.
 
 13. Concurrency Rules
 
 - GET /bookings/{id}/details:
   - No row locks required; read-only operation.
-  - Timing-based reveal uses server current time; concurrent reads may see different reveal states during the 5-hour threshold window (acceptable behavior).
+  - No timing-based behavior.
 
-- Prevent double-booking of the same roster slot:
-  - Allocation/reservation must lock candidate `roster_slots` rows and only update rows still `status='AVAILABLE'`.
-  - If reservation update affects fewer than 2 rows, treat as allocation failure and rollback.
+- Prevent double-booking: lock roster slots + conditional updates.
 
-- Concurrent booking attempts by same client:
-  - DB partial unique index will reject the second insert; map this to 409 `CLIENT_ALREADY_HAS_NON_TERMINAL_BOOKING`.
+- Concurrent booking attempts by same client: unique index rejects second insert.
 
-- Internal edit concurrency (PATCH /bookings/{id}):
-  - The booking row MUST be locked (`FOR UPDATE`) to prevent concurrent edits/cancels from creating partial state.
-  - The two assignment rows MUST be locked (`FOR UPDATE`) before checking default statuses.
-  - Release+reserve MUST occur within the same transaction.
-  - Deadlock avoidance:
-    - Slot locking MUST be deterministic by locking both target `roster_slots` rows in a single statement (preferred) using `FOR UPDATE SKIP LOCKED`.
-  - Retry policy:
-    - Retry the full PATCH transaction up to 2 times only for DB concurrency failures:
-      - SQLSTATE `40P01` (deadlock_detected)
-      - SQLSTATE `40001` (serialization_failure)
-    - Use a small jittered backoff between retries.
-    - If retries are exhausted: return 500 `INTERNAL_ERROR` (do not map to NO_DUO_AVAILABLE).
+- Internal edit concurrency:
+  - Lock booking row and assignment rows.
+  - Release+reserve within same transaction.
+  - Retry policy for DB deadlock/serialization failures (up to 2 retries) as per prior versions.
 
 14. Failure Cases
 
 - `POST /bookings`
-  - 400 `VALIDATION_ERROR` — missing/invalid `venueId` or `startAt`
+  - 400 `VALIDATION_ERROR`
   - 404 `VENUE_NOT_FOUND`
   - 409 `CLIENT_ALREADY_HAS_NON_TERMINAL_BOOKING`
-  - 409 `NO_DUO_AVAILABLE` — fewer than 2 available roster slots for `[startAt,endAt)`
+  - 409 `NO_DUO_AVAILABLE`
   - 500 `INTERNAL_ERROR`
 
 - `POST /bookings/{id}/cancel`
   - 401 `UNAUTHORIZED`
   - 403 `FORBIDDEN`
-  - 403 `COMPANION_NOT_ASSIGNED` — caller is a companion but is not assigned to the booking
+  - 403 `COMPANION_NOT_ASSIGNED`
   - 404 `BOOKING_NOT_FOUND`
-  - 400 `INVALID_STATE_TRANSITION` — e.g., cancel `COMPLETED`
+  - 400 `INVALID_STATE_TRANSITION`
   - 500 `INTERNAL_ERROR`
 
 - `PATCH /bookings/{id}` (INTERNAL ONLY)
-  - 401 `INTERNAL_UNAUTHORIZED` — missing/invalid `X-Internal-Token`
-  - 400 `VALIDATION_ERROR` — invalid/missing body, invalid ids/timestamps, or only one companion id provided
+  - 401 `INTERNAL_UNAUTHORIZED`
+  - 400 `VALIDATION_ERROR`
   - 404 `BOOKING_NOT_FOUND`
-  - 404 `VENUE_NOT_FOUND` — when `venueId` is provided and invalid
-  - 400 `INVALID_STATE_TRANSITION` — booking status is `ACTIVE`/`COMPLETED`/`CANCELLED`, OR assignment match/presence statuses have progressed beyond defaults
-  - 409 `NO_DUO_AVAILABLE` — specified/target duo cannot be reserved for the target venue/window (slots unavailable)
-  - 500 `INTERNAL_ERROR` — data-integrity failures and deadlock/serialization retry exhaustion
+  - 404 `VENUE_NOT_FOUND`
+  - 400 `INVALID_STATE_TRANSITION`
+  - 409 `NO_DUO_AVAILABLE`
+  - 500 `INTERNAL_ERROR`
+
+- `GET /bookings/{id}/details`
+  - 401 `UNAUTHORIZED`
+  - 403 `FORBIDDEN`
+  - 404 `BOOKING_NOT_FOUND`
+  - 500 `INTERNAL_ERROR`
 
 15. Side Effects
 
@@ -720,16 +543,8 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
 - On cancellation:
   - Send push notifications to companions and client: "Booking Cancelled".
 
-- On internal edit (PATCH /bookings/{id}):
+- On internal edit (PATCH /bookings/{id}`):
   - No notifications are specified in this version.
-
-**Notification Architecture (Simple):**
-- Provider: Expo Notifications (expo-notifications per tech-stack.md)
-- Device token registration: Client app registers Expo Push Token on login (stored in user session or separate device_tokens table)
-- Message format: JSON payload with `{ "event": "BOOKING_CONFIRMED"|"BOOKING_CANCELLED", "message": "string", "bookingId": "uuid" }`
-- Delivery: Best-effort; no retry logic in Phase 1
-- User preferences: No opt-out in Phase 1; all notifications are sent
-- Implementation: Backend service calls Expo Push Notification API (https://docs.expo.dev/push-notifications/sending-notifications/) with Expo Push Tokens after booking creation/cancellation
 
 16. Idempotency Rules
 
@@ -739,8 +554,6 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
   - If booking is already `CANCELLED`, return 200 with `{id, status:'CANCELLED'}` (idempotent success).
   - If booking is `COMPLETED`, return 400 `INVALID_STATE_TRANSITION`.
 
-- `PATCH /bookings/{id}` (INTERNAL ONLY):
-  - Not guaranteed idempotent in the strict sense (it performs allocation-style operations), but is designed to be safely retryable:
-    - it executes in a transaction
-    - it releases the booking’s current reservations and reserves the target duo/window atomically
-    - repeated calls with the same target venue/time/duo should converge on the same stored booking/assignment state
+- `GET /bookings/{id}/details`: idempotent.
+
+- `PATCH /bookings/{id}` (INTERNAL ONLY): designed to be safely retryable within concurrency retry rules.

@@ -309,6 +309,74 @@ If uncertain, choose smaller unless clear risk exists.
 
 ---
 
+# FAST-TRACK RULES
+
+These rules allow Lead Agent to skip stages for simple requests while maintaining quality.
+
+## Skip Clarity Conditions
+
+Lead Agent may skip Clarity Agent when ALL of these are true:
+
+* Request is unambiguous (no vague terms, clear file/function targets)
+* Request is single-module scope
+* No SDS conflict detected
+* No duplicate detection needed
+* Change size is MICRO or SMALL
+
+## Skip Code Review Conditions
+
+Lead Agent may skip Code Reviewer Agent for MICRO when:
+
+* Change is config/text/typo only
+* No logic change
+* Lead can self-validate the diff
+
+## Single-Pass Test Design
+
+For SMALL/MEDIUM changes, Test Designer may run once in EXECUTABLE_FINALIZATION mode (skip SPEC_DRIVEN_DRAFT) when:
+
+* Behavior is obvious from the clarity/planner output
+* No complex state transitions
+* No cross-module journey impact
+* Code already exists or change is incremental
+
+## Auto-Approval for Low-Risk Plans
+
+For MEDIUM pipeline, Lead Agent may auto-approve and proceed without user confirmation when ALL of these are true:
+
+* Single module impact
+* No DB/schema migration
+* No new events/jobs
+* No breaking API changes
+* Estimated files ≤ 5
+* Planner did not flag HIGH risk
+
+When auto-approval is used, Lead Agent must still log the approved plan in the final report.
+
+---
+
+# PIPELINE SELECTION DECISION TREE
+
+Use this decision tree to select the fastest viable pipeline:
+
+```text id="pipeline_decision_tree"
+1. Is the request a typo/text/config change with no logic impact?
+   → MICRO PIPELINE (skip Clarity, skip Review if trivial)
+
+2. Is the request unambiguous AND single-module AND ≤3 files AND no schema change?
+   → SMALL PIPELINE (Quick Clarity or skip, Coding, Quick Review, skip Test Designer if no behavior change)
+
+3. Is the request a new endpoint OR meaningful rule change in one module with clear scope?
+   → MEDIUM PIPELINE (Clarity, Light Planner, auto-approve if low-risk, Coding, Review, Inline Test Finalization if applicable, Test Validator)
+
+4. Is the request cross-module OR schema change OR events/jobs OR flagged high risk?
+   → LARGE PIPELINE (full flow, no shortcuts)
+
+Default to smaller pipeline unless risk is evident.
+```
+
+---
+
 # PIPELINE MODES
 
 ## MICRO PIPELINE

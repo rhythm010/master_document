@@ -1,6 +1,6 @@
 Feature: Companion Profile & Activation
 Version: 1.1.0
-Status: Current
+Status: Archived
 Previous Version: companion-profile-and-activation.feature-sds.v1.0.0.md
 Change Type: MINOR
 Change Summary: Add public/non-PII companion profile read-by-id endpoint (GET /companion-profiles/{companionId}) for any authenticated user; update scope notes to include client viewing.
