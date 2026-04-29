@@ -14,9 +14,57 @@ export type ApiRequestStep = {
   endpoint: string;
   headers?: Record<string, string>;
   queryParams?: Record<string, unknown>;
+  pathParams?: Record<string, unknown>;
+  authType?: string;
+  requiredPayloadFields?: string[];
+  payloadRules?: Record<string, unknown>;
   payload?: Record<string, unknown> | Array<unknown> | string | null;
   storeResponseFields?: string[];
   storeAs?: string;
+  expectedBehavior?: unknown;
+  notes?: unknown;
+  description?: string;
+  layman?: string;
+};
+
+export type ApiResponseStep = {
+  step: number;
+  actor?: string;
+  actionType: "apiResponse";
+  expectedStatus?: number;
+  expectedResponseFields?: string[];
+  expectedOptionalFields?: string[];
+  expectedBehavior?: unknown;
+  notes?: unknown;
+  description?: string;
+  layman?: string;
+};
+
+export type DbVerificationStep = {
+  step: number;
+  actor?: string;
+  actionType: "dbVerification";
+  target: string;
+  expectedRows?: number;
+  expectedFields?: Record<string, unknown>;
+  query?: string;
+  expectedBehavior?: unknown;
+  notes?: unknown;
+  description?: string;
+  layman?: string;
+};
+
+export type InformationalStep = {
+  step: number;
+  actor?: string;
+  actionType:
+    | "authorization"
+    | "validation"
+    | "allocation"
+    | "dbTransaction"
+    | "responseValidation";
+  expectedBehavior?: unknown;
+  notes?: unknown;
   description?: string;
   layman?: string;
 };
@@ -29,6 +77,8 @@ export type ExternalCheckStep = {
   validateEmailTo: string;
   extractTokenFromEmail?: boolean;
   storeAs?: string;
+  expectedBehavior?: unknown;
+  notes?: unknown;
   description?: string;
   layman?: string;
 };
@@ -37,16 +87,24 @@ export type DbQueryStep = {
   step: number;
   actor?: string;
   actionType: "dbQuery";
-  target: string;
+  target?: string;
   where?: {
     field: string;
     value: string;
   };
+  expectedBehavior?: unknown;
+  notes?: unknown;
   description?: string;
   layman?: string;
 };
 
-export type StepDefinition = ApiRequestStep | ExternalCheckStep | DbQueryStep;
+export type StepDefinition =
+  | ApiRequestStep
+  | ApiResponseStep
+  | DbVerificationStep
+  | InformationalStep
+  | ExternalCheckStep
+  | DbQueryStep;
 
 export type SeedVenue = {
   entity: "venue";

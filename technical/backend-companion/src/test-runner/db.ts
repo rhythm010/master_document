@@ -1,3 +1,7 @@
+import crypto from "node:crypto";
+
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { Pool } from "pg";
 
 import type { DbQueryStep, RunContext, SeedDefinition } from "./types";
@@ -13,12 +17,94 @@ export async function checkDatabase(pool: Pool): Promise<string> {
   try {
     await pool.query("SELECT 1;");
     return "OK";
-  } catch (error) {
+  } catch {
     return "FAIL";
   }
 }
 
-/** Apply seed data entries that insert venues with ON CONFLICT DO NOTHING. */
+/** Safely read the first defined key from an object. */
+function pick<T>(obj: Record<string, unknown>, keys: string[]): T | undefined {
+  for (const key of keys) {
+    if (obj[key] !== undefined) {
+      return obj[key] as T;
+    }
+  }
+  return undefined;
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function ensureFutureWindow(context: RunContext): { startAtIso: string; endAtIso: string } {
+  const existingStartAt = context["START_AT"];
+  const existingEndAt = context["END_AT"];
+
+  if (typeof existingStartAt === "string" && typeof existingEndAt === "string") {
+    return { startAtIso: existingStartAt, endAtIso: existingEndAt };
+  }
+
+  const now = new Date();
+  const start = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + 1,
+    10,
+    0,
+    0,
+    0
+  ));
+
+  if (start.getTime() <= Date.now()) {
+    start.setUTCHours(start.getUTCHours() + 1, 0, 0, 0);
+  }
+
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+  const startAtIso = start.toISOString();
+  const endAtIso = end.toISOString();
+
+  context["START_AT"] = startAtIso;
+  context["END_AT"] = endAtIso;
+
+  return { startAtIso, endAtIso };
+}
+
+async function resolvePasswordHash(values: Record<string, unknown>): Promise<string> {
+  const existing = pick<string>(values, ["passwordHash", "password_hash"]);
+  if (typeof existing === "string" && existing.length > 0) {
+    return existing;
+  }
+
+  const password = pick<string>(values, ["password"]);
+  if (typeof password === "string" && password.length > 0) {
+    const rounds = Number(process.env.BCRYPT_ROUNDS || "10");
+    return bcrypt.hash(password, rounds);
+  }
+
+  // Minimal viable default; these accounts authenticate via JWT tokens in tests.
+  return "seeded_hash_not_used";
+}
+
+function signBearerToken(payload: { sub: string; role: string; email: string }): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not set (required to seed Bearer auth tokens)");
+  }
+
+  const ttlSeconds = Number(process.env.AUTH_ACCESS_TOKEN_TTL || "3600");
+  return jwt.sign(payload, secret, { expiresIn: ttlSeconds });
+}
+
+function coerceCount(seed: Record<string, unknown>): number {
+  const raw = seed["count"];
+  if (raw === undefined || raw === null) {
+    return 1;
+  }
+  const numeric = Number(raw);
+  return Number.isFinite(numeric) && numeric > 0 ? Math.floor(numeric) : 1;
+}
+
+/** Apply seed data entries using raw SQL inserts with ON CONFLICT for idempotency. */
 export async function applySeedData(
   pool: Pool,
   seedData: SeedDefinition[] | undefined,
@@ -29,30 +115,366 @@ export async function applySeedData(
     return actions;
   }
 
-  for (const seed of seedData) {
-    if (seed.entity !== "venue") {
-      throw new Error(`Unsupported seed entity: ${seed.entity}`);
+  for (const seed of seedData as Array<Record<string, unknown>>) {
+    const entity = String(seed.entity || "");
+    const count = coerceCount(seed);
+
+    if (entity === "venue") {
+      for (let i = 0; i < count; i++) {
+        const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
+        const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
+
+        const id = String(pick(rendered, ["id"]) ?? crypto.randomUUID());
+        const venueType = String(pick(rendered, ["venueType", "venue_type"]) ?? "MALL");
+        const name = String(pick(rendered, ["name"]) ?? `Seed Venue ${context["RUN_ID"] ?? ""}`);
+        const address = String(pick(rendered, ["address"]) ?? "1 Seed Street");
+        const latitude = Number(pick(rendered, ["latitude"]) ?? 25.23);
+        const longitude = Number(pick(rendered, ["longitude"]) ?? 55.3);
+        const operatingHoursStart = String(pick(rendered, ["operatingHoursStart", "operating_hours_start"]) ?? "09:00:00");
+        const operatingHoursEnd = String(pick(rendered, ["operatingHoursEnd", "operating_hours_end"]) ?? "21:00:00");
+
+        const text =
+          "INSERT INTO venues (id, name, address, venue_type, latitude, longitude, operating_hours_start, operating_hours_end) " +
+          "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) " +
+          "ON CONFLICT (id) DO UPDATE SET " +
+          "name = EXCLUDED.name, address = EXCLUDED.address, venue_type = EXCLUDED.venue_type, " +
+          "latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, " +
+          "operating_hours_start = EXCLUDED.operating_hours_start, operating_hours_end = EXCLUDED.operating_hours_end;";
+
+        await pool.query(text, [
+          id,
+          name,
+          address,
+          venueType,
+          latitude,
+          longitude,
+          operatingHoursStart,
+          operatingHoursEnd
+        ]);
+
+        if (context["VENUE_ID"] === undefined) {
+          context["VENUE_ID"] = id;
+        }
+        actions.push(`Seeded venue ${id}`);
+      }
+
+      continue;
     }
 
-    const values = substitute(seed.values, context);
-    const text =
-      "INSERT INTO venues (id, name, address, venue_type, latitude, longitude, operating_hours_start, operating_hours_end) " +
-      "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) " +
-      "ON CONFLICT (id) DO NOTHING;";
+    if (entity === "user") {
+      for (let i = 0; i < count; i++) {
+        const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
+        const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
 
-    const params = [
-      values.id,
-      values.name,
-      values.address ?? "",
-      values.venueType,
-      values.latitude,
-      values.longitude,
-      values.operatingHoursStart ?? "09:00:00",
-      values.operatingHoursEnd ?? "21:00:00"
-    ];
+        const role = String(pick(rendered, ["role"]) ?? seed.role ?? "CLIENT");
+        const id = String(pick(rendered, ["id"]) ?? crypto.randomUUID());
+        const email = String(
+          pick(rendered, ["email"]) ??
+            `${role.toLowerCase()}.${context["RUN_ID"] ?? "run"}.${i}.${id}@test.local`
+        );
+        const name = String(pick(rendered, ["name"]) ?? `Seed ${role}`);
+        const nickname = String(pick(rendered, ["nickname"]) ?? `${role.toLowerCase()}_${context["RUN_ID"] ?? "run"}`);
+        const emailVerifiedRaw = pick(rendered, ["emailVerified", "email_verified"]);
+        const emailVerified = typeof emailVerifiedRaw === "boolean" ? emailVerifiedRaw : Boolean(seed.emailVerified ?? true);
+        const biometricRaw = pick(rendered, ["biometricAuthEnabled", "biometric_auth_enabled"]);
+        const biometricAuthEnabled = typeof biometricRaw === "boolean" ? biometricRaw : false;
+        const passwordHash = await resolvePasswordHash(rendered);
 
-    await pool.query(text, params);
-    actions.push(`Seeded venue ${values.id}`);
+        const text =
+          "INSERT INTO users (id, role, name, nickname, email, password_hash, email_verified, biometric_auth_enabled) " +
+          "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) " +
+          "ON CONFLICT (id) DO UPDATE SET " +
+          "role = EXCLUDED.role, name = EXCLUDED.name, nickname = EXCLUDED.nickname, email = EXCLUDED.email, " +
+          "password_hash = EXCLUDED.password_hash, email_verified = EXCLUDED.email_verified, " +
+          "biometric_auth_enabled = EXCLUDED.biometric_auth_enabled;";
+
+        await pool.query(text, [
+          id,
+          role,
+          name,
+          nickname,
+          email,
+          passwordHash,
+          emailVerified,
+          biometricAuthEnabled
+        ]);
+
+        if (role === "CLIENT") {
+          if (context["CLIENT_ID"] === undefined) {
+            context["CLIENT_ID"] = id;
+          }
+          if (context["CLIENT_EMAIL"] === undefined) {
+            context["CLIENT_EMAIL"] = email;
+          }
+          if (context["CLIENT_ACCESS_TOKEN"] === undefined) {
+            context["CLIENT_ACCESS_TOKEN"] = signBearerToken({ sub: id, role, email });
+          }
+        }
+
+        actions.push(`Seeded user ${id} (${role})`);
+      }
+
+      continue;
+    }
+
+    if (entity === "companion_profile") {
+      for (let i = 0; i < count; i++) {
+        const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
+        const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
+
+        const designation = String(pick(rendered, ["designation"]) ?? seed.designation ?? "VICE_CAPTAIN");
+        const userId = String(pick(rendered, ["userId", "user_id"]) ?? crypto.randomUUID());
+
+        // Ensure companion user exists.
+        const companionEmail = String(
+          pick(rendered, ["email"]) ??
+            `companion.${designation.toLowerCase()}.${context["RUN_ID"] ?? "run"}.${i}.${userId}@test.local`
+        );
+        const userText =
+          "INSERT INTO users (id, role, name, nickname, email, password_hash, email_verified, biometric_auth_enabled) " +
+          "VALUES ($1, 'COMPANION', $2, $3, $4, $5, $6, $7) " +
+          "ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;";
+
+        await pool.query(userText, [
+          userId,
+          `Seed Companion ${designation}`,
+          `seed_${designation.toLowerCase()}_${context["RUN_ID"] ?? "run"}`,
+          companionEmail,
+          "seeded_hash_not_used",
+          true,
+          false
+        ]);
+
+        const profileId = String(pick(rendered, ["id"]) ?? crypto.randomUUID());
+        const isActiveRaw = pick(rendered, ["isActive", "is_active"]);
+        const isActive = typeof isActiveRaw === "boolean" ? isActiveRaw : Boolean(seed.isActive ?? true);
+        const languages = (pick<string[]>(rendered, ["languages"]) ?? []) as string[];
+        const profilePictureUrl = String(pick(rendered, ["profilePictureUrl", "profile_picture_url"]) ?? "");
+        const averageRating = Number(pick(rendered, ["averageRating", "average_rating"]) ?? 0);
+
+        const text =
+          "INSERT INTO companion_profiles (id, user_id, designation, is_active, languages, profile_picture_url, average_rating) " +
+          "VALUES ($1, $2, $3, $4, $5, $6, $7) " +
+          "ON CONFLICT (id) DO UPDATE SET " +
+          "user_id = EXCLUDED.user_id, designation = EXCLUDED.designation, is_active = EXCLUDED.is_active, " +
+          "languages = EXCLUDED.languages, profile_picture_url = EXCLUDED.profile_picture_url, average_rating = EXCLUDED.average_rating;";
+
+        await pool.query(text, [
+          profileId,
+          userId,
+          designation,
+          isActive,
+          languages,
+          profilePictureUrl,
+          averageRating
+        ]);
+
+        if (designation === "CAPTAIN" && context["CAPTAIN_ID"] === undefined) {
+          context["CAPTAIN_ID"] = userId;
+        }
+        if (designation === "VICE_CAPTAIN" && context["VICE_CAPTAIN_ID"] === undefined) {
+          context["VICE_CAPTAIN_ID"] = userId;
+        }
+
+        actions.push(`Seeded companion_profile ${profileId} (${designation})`);
+      }
+
+      continue;
+    }
+
+    if (entity === "companion_venue_assignment") {
+      const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
+      const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
+      const companionId = String(pick(rendered, ["companionId", "companion_id"]) ?? "");
+      const venueId = String(pick(rendered, ["venueId", "venue_id"]) ?? "");
+      if (!isUuid(companionId) || !isUuid(venueId)) {
+        throw new Error("companion_venue_assignment requires companionId and venueId");
+      }
+
+      await pool.query(
+        "INSERT INTO companion_venue_assignments (companion_id, venue_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+        [companionId, venueId]
+      );
+      actions.push(`Seeded companion_venue_assignment ${companionId} -> ${venueId}`);
+      continue;
+    }
+
+    if (entity === "roster_slot") {
+      const { startAtIso, endAtIso } = ensureFutureWindow(context);
+      const venueId = String(context["VENUE_ID"] ?? "");
+      const captainId = String(context["CAPTAIN_ID"] ?? "");
+      const viceCaptainId = String(context["VICE_CAPTAIN_ID"] ?? "");
+      const bookingId = context["BOOKING_ID"] ? String(context["BOOKING_ID"]) : null;
+
+      const status = String(seed.status ?? pick((seed.values ?? {}) as Record<string, unknown>, ["status"]) ?? "AVAILABLE");
+      const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
+      const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
+
+      const rowVenueId = String(pick(rendered, ["venueId", "venue_id"]) ?? venueId);
+      const startAt = String(pick(rendered, ["startAt", "start_at"]) ?? startAtIso);
+      const endAt = String(pick(rendered, ["endAt", "end_at"]) ?? endAtIso);
+      const renderedBookingId = pick<string | null>(rendered, ["bookingId", "booking_id"]);
+      const bookingIdValue = renderedBookingId !== undefined ? renderedBookingId : status === "BOOKED" ? bookingId : null;
+
+      const companions: string[] = [];
+      const explicitCompanion = pick<string>(rendered, ["companionId", "companion_id"]);
+      if (typeof explicitCompanion === "string" && explicitCompanion.length > 0) {
+        companions.push(explicitCompanion);
+      } else {
+        if (captainId) {
+          companions.push(captainId);
+        }
+        if (viceCaptainId) {
+          companions.push(viceCaptainId);
+        }
+      }
+
+      if (!rowVenueId) {
+        throw new Error("roster_slot seeding requires a venueId (VENUE_ID context key missing)");
+      }
+      if (companions.length === 0) {
+        throw new Error("roster_slot seeding requires companion ids (CAPTAIN_ID / VICE_CAPTAIN_ID missing)");
+      }
+      if (status === "BOOKED" && !bookingIdValue) {
+        throw new Error("roster_slot seeding status=BOOKED requires BOOKING_ID");
+      }
+
+      // Seed one slot per companion (minimum viable for booking happy paths).
+      for (const companionId of companions.slice(0, count)) {
+        const id = String(pick(rendered, ["id"]) ?? crypto.randomUUID());
+
+        const text =
+          "INSERT INTO roster_slots (id, venue_id, companion_id, booking_id, start_at, end_at, status) " +
+          "VALUES ($1, $2, $3, $4, $5, $6, $7) " +
+          "ON CONFLICT (venue_id, companion_id, start_at, end_at) DO UPDATE SET " +
+          "booking_id = EXCLUDED.booking_id, status = EXCLUDED.status;";
+
+        await pool.query(text, [
+          id,
+          rowVenueId,
+          companionId,
+          bookingIdValue,
+          startAt,
+          endAt,
+          status
+        ]);
+
+        await pool.query(
+          "INSERT INTO companion_venue_assignments (companion_id, venue_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+          [companionId, rowVenueId]
+        );
+
+        actions.push(`Seeded roster_slot ${id} (${status})`);
+      }
+
+      continue;
+    }
+
+    if (entity === "booking") {
+      for (let i = 0; i < count; i++) {
+        const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
+        const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
+
+        const id = String(pick(rendered, ["id"]) ?? crypto.randomUUID());
+        const clientId = String(pick(rendered, ["clientId", "client_id"]) ?? context["CLIENT_ID"] ?? "");
+        const venueId = String(pick(rendered, ["venueId", "venue_id"]) ?? context["VENUE_ID"] ?? "");
+        if (!clientId || !venueId) {
+          throw new Error("booking seeding requires CLIENT_ID and VENUE_ID");
+        }
+
+        const { startAtIso, endAtIso } = ensureFutureWindow(context);
+        const startAt = String(pick(rendered, ["startAt", "start_at"]) ?? startAtIso);
+        const endAt = String(pick(rendered, ["endAt", "end_at"]) ?? endAtIso);
+        const status = String(pick(rendered, ["status"]) ?? seed.status ?? "CONFIRMED");
+
+        const qrCode = String(pick(rendered, ["qrCode", "qr_code"]) ?? `qr_${id}`);
+        const pinCode = String(pick(rendered, ["pinCode", "pin_code"]) ?? "111111");
+        const bookingColor = String(pick(rendered, ["bookingColor", "booking_color"]) ?? "BLUE");
+        const comMatchQrCode = String(pick(rendered, ["comMatchQrCode", "com_match_qr_code"]) ?? `com_qr_${id}`);
+        const comMatchPinCode = String(pick(rendered, ["comMatchPinCode", "com_match_pin_code"]) ?? "222222");
+        const extendedAt = pick<string | null>(rendered, ["extendedAt", "extended_at"]) ?? seed.extended_at ?? null;
+
+        const text =
+          "INSERT INTO bookings (id, client_id, venue_id, start_at, end_at, status, qr_code, pin_code, booking_color, com_match_qr_code, com_match_pin_code, extended_at) " +
+          "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) " +
+          "ON CONFLICT (id) DO UPDATE SET " +
+          "client_id = EXCLUDED.client_id, venue_id = EXCLUDED.venue_id, start_at = EXCLUDED.start_at, end_at = EXCLUDED.end_at, " +
+          "status = EXCLUDED.status, qr_code = EXCLUDED.qr_code, pin_code = EXCLUDED.pin_code, booking_color = EXCLUDED.booking_color, " +
+          "com_match_qr_code = EXCLUDED.com_match_qr_code, com_match_pin_code = EXCLUDED.com_match_pin_code, extended_at = EXCLUDED.extended_at;";
+
+        await pool.query(text, [
+          id,
+          clientId,
+          venueId,
+          startAt,
+          endAt,
+          status,
+          qrCode,
+          pinCode,
+          bookingColor,
+          comMatchQrCode,
+          comMatchPinCode,
+          extendedAt
+        ]);
+
+        if (context["BOOKING_ID"] === undefined) {
+          context["BOOKING_ID"] = id;
+        }
+        if (context["ORIGINAL_START_AT"] === undefined) {
+          context["ORIGINAL_START_AT"] = startAt;
+        }
+
+        actions.push(`Seeded booking ${id} (${status})`);
+      }
+
+      continue;
+    }
+
+    if (entity === "booking_companion_assignment") {
+      const bookingId = String(context["BOOKING_ID"] ?? "");
+      const captainId = String(context["CAPTAIN_ID"] ?? "");
+      const viceCaptainId = String(context["VICE_CAPTAIN_ID"] ?? "");
+      if (!bookingId || !captainId || !viceCaptainId) {
+        throw new Error("booking_companion_assignment seeding requires BOOKING_ID, CAPTAIN_ID, and VICE_CAPTAIN_ID");
+      }
+
+      const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
+      const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
+
+      const presenceStatus = String(pick(rendered, ["presenceStatus", "presence_status"]) ?? seed.presence_status ?? "ASSIGNED");
+      const selfMatchStatus = String(pick(rendered, ["selfMatchStatus", "self_match_status"]) ?? seed.self_match_status ?? "NOT_MATCHED");
+      const clientMatchStatus = String(pick(rendered, ["clientMatchStatus", "client_match_status"]) ?? seed.client_match_status ?? "WAITING_FOR_CLIENT");
+
+      const assignments = [
+        { designation: "CAPTAIN", companionId: captainId },
+        { designation: "VICE_CAPTAIN", companionId: viceCaptainId }
+      ];
+
+      for (const entry of assignments) {
+        const id = crypto.randomUUID();
+        const text =
+          "INSERT INTO booking_companion_assignments (id, booking_id, companion_id, designation, presence_status, self_match_status, client_match_status) " +
+          "VALUES ($1, $2, $3, $4, $5, $6, $7) " +
+          "ON CONFLICT (booking_id, designation) DO UPDATE SET " +
+          "companion_id = EXCLUDED.companion_id, presence_status = EXCLUDED.presence_status, self_match_status = EXCLUDED.self_match_status, client_match_status = EXCLUDED.client_match_status;";
+
+        await pool.query(text, [
+          id,
+          bookingId,
+          entry.companionId,
+          entry.designation,
+          presenceStatus,
+          selfMatchStatus,
+          clientMatchStatus
+        ]);
+
+        actions.push(`Seeded booking_companion_assignment (${entry.designation})`);
+      }
+
+      continue;
+    }
+
+    throw new Error(`Unsupported seed entity: ${entity}`);
   }
 
   return actions;
@@ -64,6 +486,10 @@ export async function executeDbQuery(
   step: DbQueryStep,
   context: RunContext
 ): Promise<{ rows: Array<Record<string, unknown>>; rowCount: number }>{
+  if (typeof step.target !== "string" || step.target.trim().length === 0) {
+    throw new Error("dbQuery step requires a non-empty target");
+  }
+
   const targetRaw = substitute(step.target, context);
   const target = assertSafeIdentifier(String(targetRaw), "table");
   let queryText = `SELECT * FROM "${target}"`;

@@ -7,15 +7,15 @@ export function nowIso(): string {
   return new Date().toISOString();
 }
 
-/** Build a run id that includes UTC timestamp and test id. */
+/** Build a run id that includes UTC timestamp (to milliseconds) and test id. */
 export function makeRunId(testId: string): string {
-  const stamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
+  const stamp = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 17);
   return `RUN-${stamp}-${testId}`;
 }
 
-/** Return a short run suffix for template placeholders. */
+/** Return a short run suffix (to milliseconds) for template placeholders. */
 export function makeRunSuffix(): string {
-  return new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
+  return new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 17);
 }
 
 /** Return today's date as YYYY-MM-DD in the provided time zone (defaults to UTC). */

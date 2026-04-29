@@ -1,0 +1,187 @@
+{
+  "runId": "RUN-20260429050250293-MOD-BOOKING-003",
+  "testId": "MOD-BOOKING-003",
+  "status": "FAIL",
+  "startedAt": "2026-04-29T05:02:50.293Z",
+  "endedAt": "2026-04-29T05:02:50.385Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "GET /bookings/:id/details",
+      "startedAt": "2026-04-29T05:02:50.382Z",
+      "endedAt": "2026-04-29T05:02:50.385Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 2,
+      "target": "",
+      "startedAt": "2026-04-29T05:02:50.385Z",
+      "endedAt": "2026-04-29T05:02:50.385Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    },
+    {
+      "step": 3,
+      "target": "DB query (skipped: missing target)",
+      "startedAt": "2026-04-29T05:02:50.385Z",
+      "endedAt": "2026-04-29T05:02:50.385Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "",
+      "startedAt": "2026-04-29T05:02:50.385Z",
+      "endedAt": "2026-04-29T05:02:50.385Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    },
+    {
+      "step": 5,
+      "target": "",
+      "startedAt": "2026-04-29T05:02:50.385Z",
+      "endedAt": "2026-04-29T05:02:50.385Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "UNAUTHORIZED",
+        "message": "Missing authorization"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests to view their booking details",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 1,
+        "target": "GET /bookings/:id/details",
+        "startedAt": "2026-04-29T05:02:50.382Z",
+        "endedAt": "2026-04-29T05:02:50.385Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 2,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "System",
+      "actionType": "authorization",
+      "layman": "System verifies the caller has access to this booking",
+      "serviceHit": {
+        "step": 2,
+        "target": "",
+        "startedAt": "2026-04-29T05:02:50.385Z",
+        "endedAt": "2026-04-29T05:02:50.385Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Skipped dbQuery step because step.target was missing/empty (informational step)."
+      },
+      "actor": "System",
+      "actionType": "dbQuery",
+      "layman": "System retrieves the booking information from database",
+      "serviceHit": {
+        "step": 3,
+        "target": "DB query (skipped: missing target)",
+        "startedAt": "2026-04-29T05:02:50.385Z",
+        "endedAt": "2026-04-29T05:02:50.385Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns the booking details to the caller",
+      "serviceHit": {
+        "step": 4,
+        "target": "",
+        "startedAt": "2026-04-29T05:02:50.385Z",
+        "endedAt": "2026-04-29T05:02:50.385Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 5,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "responseValidation",
+      "layman": "Verify the response contains correct and complete booking information",
+      "serviceHit": {
+        "step": 5,
+        "target": "",
+        "startedAt": "2026-04-29T05:02:50.385Z",
+        "endedAt": "2026-04-29T05:02:50.385Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 2,
+      "reason": "Unsupported actionType",
+      "evidence": "authorization"
+    },
+    {
+      "step": 2,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 4,
+      "reason": "Unsupported actionType",
+      "evidence": "apiResponse"
+    },
+    {
+      "step": 4,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 5,
+      "reason": "Unsupported actionType",
+      "evidence": "responseValidation"
+    },
+    {
+      "step": 5,
+      "reason": "Step failed",
+      "evidence": {}
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

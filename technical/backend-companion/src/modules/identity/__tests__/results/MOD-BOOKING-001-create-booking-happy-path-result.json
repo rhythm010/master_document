@@ -1,0 +1,346 @@
+{
+  "runId": "RUN-20260429044749-MOD-BOOKING-001",
+  "testId": "MOD-BOOKING-001",
+  "status": "PASS",
+  "startedAt": "2026-04-29T04:47:49.590Z",
+  "endedAt": "2026-04-29T04:47:49.927Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings",
+      "startedAt": "2026-04-29T04:47:49.747Z",
+      "endedAt": "2026-04-29T04:47:49.913Z",
+      "durationMs": 166,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "INFO validation",
+      "startedAt": "2026-04-29T04:47:49.913Z",
+      "endedAt": "2026-04-29T04:47:49.913Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "INFO allocation",
+      "startedAt": "2026-04-29T04:47:49.913Z",
+      "endedAt": "2026-04-29T04:47:49.913Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "INFO dbTransaction",
+      "startedAt": "2026-04-29T04:47:49.913Z",
+      "endedAt": "2026-04-29T04:47:49.913Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "target": "API response (from step 1)",
+      "startedAt": "2026-04-29T04:47:49.913Z",
+      "endedAt": "2026-04-29T04:47:49.913Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 6,
+      "target": "DB verify bookings",
+      "startedAt": "2026-04-29T04:47:49.913Z",
+      "endedAt": "2026-04-29T04:47:49.915Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-04-29T04:47:49.915Z",
+      "endedAt": "2026-04-29T04:47:49.926Z",
+      "durationMs": 11,
+      "result": "PASS"
+    },
+    {
+      "step": 8,
+      "target": "DB verify booking_companion_assignments",
+      "startedAt": "2026-04-29T04:47:49.926Z",
+      "endedAt": "2026-04-29T04:47:49.927Z",
+      "durationMs": 1,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+        "status": "CONFIRMED",
+        "clientId": "0555c3ef-ff77-4d33-997a-dfcc40baffb3",
+        "venueId": "fc231873-3ab0-404b-8e57-c9a7377c5453",
+        "startAt": "2026-04-30T10:00:00.000Z",
+        "endAt": "2026-04-30T12:00:00.000Z",
+        "createdAt": "2026-04-29T04:47:49.882Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests a booking by providing venue and start time",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings",
+        "startedAt": "2026-04-29T04:47:49.747Z",
+        "endedAt": "2026-04-29T04:47:49.913Z",
+        "durationMs": 166,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational step (NOOP)",
+        "expectedBehavior": [
+          "Validate client role is CLIENT",
+          "Check client has no non-terminal bookings",
+          "Validate venue exists",
+          "Calculate endAt = startAt + 2 hours"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System validates the client is eligible and calculates the 2-hour booking window",
+      "serviceHit": {
+        "step": 2,
+        "target": "INFO validation",
+        "startedAt": "2026-04-29T04:47:49.913Z",
+        "endedAt": "2026-04-29T04:47:49.913Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational step (NOOP)",
+        "expectedBehavior": [
+          "Find one CAPTAIN with available roster slot for [startAt, endAt)",
+          "Find one VICE_CAPTAIN with available roster slot for [startAt, endAt)",
+          "Lock both roster slots using FOR UPDATE SKIP LOCKED"
+        ]
+      },
+      "actor": "System",
+      "actionType": "allocation",
+      "layman": "System allocates a duo (captain + vice captain) from available roster",
+      "serviceHit": {
+        "step": 3,
+        "target": "INFO allocation",
+        "startedAt": "2026-04-29T04:47:49.913Z",
+        "endedAt": "2026-04-29T04:47:49.913Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational step (NOOP)",
+        "expectedBehavior": [
+          "Create booking record with status=CONFIRMED",
+          "Generate qrCode, pinCode, comMatchQrCode, comMatchPinCode, bookingColor",
+          "Mark 2 roster slots as BOOKED with booking_id reference",
+          "Create 2 booking_companion_assignments (CAPTAIN + VICE_CAPTAIN) with default statuses"
+        ]
+      },
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "layman": "System creates the booking, reserves slots, and assigns the duo atomically",
+      "serviceHit": {
+        "step": 4,
+        "target": "INFO dbTransaction",
+        "startedAt": "2026-04-29T04:47:49.913Z",
+        "endedAt": "2026-04-29T04:47:49.913Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "observed": {
+          "id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+          "status": "CONFIRMED",
+          "clientId": "0555c3ef-ff77-4d33-997a-dfcc40baffb3",
+          "venueId": "fc231873-3ab0-404b-8e57-c9a7377c5453",
+          "startAt": "2026-04-30T10:00:00.000Z",
+          "endAt": "2026-04-30T12:00:00.000Z",
+          "createdAt": "2026-04-29T04:47:49.882Z"
+        },
+        "failures": []
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns the confirmed booking with booking ID and details",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 5,
+        "target": "API response (from step 1)",
+        "startedAt": "2026-04-29T04:47:49.913Z",
+        "endedAt": "2026-04-29T04:47:49.913Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "query": "SELECT * FROM \"bookings\" WHERE id = $1;",
+        "params": [
+          "8422636e-f70e-4ab8-ab33-fb51b1ee17d1"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "client_id": "0555c3ef-ff77-4d33-997a-dfcc40baffb3",
+            "venue_id": "fc231873-3ab0-404b-8e57-c9a7377c5453",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "d4907c42-236e-44c4-8c95-4e91f2e22a8e",
+            "pin_code": "102120",
+            "booking_color": "RED",
+            "com_match_qr_code": "99674cd6-e2fa-49e7-a046-740099406967",
+            "com_match_pin_code": "086734",
+            "extended_at": null,
+            "created_at": "2026-04-29T04:47:49.882Z"
+          }
+        ],
+        "failures": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify booking exists in database with all required artifacts generated",
+      "serviceHit": {
+        "step": 6,
+        "target": "DB verify bookings",
+        "startedAt": "2026-04-29T04:47:49.913Z",
+        "endedAt": "2026-04-29T04:47:49.915Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "query": "SELECT * FROM \"roster_slots\" WHERE booking_id = $1;",
+        "params": [
+          "8422636e-f70e-4ab8-ab33-fb51b1ee17d1"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "b6a92382-13a6-4d7e-bbc5-fd7cad3b21fd",
+            "venue_id": "fc231873-3ab0-404b-8e57-c9a7377c5453",
+            "companion_id": "87cb250c-0b12-4e5b-94a8-c1decdd37acb",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "4cba7b56-30e3-41cc-be40-f4c0d997aec2",
+            "venue_id": "fc231873-3ab0-404b-8e57-c9a7377c5453",
+            "companion_id": "2d37e0e2-eb1b-4dc0-9582-37a6928a9b22",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "failures": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify exactly 2 roster slots are marked as BOOKED for this booking",
+      "serviceHit": {
+        "step": 7,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-04-29T04:47:49.915Z",
+        "endedAt": "2026-04-29T04:47:49.926Z",
+        "durationMs": 11,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "query": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id = $1;",
+        "params": [
+          "8422636e-f70e-4ab8-ab33-fb51b1ee17d1"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "831cd9a6-cb8c-4727-b5bb-47c2a7ef1c10",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "companion_id": "87cb250c-0b12-4e5b-94a8-c1decdd37acb",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "261e529a-bf5f-4139-bcbc-3a6176af0f28",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "companion_id": "2d37e0e2-eb1b-4dc0-9582-37a6928a9b22",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          }
+        ],
+        "failures": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify duo assignments exist with correct designations and default match statuses",
+      "serviceHit": {
+        "step": 8,
+        "target": "DB verify booking_companion_assignments",
+        "startedAt": "2026-04-29T04:47:49.926Z",
+        "endedAt": "2026-04-29T04:47:49.927Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

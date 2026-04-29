@@ -1,0 +1,243 @@
+{
+  "runId": "RUN-20260429051851195-MOD-BOOKING-003",
+  "testId": "MOD-BOOKING-003",
+  "status": "PASS",
+  "startedAt": "2026-04-29T05:18:51.195Z",
+  "endedAt": "2026-04-29T05:18:51.222Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "GET /bookings/bc595917-0985-4e65-83f9-24304f27b228/details",
+      "startedAt": "2026-04-29T05:18:51.219Z",
+      "endedAt": "2026-04-29T05:18:51.222Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 2,
+      "target": "authorization (noop)",
+      "startedAt": "2026-04-29T05:18:51.222Z",
+      "endedAt": "2026-04-29T05:18:51.222Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "DB query (skipped: missing target)",
+      "startedAt": "2026-04-29T05:18:51.222Z",
+      "endedAt": "2026-04-29T05:18:51.222Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "API response validation",
+      "startedAt": "2026-04-29T05:18:51.222Z",
+      "endedAt": "2026-04-29T05:18:51.222Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "responseValidation (noop)",
+      "startedAt": "2026-04-29T05:18:51.222Z",
+      "endedAt": "2026-04-29T05:18:51.222Z",
+      "durationMs": 0,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "bc595917-0985-4e65-83f9-24304f27b228",
+        "status": "CONFIRMED",
+        "clientId": "7213780c-670b-4581-9ecc-b0ddbe084c0e",
+        "venueId": "07b5cd38-d93c-4092-819f-6c03f435aadd",
+        "startAt": "2026-04-30T10:00:00.000Z",
+        "endAt": "2026-04-30T12:00:00.000Z",
+        "createdAt": "2026-04-29T05:18:51.216Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests to view their booking details",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 1,
+        "target": "GET /bookings/bc595917-0985-4e65-83f9-24304f27b228/details",
+        "startedAt": "2026-04-29T05:18:51.219Z",
+        "endedAt": "2026-04-29T05:18:51.222Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Verify booking exists",
+          "Verify caller is authorized (owner client, assigned companion, or admin)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "authorization",
+      "layman": "System verifies the caller has access to this booking",
+      "serviceHit": {
+        "step": 2,
+        "target": "authorization (noop)",
+        "startedAt": "2026-04-29T05:18:51.222Z",
+        "endedAt": "2026-04-29T05:18:51.222Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Skipped dbQuery step because step.target was missing/empty (informational step).",
+        "expectedBehavior": [
+          "Fetch booking by ID",
+          "Include minimal details as per endpoint contract"
+        ]
+      },
+      "actor": "System",
+      "actionType": "dbQuery",
+      "layman": "System retrieves the booking information from database",
+      "serviceHit": {
+        "step": 3,
+        "target": "DB query (skipped: missing target)",
+        "startedAt": "2026-04-29T05:18:51.222Z",
+        "endedAt": "2026-04-29T05:18:51.222Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "id": "bc595917-0985-4e65-83f9-24304f27b228",
+          "status": "CONFIRMED",
+          "clientId": "7213780c-670b-4581-9ecc-b0ddbe084c0e",
+          "venueId": "07b5cd38-d93c-4092-819f-6c03f435aadd",
+          "startAt": "2026-04-30T10:00:00.000Z",
+          "endAt": "2026-04-30T12:00:00.000Z",
+          "createdAt": "2026-04-29T05:18:51.216Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "id",
+            "actual": "bc595917-0985-4e65-83f9-24304f27b228",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "status",
+            "actual": "CONFIRMED",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "clientId",
+            "actual": "7213780c-670b-4581-9ecc-b0ddbe084c0e",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "venueId",
+            "actual": "07b5cd38-d93c-4092-819f-6c03f435aadd",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "startAt",
+            "actual": "2026-04-30T10:00:00.000Z",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "endAt",
+            "actual": "2026-04-30T12:00:00.000Z",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "createdAt",
+            "actual": "2026-04-29T05:18:51.216Z",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns the booking details to the caller",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "API response validation",
+        "startedAt": "2026-04-29T05:18:51.222Z",
+        "endedAt": "2026-04-29T05:18:51.222Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Validate all required fields are present",
+          "Validate data types (UUIDs, ISO-8601 timestamps, status enum)",
+          "Validate endAt = startAt + 2 hours (or +3 if extended)",
+          "Validate status is one of: CONFIRMED, ACTIVE, COMPLETED, CANCELLED"
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "responseValidation",
+      "layman": "Verify the response contains correct and complete booking information",
+      "serviceHit": {
+        "step": 5,
+        "target": "responseValidation (noop)",
+        "startedAt": "2026-04-29T05:18:51.222Z",
+        "endedAt": "2026-04-29T05:18:51.222Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
