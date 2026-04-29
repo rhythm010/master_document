@@ -1,19 +1,19 @@
 Feature: Booking & Allocation
-Version: 1.2.0
+Version: 1.1.1
 Status: Current
-Previous Version: booking-and-allocation.feature-sds.v1.1.1.md
-Change Type: MINOR
-Change Summary: Add GET /bookings/{id}/details client-only endpoint with timed companion reveal (T-5h) per master-document/1.3
-Created At: 2026-04-28T16:00:00Z
-Last Edited At: 2026-04-29T04:15:09Z
-Owner: Booking & Allocation Module
+Previous Version: booking-and-allocation.feature-sds.v1.1.0.md
+Change Type: PATCH
+Change Summary: Harden internal edit PATCH /bookings/{id} with deadlock-safe slot locking, row-count guards, and clarified concurrency handling.
+Created At: 2026-04-24T03:10:02Z
+Last Edited At: 2026-04-28T17:23:30Z
+Owner: Booking & Allocation
 
 Feature: Booking & Allocation
 Module: Booking & Allocation
 
 1. Purpose
 
-Implement booking creation and allocation of a companion duo (Captain + Vice Captain) from a venue-based roster, enforce the "one non-terminal booking per client" rule, support cancellation (pre-session and in-session) with roster release, and provide client-only booking details retrieval with timed companion reveal.
+Implement booking creation and allocation of a companion duo (Captain + Vice Captain) from a venue-based roster, enforce the “one non-terminal booking per client” rule, and support cancellation (pre-session and in-session) with roster release.
 
 Additionally, support INTERNAL ONLY edits of an existing booking in CONFIRMED state to:
 - change `venueId` and/or `startAt` (with fixed duration), and
@@ -26,7 +26,7 @@ Dependencies / Assumptions:
 - Venues & Availability module owns roster slot population/backfill. Roster slots for the coming week are created for each companion at signup and backfilled if missing (see Constraints).
 - Admin reassignment via client-facing/admin Bearer authorization is deferred; reassignment is supported only via the internal edit endpoint `PATCH /bookings/{id}` with internalAuth.
 
-Source: `master-document/1.2_Booking_And_Allocation_Flow.md`, `master-document/1.3_Booking_Confirmation_Page.md`
+Source: `master-document/1.2_Booking_And_Allocation_Flow.md`
 Alignment:
 - `SDS/core_sds.md` (Booking lifecycle + invariants)
 - `SDS/data-model/schema.md` (`bookings`, `roster_slots`, `booking_companion_assignments`, partial unique index enforcing one non-terminal booking)
@@ -50,10 +50,6 @@ On success, the edit operation MUST be atomic:
 
 Booking artifacts stability rule:
 - `qrCode`, `pinCode`, `comMatchQrCode`, `comMatchPinCode`, and `bookingColor` MUST remain unchanged across edits, even if companions change.
-
-
-D. `GET /bookings/{id}/details`
-Retrieves booking details for the authenticated client. Returns booking metadata with conditionally revealed companion information based on timing rules (T-5h before startAt).
 
 3. Input
 
@@ -86,11 +82,6 @@ Companion reassignment rule:
 
 Duration invariant on edit:
 - `endAt` is derived by server as `endAt = startAt + 2 hours` using the (possibly updated) `startAt`.
-
-
-D. `GET /bookings/{id}/details`
-- Path parameter: `{id}` — booking uuid
-- No request body
 
 4. Output
 
@@ -128,41 +119,6 @@ Returns updated booking summary. Same shape as `POST /bookings` response is acce
   "createdAt": "ISO-8601"
 }
 ```
-
-
-D. `GET /bookings/{id}/details` (200)
-```json
-{
-  "id": "uuid",
-  "status": "CONFIRMED" | "ACTIVE" | "COMPLETED" | "CANCELLED",
-  "clientId": "uuid",
-  "venueId": "uuid",
-  "startAt": "ISO-8601",
-  "endAt": "ISO-8601",
-  "createdAt": "ISO-8601",
-  "companions": [
-    {
-      "designation": "CAPTAIN" | "VICE_CAPTAIN",
-      "displayName": "string",
-      "languages": ["string"],
-      "profilePictureUrl": "string",
-      "averageRating": 0.00
-    }
-  ] | null
-}
-```
-
-Response field rules:
-- `companions`:
-  - `null` when current time < (startAt - 5 hours) OR booking status is `CANCELLED` OR booking status is `COMPLETED`
-  - Array of exactly 2 companion objects when current time >= (startAt - 5 hours) AND booking status is `CONFIRMED` or `ACTIVE`
-  - Array is ordered: [CAPTAIN, VICE_CAPTAIN]
-  - Each companion object contains:
-    - `designation`: from `booking_companion_assignments.designation`
-    - `displayName`: from `users.nickname` (NO PII: no full name, email, or phone)
-    - `languages`: from `companion_profiles.languages`
-    - `profilePictureUrl`: from `companion_profiles.profile_picture_url`
-    - `averageRating`: from `companion_profiles.average_rating`
 
 Error envelope (per Core SDS):
 ```json
@@ -245,9 +201,7 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
 - `booking_companion_assignments`
   - `id`, `booking_id`, `companion_id`, `designation`, `presence_status`, `self_match_status`, `client_match_status`
 - `companion_profiles`
-  - `user_id`, `designation`, `languages`, `profile_picture_url`, `average_rating`
-- `users`
-  - `id`, `nickname`
+  - `user_id`, `designation` (used for validating CAPTAIN vs VICE_CAPTAIN)
 
 8. Business Logic
 
@@ -402,26 +356,6 @@ Goal: apply requested edits and (re)allocate roster slots/assignments atomically
 
 15. Return updated booking summary (status remains `CONFIRMED`).
 
-
-D. `GET /bookings/{id}/details`
-1. Authenticate and authorize `role==CLIENT`.
-2. Fetch booking by id.
-3. Authorize owner:
-   - require `bookings.client_id == caller.userId`.
-4. Compute reveal time:
-   - `revealTime = bookings.start_at - 5 hours`.
-5. Determine whether to reveal companions:
-   - If `current_time < revealTime`: companions = null
-   - If `bookings.status == 'CANCELLED'`: companions = null
-   - If `bookings.status == 'COMPLETED'`: companions = null
-   - Else (status is `CONFIRMED` or `ACTIVE` AND current_time >= revealTime): reveal companions
-6. If companions should be revealed:
-   - Load exactly two assignment rows for the booking (CAPTAIN + VICE_CAPTAIN)
-   - Join to `users.nickname` and `companion_profiles` for the assigned companions
-   - Return companions array with exactly 2 elements, ordered: [CAPTAIN, VICE_CAPTAIN]
-7. If companions should NOT be revealed:
-   - Set companions field to `null`
-
 9. State Changes
 
 - Booking status:
@@ -429,7 +363,6 @@ D. `GET /bookings/{id}/details`
   - On cancel (pre-session): `CONFIRMED → CANCELLED`
   - On cancel (in-session): `ACTIVE → CANCELLED`
   - On internal edit (PATCH /bookings/{id}): booking status remains `CONFIRMED` (no lifecycle transition).
-  - On GET /bookings/{id}/details: no state change.
 
 - RosterSlot status:
   - On create: `AVAILABLE → BOOKED` (for the two selected slots)
@@ -576,19 +509,6 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
          client_match_status = CASE WHEN companion_id <> $targetViceCaptainId THEN 'WAITING_FOR_CLIENT' ELSE client_match_status END
      WHERE booking_id = $bookingId AND designation = 'VICE_CAPTAIN'`
 
-
-D. `GET /bookings/{id}/details`
-- Fetch booking core fields:
-  - `SELECT id, status, client_id, venue_id, start_at, end_at, created_at FROM bookings WHERE id = $1 LIMIT 1`
-
-- If companions are revealed, fetch companion public info (no PII):
-  - `SELECT bca.designation, u.nickname, cp.languages, cp.profile_picture_url, cp.average_rating
-     FROM booking_companion_assignments bca
-     JOIN users u ON u.id = bca.companion_id
-     JOIN companion_profiles cp ON cp.user_id = bca.companion_id
-     WHERE bca.booking_id = $1
-     ORDER BY CASE bca.designation WHEN 'CAPTAIN' THEN 1 WHEN 'VICE_CAPTAIN' THEN 2 ELSE 3 END`
-
 11. Transaction Boundaries
 
 A. `POST /bookings`
@@ -660,10 +580,6 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
   - Booking creation reserves existing matching slots by setting `status='BOOKED'` and `booking_id=booking.id`.
 
 13. Concurrency Rules
-
-- GET /bookings/{id}/details:
-  - No row locks required; read-only operation.
-  - Timing-based reveal uses server current time; concurrent reads may see different reveal states during the 5-hour threshold window (acceptable behavior).
 
 - Prevent double-booking of the same roster slot:
   - Allocation/reservation must lock candidate `roster_slots` rows and only update rows still `status='AVAILABLE'`.

@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, jest } from "@jest/globals";
+import { describe, test, expect, beforeEach, afterEach, jest } from "@jest/globals";
 
 import { bookingService } from "../booking.service";
 import { ErrorCodes } from "../../../shared/errors/errorCodes";
@@ -36,7 +36,8 @@ jest.mock("../booking.repository", () => ({
     lockBookingById: jest.fn(),
     isCompanionAssignedToBooking: jest.fn(),
     updateBookingStatus: jest.fn(),
-    findBookingDetailsById: jest.fn()
+    findBookingDetailsById: jest.fn(),
+    findBookingCompanionPublicInfoByBookingId: jest.fn()
   }
 }));
 
@@ -49,6 +50,10 @@ describe("bookingService", () => {
       const tx = {};
       return callback(tx);
     });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   test("createBooking creates booking and assignments", async () => {
@@ -224,6 +229,174 @@ describe("bookingService", () => {
         caller: { id: "companion-1", role: "COMPANION" }
       })
     ).rejects.toMatchObject({ code: ErrorCodes.COMPANION_NOT_ASSIGNED, statusCode: 403 });
+  });
+
+  test("getBookingDetails hides companions before reveal window", async () => {
+    const { bookingRepository } = requireMock("../booking.repository");
+
+    const startAt = new Date("2026-04-26T10:00:00.000Z");
+    const endAt = new Date("2026-04-26T12:00:00.000Z");
+    const createdAt = new Date("2026-04-01T00:00:00.000Z");
+
+    bookingRepository.findBookingDetailsById.mockResolvedValue({
+      id: "booking-1",
+      status: "CONFIRMED",
+      clientId: "client-1",
+      venueId: "venue-1",
+      startAt,
+      endAt,
+      createdAt
+    });
+
+    const dateNowSpy = jest
+      .spyOn(Date, "now")
+      .mockReturnValue(startAt.getTime() - 5 * 60 * 60 * 1000 - 1);
+
+    try {
+      const result = await bookingService.getBookingDetails({ bookingId: "booking-1", clientId: "client-1" });
+
+      expect(bookingRepository.findBookingCompanionPublicInfoByBookingId).not.toHaveBeenCalled();
+      expect(result).toEqual({
+        id: "booking-1",
+        status: "CONFIRMED",
+        clientId: "client-1",
+        venueId: "venue-1",
+        startAt: startAt.toISOString(),
+        endAt: endAt.toISOString(),
+        createdAt: createdAt.toISOString(),
+        companions: null
+      });
+    } finally {
+      dateNowSpy.mockRestore();
+    }
+  });
+
+  test("getBookingDetails reveals companions at T-5h boundary in CAPTAIN then VICE_CAPTAIN order", async () => {
+    const { bookingRepository } = requireMock("../booking.repository");
+
+    const startAt = new Date("2026-04-26T10:00:00.000Z");
+    const endAt = new Date("2026-04-26T12:00:00.000Z");
+    const createdAt = new Date("2026-04-01T00:00:00.000Z");
+
+    bookingRepository.findBookingDetailsById.mockResolvedValue({
+      id: "booking-1",
+      status: "CONFIRMED",
+      clientId: "client-1",
+      venueId: "venue-1",
+      startAt,
+      endAt,
+      createdAt
+    });
+
+    bookingRepository.findBookingCompanionPublicInfoByBookingId.mockResolvedValue([
+      {
+        designation: "VICE_CAPTAIN",
+        companion: {
+          nickname: "vice",
+          companionProfile: {
+            languages: ["AR"],
+            profilePictureUrl: "pic-vice",
+            averageRating: "4.25"
+          }
+        }
+      },
+      {
+        designation: "CAPTAIN",
+        companion: {
+          nickname: "captain",
+          companionProfile: {
+            languages: ["EN"],
+            profilePictureUrl: "pic-captain",
+            averageRating: "4.9"
+          }
+        }
+      }
+    ]);
+
+    const dateNowSpy = jest
+      .spyOn(Date, "now")
+      .mockReturnValue(startAt.getTime() - 5 * 60 * 60 * 1000);
+
+    try {
+      const result = await bookingService.getBookingDetails({ bookingId: "booking-1", clientId: "client-1" });
+
+      expect(result.companions).toEqual([
+        {
+          designation: "CAPTAIN",
+          displayName: "captain",
+          languages: ["EN"],
+          profilePictureUrl: "pic-captain",
+          averageRating: 4.9
+        },
+        {
+          designation: "VICE_CAPTAIN",
+          displayName: "vice",
+          languages: ["AR"],
+          profilePictureUrl: "pic-vice",
+          averageRating: 4.25
+        }
+      ]);
+    } finally {
+      dateNowSpy.mockRestore();
+    }
+  });
+
+  test("getBookingDetails fails closed when assignments incomplete", async () => {
+    const { bookingRepository } = requireMock("../booking.repository");
+    const { logger } = requireMock("../../../shared/logger");
+
+    const startAt = new Date("2026-04-26T10:00:00.000Z");
+    const endAt = new Date("2026-04-26T12:00:00.000Z");
+    const createdAt = new Date("2026-04-01T00:00:00.000Z");
+
+    bookingRepository.findBookingDetailsById.mockResolvedValue({
+      id: "booking-1",
+      status: "CONFIRMED",
+      clientId: "client-1",
+      venueId: "venue-1",
+      startAt,
+      endAt,
+      createdAt
+    });
+
+    bookingRepository.findBookingCompanionPublicInfoByBookingId.mockResolvedValue([
+      {
+        designation: "CAPTAIN",
+        companion: {
+          nickname: "captain",
+          companionProfile: {
+            languages: ["EN"],
+            profilePictureUrl: "pic-captain",
+            averageRating: "4.9"
+          }
+        }
+      }
+    ]);
+
+    const dateNowSpy = jest
+      .spyOn(Date, "now")
+      .mockReturnValue(startAt.getTime() - 5 * 60 * 60 * 1000);
+
+    try {
+      const result = await bookingService.getBookingDetails({ bookingId: "booking-1", clientId: "client-1" });
+
+      expect(bookingRepository.findBookingCompanionPublicInfoByBookingId).toHaveBeenCalledWith(
+        expect.any(Object),
+        "booking-1"
+      );
+      expect(result.companions).toBeNull();
+
+      expect(logger.info).toHaveBeenCalledWith(
+        expect.objectContaining({
+          bookingId: "booking-1",
+          missingCaptain: false,
+          missingViceCaptain: true
+        }),
+        "booking companion assignments incomplete"
+      );
+    } finally {
+      dateNowSpy.mockRestore();
+    }
   });
 
   test("getBookingDetails forbids non-owner clients", async () => {

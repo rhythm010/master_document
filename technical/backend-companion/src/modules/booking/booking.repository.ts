@@ -165,5 +165,28 @@ export const bookingRepository = {
         endAt: true,
         createdAt: true
       }
+    }),
+
+  // Fetch companion public info for a booking (no PII; used for client reveal window UI).
+  findBookingCompanionPublicInfoByBookingId: (db: DbClient, bookingId: string) =>
+    db.bookingCompanionAssignment.findMany({
+      where: {
+        bookingId
+      },
+      select: {
+        designation: true,
+        companion: {
+          select: {
+            nickname: true,
+            companionProfile: {
+              select: {
+                languages: true,
+                profilePictureUrl: true,
+                averageRating: true
+              }
+            }
+          }
+        }
+      }
     })
 };

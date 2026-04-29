@@ -19,6 +19,14 @@ export type CancelBookingResponseDTO = {
   status: "CANCELLED";
 };
 
+export type BookingCompanionPublicInfoDTO = {
+  designation: "CAPTAIN" | "VICE_CAPTAIN";
+  displayName: string;
+  languages: string[];
+  profilePictureUrl: string;
+  averageRating: number;
+};
+
 export type BookingDetailsDTO = {
   id: string;
   status: "CONFIRMED" | "ACTIVE" | "COMPLETED" | "CANCELLED";
@@ -27,4 +35,5 @@ export type BookingDetailsDTO = {
   startAt: string;
   endAt: string;
   createdAt: string;
+  companions?: BookingCompanionPublicInfoDTO[] | null;
 };
