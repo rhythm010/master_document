@@ -1,0 +1,396 @@
+{
+  "taskId": "TASK-20260429-001",
+  "type": "clarity-artifact",
+  "status": "CLARITY_COMPLETE",
+  "summary": "Update Booking Details endpoint to always return full companion public info (remove timed reveal entirely), add public Companion Profile read-by-id endpoint, and add Venue read-by-id endpoint.",
+  "references": {
+    "coreSds": "SDS/core_sds.md",
+    "schema": "SDS/data-model/schema.md",
+    "featureSdsDocsToUpdate": [
+      {
+        "path": "SDS/feature-sds/booking-and-allocation.feature-sds.md",
+        "requiredUpdates": [
+          "Remove all timed reveal (T-5h) logic and any mention of reveal windows.",
+          "Update GET /bookings/{id}/details response: companions must always be present and must always contain exactly 2 assignments (CAPTAIN + VICE_CAPTAIN), including companionId."
+        ]
+      },
+      {
+        "path": "SDS/feature-sds/companion-profile-and-activation.feature-sds.md",
+        "requiredUpdates": [
+          "Add a new public/non-PII endpoint GET /companion-profiles/{companionId}.",
+          "Update scope notes that previously stated client viewing is out of scope (this change explicitly adds client/any-user read access to public companion info)."
+        ]
+      },
+      {
+        "path": "SDS/feature-sds/venues-and-availability-roster.feature-sds.md",
+        "requiredUpdates": [
+          "Add a new endpoint GET /venues/{venueId} for authenticated users.",
+          "Response fields must match the venue catalog item fields (id, name, address, venueType, latitude, longitude, operatingHoursStart, operatingHoursEnd)."
+        ]
+      }
+    ]
+  },
+  "decisions": {
+    "endpoints": [
+      {
+        "name": "bookingDetails",
+        "method": "GET",
+        "path": "/bookings/{id}/details",
+        "callTiming": {
+          "canBeCalledAnytime": true,
+          "notes": [
+            "No timing-based restrictions (no reveal window).",
+            "Must work for any booking status, including CANCELLED and COMPLETED."
+          ]
+        },
+        "authorization": {
+          "authType": "bearerToken",
+          "allowedCallers": [
+            {
+              "principal": "client",
+              "rule": "CLIENT role AND must own the booking (bookings.client_id == auth.userId)"
+            }
+          ],
+          "explicitlyNotAllowed": [
+            "companions (even if assigned)",
+            "unauthenticated callers"
+          ]
+        },
+        "pathParams": {
+          "id": {
+            "type": "uuid",
+            "mapsTo": "bookings.id"
+          }
+        },
+        "response": {
+          "contentType": "application/json",
+          "successStatus": 200,
+          "schema": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "clientId",
+              "venueId",
+              "startAt",
+              "endAt",
+              "createdAt",
+              "companions"
+            ],
+            "properties": {
+              "id": {
+                "type": "uuid"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "CONFIRMED",
+                  "ACTIVE",
+                  "COMPLETED",
+                  "CANCELLED"
+                ]
+              },
+              "clientId": {
+                "type": "uuid"
+              },
+              "venueId": {
+                "type": "uuid"
+              },
+              "startAt": {
+                "type": "iso-8601-timestamp"
+              },
+              "endAt": {
+                "type": "iso-8601-timestamp"
+              },
+              "createdAt": {
+                "type": "iso-8601-timestamp"
+              },
+              "companions": {
+                "type": "array",
+                "description": "Always present. Must represent exactly 2 assignments: CAPTAIN + VICE_CAPTAIN.",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "companionId",
+                    "designation",
+                    "displayName",
+                    "languages",
+                    "profilePictureUrl",
+                    "averageRating"
+                  ],
+                  "properties": {
+                    "companionId": {
+                      "type": "uuid",
+                      "mapsTo": "booking_companion_assignments.companion_id (users.id)"
+                    },
+                    "designation": {
+                      "type": "string",
+                      "enum": [
+                        "CAPTAIN",
+                        "VICE_CAPTAIN"
+                      ],
+                      "mapsTo": "booking_companion_assignments.designation"
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "mapsTo": "users.nickname",
+                      "pii": "non-PII"
+                    },
+                    "languages": {
+                      "type": "string[]",
+                      "mapsTo": "companion_profiles.languages",
+                      "constraints": {
+                        "allowedValues": [
+                          "ENGLISH",
+                          "ARABIC"
+                        ]
+                      }
+                    },
+                    "profilePictureUrl": {
+                      "type": "string",
+                      "mapsTo": "companion_profiles.profile_picture_url",
+                      "pii": "non-PII"
+                    },
+                    "averageRating": {
+                      "type": "number",
+                      "format": "numeric(3,2)",
+                      "mapsTo": "companion_profiles.average_rating"
+                    }
+                  }
+                },
+                "orderingRules": [
+                  "Array MUST be ordered: [CAPTAIN, VICE_CAPTAIN].",
+                  "Exactly one element per designation."
+                ]
+              }
+            }
+          },
+          "errorEnvelope": {
+            "schema": {
+              "code": "string",
+              "message": "string"
+            },
+            "source": "core_sds"
+          }
+        },
+        "dataIntegrityGuards": [
+          "Booking must have exactly two assignment rows; if not, treat as INTERNAL_ERROR (server-side data integrity violation).",
+          "The two assignments must cover exactly one CAPTAIN and one VICE_CAPTAIN."
+        ]
+      },
+      {
+        "name": "companionPublicProfileById",
+        "method": "GET",
+        "path": "/companion-profiles/{companionId}",
+        "authorization": {
+          "authType": "bearerToken",
+          "allowedCallers": [
+            {
+              "principal": "anyAuthenticatedUser",
+              "rule": "Any authenticated user (CLIENT or COMPANION)"
+            }
+          ],
+          "responseIsPublicNonPii": true,
+          "explicitlyNotAllowed": [
+            "unauthenticated callers"
+          ]
+        },
+        "pathParams": {
+          "companionId": {
+            "type": "uuid",
+            "meaning": "Companion user id",
+            "mapsTo": "users.id and companion_profiles.user_id"
+          }
+        },
+        "response": {
+          "contentType": "application/json",
+          "successStatus": 200,
+          "schema": {
+            "type": "object",
+            "required": [
+              "id",
+              "displayName",
+              "designation",
+              "languages",
+              "profilePictureUrl",
+              "averageRating"
+            ],
+            "properties": {
+              "id": {
+                "type": "uuid",
+                "definition": "Same value as {companionId} path param (users.id)",
+                "pii": "non-PII"
+              },
+              "displayName": {
+                "type": "string",
+                "mapsTo": "users.nickname",
+                "pii": "non-PII"
+              },
+              "designation": {
+                "type": "string",
+                "enum": [
+                  "CAPTAIN",
+                  "VICE_CAPTAIN"
+                ],
+                "mapsTo": "companion_profiles.designation"
+              },
+              "languages": {
+                "type": "string[]",
+                "mapsTo": "companion_profiles.languages",
+                "constraints": {
+                  "allowedValues": [
+                    "ENGLISH",
+                    "ARABIC"
+                  ]
+                }
+              },
+              "profilePictureUrl": {
+                "type": "string",
+                "mapsTo": "companion_profiles.profile_picture_url",
+                "pii": "non-PII"
+              },
+              "averageRating": {
+                "type": "number",
+                "format": "numeric(3,2)",
+                "mapsTo": "companion_profiles.average_rating"
+              }
+            }
+          },
+          "errorEnvelope": {
+            "schema": {
+              "code": "string",
+              "message": "string"
+            },
+            "source": "core_sds"
+          }
+        },
+        "privacyRules": [
+          "Response MUST NOT include PII fields such as users.name, users.email, users.passwordHash, phone, or any location data.",
+          "Response is explicitly defined as public/non-PII and safe to show to any authenticated user."
+        ]
+      },
+      {
+        "name": "venueById",
+        "method": "GET",
+        "path": "/venues/{venueId}",
+        "authorization": {
+          "authType": "bearerToken",
+          "allowedCallers": [
+            {
+              "principal": "anyAuthenticatedUser",
+              "rule": "Any authenticated user with Bearer token (CLIENT or COMPANION)"
+            }
+          ],
+          "explicitlyNotAllowed": [
+            "unauthenticated callers"
+          ]
+        },
+        "pathParams": {
+          "venueId": {
+            "type": "uuid",
+            "mapsTo": "venues.id"
+          }
+        },
+        "response": {
+          "contentType": "application/json",
+          "successStatus": 200,
+          "schema": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "address",
+              "venueType",
+              "latitude",
+              "longitude",
+              "operatingHoursStart",
+              "operatingHoursEnd"
+            ],
+            "properties": {
+              "id": {
+                "type": "uuid"
+              },
+              "name": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "venueType": {
+                "type": "string",
+                "enum": [
+                  "MALL",
+                  "CLUB",
+                  "RESTAURANT"
+                ]
+              },
+              "latitude": {
+                "type": "number",
+                "format": "numeric(10,7)"
+              },
+              "longitude": {
+                "type": "number",
+                "format": "numeric(10,7)"
+              },
+              "operatingHoursStart": {
+                "type": "string",
+                "format": "HH:MM",
+                "mapsTo": "venues.operating_hours_start"
+              },
+              "operatingHoursEnd": {
+                "type": "string",
+                "format": "HH:MM",
+                "mapsTo": "venues.operating_hours_end"
+              }
+            }
+          },
+          "errorEnvelope": {
+            "schema": {
+              "code": "string",
+              "message": "string"
+            },
+            "source": "core_sds"
+          }
+        }
+      }
+    ]
+  },
+  "backwardCompatibility": {
+    "changes": [
+      {
+        "area": "GET /bookings/{id}/details",
+        "type": "behaviorChange",
+        "previousBehavior": [
+          "companions was null before (startAt - 5 hours)",
+          "companions was null for CANCELLED and COMPLETED bookings"
+        ],
+        "newBehavior": [
+          "companions is ALWAYS included and ALWAYS contains exactly 2 companion objects (CAPTAIN + VICE_CAPTAIN), regardless of time and regardless of booking status"
+        ],
+        "risk": "Product/UI behavior changes: clients will be able to render companion public info earlier than before and for terminal bookings.",
+        "schemaImpact": [
+          "companions changes from nullable (array|null) to always an array length 2",
+          "companionId is added (new required field per companion entry)"
+        ]
+      },
+      {
+        "area": "Companion public info access",
+        "type": "surfaceAreaIncrease",
+        "newEndpoint": "GET /companion-profiles/{companionId}",
+        "risk": "Adds a new public endpoint; must strictly enforce non-PII response contract."
+      },
+      {
+        "area": "Venue read access",
+        "type": "surfaceAreaIncrease",
+        "newEndpoint": "GET /venues/{venueId}",
+        "risk": "Adds a new read endpoint; aligns with existing authenticated access patterns for venue search/availability."
+      }
+    ],
+    "notes": [
+      "Removing timed reveal logic is an intentional functional change; any previous client-side countdown/lockout behavior tied to T-5h must be updated accordingly.",
+      "If any clients treated companions==null as a required gate, they will now observe companion data immediately."
+    ]
+  }
+}

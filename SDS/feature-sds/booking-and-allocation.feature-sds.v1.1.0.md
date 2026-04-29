@@ -1,7 +1,7 @@
 Feature: Booking & Allocation
 Version: 1.1.0
 Status: Archived
-Previous Version: booking-and-allocation.feature-sds.v1.0.0.md
+Previous Version: Pruned by retention (booking-and-allocation.feature-sds.v1.0.0.md)
 Change Type: MINOR
 Change Summary: Add INTERNAL ONLY PATCH /bookings/{id} to edit CONFIRMED bookings (venueId/startAt and optional manual reassignment) with atomic roster slot release+reserve and assignment updates. Booking artifacts (qrCode/pinCode/comMatch*/bookingColor) remain stable across edits.
 Created At: 2026-04-24T03:10:02Z

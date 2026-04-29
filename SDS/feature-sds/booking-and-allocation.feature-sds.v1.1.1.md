@@ -1,6 +1,6 @@
 Feature: Booking & Allocation
 Version: 1.1.1
-Status: Current
+Status: Archived
 Previous Version: booking-and-allocation.feature-sds.v1.1.0.md
 Change Type: PATCH
 Change Summary: Harden internal edit PATCH /bookings/{id} with deadlock-safe slot locking, row-count guards, and clarified concurrency handling.
