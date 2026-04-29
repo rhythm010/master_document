@@ -1,0 +1,441 @@
+{
+  "runId": "RUN-BOOKING-HAPPY-20260429-001",
+  "runner": {
+    "type": "js",
+    "implementation": "technical/backend-companion/src/test-runner/runner.ts (invoked via npx tsx)",
+    "commandUsed": "cd technical/backend-companion && npx tsx -e \"import 'dotenv/config'; import { runTestFile } from './src/test-runner/runner'; (async()=>{ const file='src/modules/booking/__tests__/MOD-BOOKING-001-create-booking-happy-path.json'; const report=await runTestFile(file,false); console.log(JSON.stringify(report,null,2)); })()\"",
+    "serviceConventionsCheckedByRunner": [
+      "API http://localhost:3000/health",
+      "Mailpit http://localhost:8025/api/v1/messages",
+      "Postgres via DATABASE_URL"
+    ]
+  },
+  "environmentReadiness": {
+    "observed": {
+      "apiHealthHttpStatus": 200,
+      "dockerComposeDbStatus": "running",
+      "dockerComposeMailpitStatus": "healthy"
+    },
+    "runnerEnvironmentCheck": {
+      "apiServer": "OK",
+      "mailpit": "OK",
+      "database": "OK"
+    }
+  },
+  "overallStatus": "FAIL",
+  "stopPolicy": {
+    "stopOnFirstFailure": true,
+    "stoppedAfterTestId": "MOD-BOOKING-001"
+  },
+  "tests": [
+    {
+      "testFile": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-001-create-booking-happy-path.json",
+      "testId": "MOD-BOOKING-001",
+      "scenarioName": "Create Booking - Happy Path",
+      "overallStatus": "FAIL",
+      "timing": {
+        "startedAt": "2026-04-29T04:29:40.231Z",
+        "endedAt": "2026-04-29T04:29:40.390Z",
+        "durationMs": 159
+      },
+      "artifactsCaptured": {},
+      "runnerRawResult": {
+        "runId": "RUN-20260429042940-MOD-BOOKING-001",
+        "testId": "MOD-BOOKING-001",
+        "status": "FAIL",
+        "startedAt": "2026-04-29T04:29:40.231Z",
+        "endedAt": "2026-04-29T04:29:40.390Z",
+        "environmentCheck": {
+          "apiServer": "OK",
+          "mailpit": "OK",
+          "database": "OK"
+        },
+        "serviceHitLog": [],
+        "stepResults": [],
+        "assertionSummary": {
+          "api": "PASS",
+          "db": "PASS",
+          "external": "PASS",
+          "mustNotOccur": "PASS"
+        },
+        "failures": [
+          {
+            "step": null,
+            "reason": "Seed data failed",
+            "evidence": "Error: Unsupported seed entity: user"
+          }
+        ],
+        "cleanup": {
+          "status": "SKIPPED",
+          "reason": "Default behavior - cleanup not requested",
+          "actions": []
+        }
+      },
+      "designStepResults_1to1": [
+        {
+          "step": 1,
+          "layman": "Client requests a booking by providing venue and start time",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: runner failed before executing any steps due to seedData error (Unsupported seed entity: user).",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 2,
+          "layman": "System validates the client is eligible and calculates the 2-hour booking window",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: seedData failure prevented execution.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 3,
+          "layman": "System allocates a duo (captain + vice captain) from available roster",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: seedData failure prevented execution.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 4,
+          "layman": "System creates the booking, reserves slots, and assigns the duo atomically",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: seedData failure prevented execution.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 5,
+          "layman": "System returns the confirmed booking with booking ID and details",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: seedData failure prevented execution.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 6,
+          "layman": "Verify booking exists in database with all required artifacts generated",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: seedData failure prevented execution.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 7,
+          "layman": "Verify exactly 2 roster slots are marked as BOOKED for this booking",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: seedData failure prevented execution.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 8,
+          "layman": "Verify duo assignments exist with correct designations and default match statuses",
+          "status": "NOT_RUN",
+          "observedOutcome": "Blocked: seedData failure prevented execution.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        }
+      ],
+      "errors": [
+        {
+          "type": "runner_seed",
+          "message": "Seed data failed",
+          "details": "Unsupported seed entity: user",
+          "implication": "This booking test design file is not executable by the current JS runner seeding implementation."
+        }
+      ]
+    },
+    {
+      "testFile": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-002-cancel-booking-happy-path.json",
+      "testId": "MOD-BOOKING-002",
+      "scenarioName": "Cancel Booking - Happy Path (Pre-Session)",
+      "overallStatus": "SKIPPED",
+      "skipReason": "Stopped after MOD-BOOKING-001 failure per stop-on-fail requirement.",
+      "timing": {
+        "startedAt": null,
+        "endedAt": null,
+        "durationMs": 0
+      },
+      "artifactsCaptured": {},
+      "designStepResults_1to1": [
+        {
+          "step": 1,
+          "layman": "Client requests to cancel their confirmed booking",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 2,
+          "layman": "System verifies the client owns this booking",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 3,
+          "layman": "System checks that the booking can be cancelled (not completed)",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 4,
+          "layman": "System cancels the booking and releases the reserved roster slots",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 5,
+          "layman": "System confirms the booking has been cancelled",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 6,
+          "layman": "Verify booking status is now CANCELLED in database",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 7,
+          "layman": "Verify no roster slots are linked to this booking anymore",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 8,
+          "layman": "Verify the duo's roster slots are marked AVAILABLE again",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 9,
+          "layman": "Verify assignments remain in database (audit trail preserved)",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        }
+      ]
+    },
+    {
+      "testFile": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-003-get-booking-details-happy-path.json",
+      "testId": "MOD-BOOKING-003",
+      "scenarioName": "Get Booking Details - Happy Path",
+      "overallStatus": "SKIPPED",
+      "skipReason": "Stopped after MOD-BOOKING-001 failure per stop-on-fail requirement.",
+      "timing": {
+        "startedAt": null,
+        "endedAt": null,
+        "durationMs": 0
+      },
+      "artifactsCaptured": {},
+      "designStepResults_1to1": [
+        {
+          "step": 1,
+          "layman": "Client requests to view their booking details",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 2,
+          "layman": "System verifies the caller has access to this booking",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 3,
+          "layman": "System retrieves the booking information from database",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 4,
+          "layman": "System returns the booking details to the caller",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        },
+        {
+          "step": 5,
+          "layman": "Verify the response contains correct and complete booking information",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        }
+      ]
+    },
+    {
+      "testFile": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-004-internal-edit-venue-time-happy-path.json",
+      "testId": "MOD-BOOKING-004",
+      "scenarioName": "Internal Edit - Change Venue and Time (Happy Path)",
+      "overallStatus": "SKIPPED",
+      "skipReason": "Stopped after MOD-BOOKING-001 failure per stop-on-fail requirement.",
+      "timing": {
+        "startedAt": null,
+        "endedAt": null,
+        "durationMs": 0
+      },
+      "artifactsCaptured": {},
+      "internalAuthRequirement": {
+        "designRequirement": "X-Internal-Token only; explicitly ensure bearer tokens are NOT used.",
+        "executionNote": "NOT_RUN (skipped)."
+      },
+      "designStepResults_1to1": [
+        {
+          "step": 1,
+          "layman": "Internal service requests to change the booking's venue and start time",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        }
+      ]
+    },
+    {
+      "testFile": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-005-internal-edit-reassign-duo-happy-path.json",
+      "testId": "MOD-BOOKING-005",
+      "scenarioName": "Internal Edit - Manual Duo Reassignment (Happy Path)",
+      "overallStatus": "SKIPPED",
+      "skipReason": "Stopped after MOD-BOOKING-001 failure per stop-on-fail requirement.",
+      "timing": {
+        "startedAt": null,
+        "endedAt": null,
+        "durationMs": 0
+      },
+      "artifactsCaptured": {},
+      "internalAuthRequirement": {
+        "designRequirement": "X-Internal-Token only; explicitly ensure bearer tokens are NOT used.",
+        "executionNote": "NOT_RUN (skipped)."
+      },
+      "designStepResults_1to1": [
+        {
+          "step": 1,
+          "layman": "Internal service requests to manually reassign a different duo to the booking",
+          "status": "NOT_RUN",
+          "observedOutcome": "Skipped due to prior test failure.",
+          "timing": {
+            "startedAt": null,
+            "endedAt": null,
+            "durationMs": 0
+          }
+        }
+      ]
+    }
+  ],
+  "serverDbErrorsEncountered": [
+    {
+      "scope": "test-runner",
+      "type": "seed",
+      "message": "Unsupported seed entity: user",
+      "details": "The current JS runner seed implementation (applySeedData) only supports seeding venues; booking module DRAFT_SPEC designs include seedData entities like user, booking, roster_slot, companion_profile."
+    }
+  ],
+  "keyFinding": {
+    "whyHappyPathDidNotRun": [
+      "The specified BOOKING module test files are SPEC_DRIVEN_DRAFT (DRAFT_SPEC) artifacts.",
+      "They contain seedData entities and step actionTypes (validation/allocation/dbVerification/etc.) that the current JS runner does not execute.",
+      "Execution therefore fails immediately at seeding with: Unsupported seed entity: user."
+    ],
+    "whatWouldBeNeededToMakeTheseRunnableWithJSRunner": [
+      "Extend JS runner seeding to support: user, booking, companion_profile, roster_slot, booking_companion_assignment (and any FK/enum constraints).",
+      "Add step executors for actionTypes like dbVerification / authorization / internalAuth / allocation / responseValidation (or translate these designs into executable apiRequest+dbQuery steps).",
+      "Materialize requiredPayloadFields/payloadRules into concrete step.payload values (like the existing qa/tmp/*-materialized.json journey tests do)."
+    ]
+  },
+  "notes": {
+    "additionalConstraintFound": "PATCH /bookings/{id} is not currently registered in src/modules/booking/booking.route.ts, so MOD-BOOKING-004/005 cannot pass until the endpoint exists."
+  }
+}
