@@ -1,11 +1,11 @@
 Feature: Booking & Allocation
-Version: 1.1.1
-Status: Current
-Previous Version: booking-and-allocation.feature-sds.v1.1.0.md
-Change Type: PATCH
-Change Summary: Harden internal edit PATCH /bookings/{id} with deadlock-safe slot locking, row-count guards, and clarified concurrency handling.
+Version: 1.1.0
+Status: Archived
+Previous Version: booking-and-allocation.feature-sds.v1.0.0.md
+Change Type: MINOR
+Change Summary: Add INTERNAL ONLY PATCH /bookings/{id} to edit CONFIRMED bookings (venueId/startAt and optional manual reassignment) with atomic roster slot release+reserve and assignment updates. Booking artifacts (qrCode/pinCode/comMatch*/bookingColor) remain stable across edits.
 Created At: 2026-04-24T03:10:02Z
-Last Edited At: 2026-04-28T17:23:30Z
+Last Edited At: 2026-04-28T16:02:11.294Z
 Owner: Booking & Allocation
 
 Feature: Booking & Allocation
@@ -30,7 +30,6 @@ Source: `master-document/1.2_Booking_And_Allocation_Flow.md`
 Alignment:
 - `SDS/core_sds.md` (Booking lifecycle + invariants)
 - `SDS/data-model/schema.md` (`bookings`, `roster_slots`, `booking_companion_assignments`, partial unique index enforcing one non-terminal booking)
-- Clarity artifact: `SDS/artifacts/TASK-20260428-002-clarity.json`
 
 2. API Contract
 
@@ -166,19 +165,6 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
 - Booking exists, otherwise return 404 `BOOKING_NOT_FOUND`.
 - Booking must be in status `CONFIRMED`.
   - If status is `ACTIVE`, `COMPLETED`, or `CANCELLED`: reject with 400 `INVALID_STATE_TRANSITION`.
-- Extended/time edit safety:
-  - Booking MUST NOT be extended (`bookings.extended_at` must be NULL).
-  - Current server time MUST be strictly before both:
-    - the booking's current `start_at`, and
-    - the target edited `startAt` (if changed)
-  - If violated: reject with 400 `INVALID_STATE_TRANSITION`.
-- Match/presence safety constraint:
-  - Internal edits are allowed only before matching/presence has progressed.
-  - Both assignment rows for the booking MUST still be at defaults:
-    - `presence_status='ASSIGNED'`
-    - `self_match_status='NOT_MATCHED'`
-    - `client_match_status='WAITING_FOR_CLIENT'`
-  - If not: reject with 400 `INVALID_STATE_TRANSITION`.
 - Request body must include at least one editable field (`venueId`, `startAt`, and/or BOTH companion ids). Otherwise 400 `VALIDATION_ERROR`.
 - If `venueId` is provided, it must reference an existing venue, otherwise 404 `VENUE_NOT_FOUND`.
 - If `startAt` is provided, it must be a valid ISO-8601 timestamp.
@@ -194,8 +180,6 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
 
 - `bookings`
   - `id`, `client_id`, `venue_id`, `start_at`, `end_at`, `status`, `qr_code`, `pin_code`, `booking_color`, `com_match_qr_code`, `com_match_pin_code`, `extended_at`, `created_at`
-- `venues`
-  - `id` (used for venue existence validation)
 - `roster_slots`
   - `id`, `venue_id`, `companion_id`, `booking_id`, `start_at`, `end_at`, `status`
 - `booking_companion_assignments`
@@ -281,31 +265,16 @@ Goal: apply requested edits and (re)allocate roster slots/assignments atomically
 5. Enforce status constraint:
    - If `bookings.status != 'CONFIRMED'`: rollback and return 400 `INVALID_STATE_TRANSITION`.
 
-5b. Enforce extended/time edit safety:
-   - Booking MUST NOT be extended:
-     - If `bookings.extended_at IS NOT NULL`: rollback and return 400 `INVALID_STATE_TRANSITION`.
-   - Current server time MUST be strictly before `bookings.start_at`.
-     - If `now >= bookings.start_at`: rollback and return 400 `INVALID_STATE_TRANSITION`.
-
 6. Compute target time window:
    - `targetStartAt = input.startAt ?? bookings.start_at`
    - `targetEndAt = targetStartAt + 2 hours`
-   - Temporal guard for edits:
-     - If `now >= targetStartAt`: rollback and return 400 `INVALID_STATE_TRANSITION`
 
 7. Compute target venue:
    - `targetVenueId = input.venueId ?? bookings.venue_id`
    - If `input.venueId` is provided, validate venue exists; if not: rollback and return 404 `VENUE_NOT_FOUND`.
 
 8. Determine current assigned duo (for validation and defaulting):
-   - Load and LOCK the two assignment rows for the booking (CAPTAIN + VICE_CAPTAIN) using `FOR UPDATE` inside the PATCH transaction.
-   - Data integrity check: MUST return exactly 2 rows, containing one `designation='CAPTAIN'` and one `designation='VICE_CAPTAIN'`.
-     - If violated: rollback and return 500 `INTERNAL_ERROR`.
-   - Enforce edit safety constraint: both assignment rows MUST still be at default statuses:
-     - `presence_status='ASSIGNED'`
-     - `self_match_status='NOT_MATCHED'`
-     - `client_match_status='WAITING_FOR_CLIENT'`
-   - If not: rollback and return 400 `INVALID_STATE_TRANSITION`.
+   - Load two assignment rows for the booking (CAPTAIN + VICE_CAPTAIN).
 
 9. Determine target duo:
    - If BOTH `captainCompanionId` and `viceCaptainCompanionId` are provided:
@@ -322,21 +291,15 @@ Goal: apply requested edits and (re)allocate roster slots/assignments atomically
 10. Release currently reserved roster slots for the booking:
    - Update all `roster_slots` where `booking_id = bookings.id`:
      - set `status='AVAILABLE'`, `booking_id=NULL`
-   - Data integrity check: for a CONFIRMED, non-extended booking, this SHOULD release exactly 2 slots.
-     - If it releases a different count: rollback and return 500 `INTERNAL_ERROR`.
    - This MUST occur inside the same transaction as reservation of the new slots.
 
-11. Reserve new roster slots for the target duo for the edited window (deadlock-safe):
-   - Lock BOTH target roster slots in a single statement (must return exactly 2 rows):
-     - Find rows matching:
-       - `venue_id=targetVenueId`, `start_at=targetStartAt`, `end_at=targetEndAt`, `status='AVAILABLE'`
-       - `companion_id IN (targetCaptainId, targetViceCaptainId)`
-     - Lock using `FOR UPDATE SKIP LOCKED`.
-   - If fewer than 2 rows are returned (missing/unavailable/locked): rollback and return 409 `NO_DUO_AVAILABLE`.
-   - Book both locked slots:
-     - set `status='BOOKED'`, `booking_id=bookings.id`
-   - Row-count guard:
-     - The BOOK update MUST affect exactly 2 rows; otherwise rollback and return 409 `NO_DUO_AVAILABLE`.
+11. Reserve new roster slots for the target duo for the edited window:
+   - Validate both companions have AVAILABLE roster slots for the exact window at the target venue:
+     - CAPTAIN: find `roster_slots` row matching `(venue_id=targetVenueId, companion_id=targetCaptainId, start_at=targetStartAt, end_at=targetEndAt, status='AVAILABLE')` and lock it (`FOR UPDATE`).
+     - VICE_CAPTAIN: same for `targetViceCaptainId`.
+   - If either slot does not exist or cannot be reserved: rollback and return 409 `NO_DUO_AVAILABLE`.
+   - Update both selected slots:
+     - set `status='BOOKED'`, `booking_id=bookings.id`.
 
 12. Update booking time/venue fields (artifacts unchanged):
    - Update `bookings.venue_id = targetVenueId` (if changed)
@@ -442,18 +405,17 @@ B. `POST /bookings/{id}/cancel`
 
 C. `PATCH /bookings/{id}` (INTERNAL ONLY)
 - Lock booking:
-  - `SELECT id, status, client_id, venue_id, start_at, end_at, extended_at, created_at
+  - `SELECT id, status, client_id, venue_id, start_at, end_at, created_at
      FROM bookings
      WHERE id = $1
      FOR UPDATE`
 
 - Validate booking is CONFIRMED in application logic (else 400 INVALID_STATE_TRANSITION).
 
-- Load and lock current duo (prevents races with match/presence updates):
-  - `SELECT designation, companion_id, presence_status, self_match_status, client_match_status
+- Load current duo:
+  - `SELECT designation, companion_id
      FROM booking_companion_assignments
-     WHERE booking_id = $1
-     FOR UPDATE`
+     WHERE booking_id = $1`
 
 - If venueId provided, validate venue:
   - `SELECT id FROM venues WHERE id = $1 LIMIT 1`
@@ -468,24 +430,24 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
   - `UPDATE roster_slots
      SET status = 'AVAILABLE', booking_id = NULL
      WHERE booking_id = $1`
-  - Guard: this SHOULD release exactly 2 rows for a CONFIRMED, non-extended booking; otherwise treat as data-integrity failure.
 
-- Reserve target duo slots for target window (deadlock-safe):
-  - Lock BOTH slots in one query:
-    - `SELECT id, companion_id FROM roster_slots
-       WHERE venue_id = $1
-         AND start_at = $2
-         AND end_at = $3
-         AND status = 'AVAILABLE'
-         AND companion_id IN ($targetCaptainId, $targetViceCaptainId)
-       FOR UPDATE SKIP LOCKED`
-  - Guard: MUST return exactly 2 rows; else rollback and return 409 NO_DUO_AVAILABLE.
+- Reserve target duo slots for target window:
+  - Lock captain slot:
+    - `SELECT id FROM roster_slots
+       WHERE venue_id = $1 AND companion_id = $2 AND start_at = $3 AND end_at = $4 AND status = 'AVAILABLE'
+       LIMIT 1
+       FOR UPDATE`
+  - Lock vice slot:
+    - `SELECT id FROM roster_slots
+       WHERE venue_id = $1 AND companion_id = $2 AND start_at = $3 AND end_at = $4 AND status = 'AVAILABLE'
+       LIMIT 1
+       FOR UPDATE`
+  - If either not found: rollback and return 409 NO_DUO_AVAILABLE.
 
   - Book both slots:
     - `UPDATE roster_slots
        SET status = 'BOOKED', booking_id = $bookingId
-       WHERE id IN ($slotId1, $slotId2) AND status = 'AVAILABLE'`
-  - Guard: MUST update exactly 2 rows; else rollback and return 409 NO_DUO_AVAILABLE.
+       WHERE id IN ($captainSlotId, $viceSlotId) AND status = 'AVAILABLE'`
 
 - Update booking fields (do NOT update code artifacts):
   - `UPDATE bookings
@@ -590,16 +552,8 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
 
 - Internal edit concurrency (PATCH /bookings/{id}):
   - The booking row MUST be locked (`FOR UPDATE`) to prevent concurrent edits/cancels from creating partial state.
-  - The two assignment rows MUST be locked (`FOR UPDATE`) before checking default statuses.
   - Release+reserve MUST occur within the same transaction.
-  - Deadlock avoidance:
-    - Slot locking MUST be deterministic by locking both target `roster_slots` rows in a single statement (preferred) using `FOR UPDATE SKIP LOCKED`.
-  - Retry policy:
-    - Retry the full PATCH transaction up to 2 times only for DB concurrency failures:
-      - SQLSTATE `40P01` (deadlock_detected)
-      - SQLSTATE `40001` (serialization_failure)
-    - Use a small jittered backoff between retries.
-    - If retries are exhausted: return 500 `INTERNAL_ERROR` (do not map to NO_DUO_AVAILABLE).
+  - The target `roster_slots` rows MUST be locked before updating to BOOKED to avoid competing reservations.
 
 14. Failure Cases
 
@@ -623,9 +577,9 @@ C. `PATCH /bookings/{id}` (INTERNAL ONLY)
   - 400 `VALIDATION_ERROR` — invalid/missing body, invalid ids/timestamps, or only one companion id provided
   - 404 `BOOKING_NOT_FOUND`
   - 404 `VENUE_NOT_FOUND` — when `venueId` is provided and invalid
-  - 400 `INVALID_STATE_TRANSITION` — booking status is `ACTIVE`/`COMPLETED`/`CANCELLED`, OR assignment match/presence statuses have progressed beyond defaults
+  - 400 `INVALID_STATE_TRANSITION` — booking status is `ACTIVE`/`COMPLETED`/`CANCELLED`
   - 409 `NO_DUO_AVAILABLE` — specified/target duo cannot be reserved for the target venue/window (slots unavailable)
-  - 500 `INTERNAL_ERROR` — data-integrity failures and deadlock/serialization retry exhaustion
+  - 500 `INTERNAL_ERROR`
 
 15. Side Effects
 

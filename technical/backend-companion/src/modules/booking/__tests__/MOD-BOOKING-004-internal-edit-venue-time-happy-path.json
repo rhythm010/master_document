@@ -1,0 +1,266 @@
+{
+  "testId": "MOD-BOOKING-004",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Internal Edit - Change Venue and Time (Happy Path)",
+  "flowType": "happy",
+  "linkedRequirement": "booking-and-allocation/internal-edit",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-004-internal-edit-venue-time-happy-path.json",
+  "executionMode": "api+db+internalAuth",
+  "objective": "Validate that an internal service can edit a CONFIRMED booking's venue and time while preserving booking artifacts and atomically updating roster slots",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1
+    },
+    {
+      "entity": "venue",
+      "count": 2,
+      "description": "Original venue and target venue for edit"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1,
+      "isActive": true
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1,
+      "isActive": true
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "extended_at": null,
+      "count": 1,
+      "description": "Future booking (server time < start_at) with default assignment statuses"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "BOOKED",
+      "count": 2,
+      "description": "Original roster slots reserved for the booking at original venue/time"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "AVAILABLE",
+      "count": 2,
+      "description": "Available roster slots for same duo at target venue/time"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "presence_status": "ASSIGNED",
+      "self_match_status": "NOT_MATCHED",
+      "client_match_status": "WAITING_FOR_CLIENT",
+      "description": "Duo assignments at default statuses (no matching/presence progression)"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "method": "PATCH",
+      "endpoint": "/bookings/{id}",
+      "authType": "InternalToken",
+      "headers": {
+        "X-Internal-Token": "{{VALID_INTERNAL_TOKEN}}"
+      },
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": ["venueId", "startAt"],
+      "payloadRules": {
+        "venueId": "Reference to target venue (different from original)",
+        "startAt": "Future ISO-8601 timestamp with available roster slots for same duo"
+      },
+      "layman": "Internal service requests to change the booking's venue and start time"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "internalAuth",
+      "expectedBehavior": [
+        "Validate X-Internal-Token header is present and valid",
+        "Reject if Bearer token is provided instead (INTERNAL ONLY endpoint)"
+      ],
+      "layman": "System verifies the request comes from an authorized internal service"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Booking exists",
+        "Booking status is CONFIRMED",
+        "extended_at is NULL",
+        "Current server time < booking.start_at",
+        "Current server time < target startAt",
+        "Target venue exists"
+      ],
+      "layman": "System validates the booking can be edited (not extended, not started, not progressed)"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "transactionStart": true,
+      "expectedBehavior": [
+        "Lock booking FOR UPDATE",
+        "Load and lock both assignment rows FOR UPDATE",
+        "Verify assignments are at default statuses (ASSIGNED, NOT_MATCHED, WAITING_FOR_CLIENT)"
+      ],
+      "layman": "System locks the booking and verifies no matching/presence has progressed"
+    },
+    {
+      "step": 5,
+      "actor": "System",
+      "actionType": "slotRelease",
+      "expectedBehavior": [
+        "Calculate targetEndAt = targetStartAt + 2 hours",
+        "Release current roster slots: UPDATE roster_slots SET status='AVAILABLE', booking_id=NULL WHERE booking_id={{BOOKING_ID}}",
+        "Verify exactly 2 rows affected (data integrity check)"
+      ],
+      "layman": "System releases the currently reserved roster slots for this booking"
+    },
+    {
+      "step": 6,
+      "actor": "System",
+      "actionType": "slotReservation",
+      "expectedBehavior": [
+        "Lock target slots: SELECT ... WHERE venue_id=targetVenueId AND start_at=targetStartAt AND end_at=targetEndAt AND status='AVAILABLE' AND companion_id IN (captainId, viceCaptainId) FOR UPDATE SKIP LOCKED",
+        "Verify exactly 2 rows locked (duo available)",
+        "Reserve slots: UPDATE roster_slots SET status='BOOKED', booking_id={{BOOKING_ID}}",
+        "Verify exactly 2 rows affected (row-count guard)"
+      ],
+      "layman": "System reserves the new roster slots for the same duo at the target venue/time"
+    },
+    {
+      "step": 7,
+      "actor": "System",
+      "actionType": "dbUpdate",
+      "expectedBehavior": [
+        "Update booking: SET venue_id=targetVenueId, start_at=targetStartAt, end_at=targetEndAt WHERE id={{BOOKING_ID}}",
+        "Do NOT change: qr_code, pin_code, com_match_qr_code, com_match_pin_code, booking_color",
+        "Verify exactly 1 row affected"
+      ],
+      "layman": "System updates the booking's venue and time while preserving all booking artifacts"
+    },
+    {
+      "step": 8,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "transactionEnd": "COMMIT",
+      "layman": "System commits all changes atomically"
+    },
+    {
+      "step": 9,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "id",
+        "status=CONFIRMED",
+        "venueId={{TARGET_VENUE_ID}}",
+        "startAt={{TARGET_START_AT}}",
+        "endAt={{TARGET_END_AT}}"
+      ],
+      "layman": "System returns the updated booking with new venue and time"
+    },
+    {
+      "step": 10,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "expectedRows": 1,
+      "expectedFields": {
+        "id": "{{BOOKING_ID}}",
+        "status": "CONFIRMED",
+        "venue_id": "{{TARGET_VENUE_ID}}",
+        "start_at": "{{TARGET_START_AT}}",
+        "end_at": "{{TARGET_END_AT}}",
+        "qr_code": "{{ORIGINAL_QR_CODE}}",
+        "pin_code": "{{ORIGINAL_PIN_CODE}}",
+        "com_match_qr_code": "{{ORIGINAL_COM_MATCH_QR}}",
+        "com_match_pin_code": "{{ORIGINAL_COM_MATCH_PIN}}",
+        "booking_color": "{{ORIGINAL_BOOKING_COLOR}}",
+        "extended_at": null
+      },
+      "layman": "Verify booking was updated with new venue/time but artifacts remain unchanged"
+    },
+    {
+      "step": 11,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE venue_id={{ORIGINAL_VENUE_ID}} AND start_at={{ORIGINAL_START_AT}}",
+      "expectedFields": {
+        "status": "AVAILABLE",
+        "booking_id": null
+      },
+      "layman": "Verify original roster slots are now available"
+    },
+    {
+      "step": 12,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE booking_id={{BOOKING_ID}}",
+      "expectedRows": 2,
+      "expectedFields": {
+        "venue_id": "{{TARGET_VENUE_ID}}",
+        "start_at": "{{TARGET_START_AT}}",
+        "end_at": "{{TARGET_END_AT}}",
+        "status": "BOOKED"
+      },
+      "layman": "Verify new roster slots are reserved for this booking"
+    },
+    {
+      "step": 13,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_companion_assignments",
+      "query": "WHERE booking_id={{BOOKING_ID}}",
+      "expectedRows": 2,
+      "expectedFields": {
+        "companion_id": "{{SAME_CAPTAIN_ID, SAME_VICE_CAPTAIN_ID}}",
+        "designation": ["CAPTAIN", "VICE_CAPTAIN"],
+        "presence_status": "ASSIGNED",
+        "self_match_status": "NOT_MATCHED",
+        "client_match_status": "WAITING_FOR_CLIENT"
+      },
+      "layman": "Verify duo assignments remain unchanged (no reassignment requested)"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "Venue and time updated in response"
+    ],
+    "db": [
+      "Booking venue_id and start_at/end_at updated",
+      "Booking artifacts unchanged (qrCode, pinCode, etc.)",
+      "Original roster slots released (AVAILABLE, booking_id=NULL)",
+      "New roster slots reserved (BOOKED, booking_id set)",
+      "Exactly 2 old slots released, 2 new slots reserved",
+      "Companion assignments unchanged"
+    ],
+    "businessRules": [
+      "Edit is atomic (all or nothing)",
+      "Only INTERNAL token can authorize",
+      "Artifacts stability preserved across edits",
+      "Duo remains the same when no reassignment requested"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests venue and time change without companion reassignment",
+    "Validates deadlock-safe slot locking (FOR UPDATE SKIP LOCKED)",
+    "Validates row-count guards for data integrity",
+    "Tests artifact stability rule"
+  ]
+}

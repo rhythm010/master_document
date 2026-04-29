@@ -1,0 +1,248 @@
+{
+  "designMode": "SPEC_DRIVEN_DRAFT",
+  "artifactStatus": "DRAFT_SPEC",
+  "scopeChosen": "Feature Module Tests - Booking & Allocation",
+  "linkedRequirements": [
+    "booking-and-allocation/create-booking",
+    "booking-and-allocation/cancel-booking",
+    "booking-and-allocation/get-booking-details",
+    "booking-and-allocation/internal-edit",
+    "booking-and-allocation/one-non-terminal-booking-rule",
+    "booking-and-allocation/no-duo-available",
+    "booking-and-allocation/cancel-idempotency",
+    "booking-and-allocation/cancel-invalid-state",
+    "booking-and-allocation/internal-edit-safety-constraints"
+  ],
+  "analyzedInputs": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/booking-and-allocation.feature-sds.md (v1.1.1)"
+  ],
+  "module": "booking",
+  "modulePath": "technical/backend-companion/src/modules/booking",
+  "testArtifactsLocation": "technical/backend-companion/src/modules/booking/__tests__/",
+  "createdAt": "2024-04-28T17:45:00Z",
+  "filesCreated": [
+    {
+      "testId": "MOD-BOOKING-001",
+      "fileName": "MOD-BOOKING-001-create-booking-happy-path.json",
+      "scenarioName": "Create Booking - Happy Path",
+      "flowType": "happy",
+      "objective": "Validate successful booking creation with duo allocation",
+      "endpoints": ["POST /bookings"],
+      "coverage": [
+        "Client authentication and role validation",
+        "One non-terminal booking rule enforcement",
+        "Duo allocation (First-Available strategy)",
+        "Roster slot reservation (2 slots)",
+        "Companion assignment creation (CAPTAIN + VICE_CAPTAIN)",
+        "Booking artifact generation (qrCode, pinCode, etc.)",
+        "Atomic transaction (booking + roster + assignments)"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-002",
+      "fileName": "MOD-BOOKING-002-cancel-booking-happy-path.json",
+      "scenarioName": "Cancel Booking - Happy Path (Pre-Session)",
+      "flowType": "happy",
+      "objective": "Validate successful cancellation of CONFIRMED booking with roster release",
+      "endpoints": ["POST /bookings/:id/cancel"],
+      "coverage": [
+        "Authorization (booking owner)",
+        "Status transition (CONFIRMED → CANCELLED)",
+        "Roster slot release (BOOKED → AVAILABLE)",
+        "Companion assignments preserved (audit trail)"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-003",
+      "fileName": "MOD-BOOKING-003-get-booking-details-happy-path.json",
+      "scenarioName": "Get Booking Details - Happy Path",
+      "flowType": "happy",
+      "objective": "Validate authorized retrieval of minimal booking details",
+      "endpoints": ["GET /bookings/:id/details"],
+      "coverage": [
+        "Authorization (owner, assigned companion, admin)",
+        "Minimal details response contract",
+        "Field type validation (UUIDs, ISO-8601, enums)"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-004",
+      "fileName": "MOD-BOOKING-004-internal-edit-venue-time-happy-path.json",
+      "scenarioName": "Internal Edit - Change Venue and Time (Happy Path)",
+      "flowType": "happy",
+      "objective": "Validate internal edit of venue/time with atomic roster swap and artifact stability",
+      "endpoints": ["PATCH /bookings/{id}"],
+      "coverage": [
+        "Internal token authentication (X-Internal-Token)",
+        "Booking safety validations (CONFIRMED, not extended, not started, not progressed)",
+        "Atomic roster slot release and reservation (deadlock-safe)",
+        "Booking artifact stability (qrCode, pinCode unchanged)",
+        "Row-count guards for data integrity",
+        "Duo remains same when no reassignment requested"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-005",
+      "fileName": "MOD-BOOKING-005-internal-edit-reassign-duo-happy-path.json",
+      "scenarioName": "Internal Edit - Manual Duo Reassignment (Happy Path)",
+      "flowType": "happy",
+      "objective": "Validate manual duo reassignment with roster swap and status reset",
+      "endpoints": ["PATCH /bookings/{id}"],
+      "coverage": [
+        "Manual reassignment (both companion IDs required)",
+        "Designation validation (CAPTAIN, VICE_CAPTAIN)",
+        "Companion distinctness validation",
+        "Atomic roster slot swap (old duo → new duo)",
+        "Assignment companion_id updates",
+        "Match/presence status reset to defaults",
+        "Booking artifact stability across reassignment"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-006",
+      "fileName": "MOD-BOOKING-006-create-booking-client-has-non-terminal.json",
+      "scenarioName": "Create Booking - Client Already Has Non-Terminal Booking (409)",
+      "flowType": "edge",
+      "objective": "Validate enforcement of one non-terminal booking per client rule",
+      "endpoints": ["POST /bookings"],
+      "coverage": [
+        "Pre-check for existing non-terminal bookings",
+        "Error code: CLIENT_ALREADY_HAS_NON_TERMINAL_BOOKING",
+        "No booking created on constraint violation",
+        "No roster slots reserved on rejection"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-007",
+      "fileName": "MOD-BOOKING-007-create-booking-no-duo-available.json",
+      "scenarioName": "Create Booking - No Duo Available (409)",
+      "flowType": "edge",
+      "objective": "Validate deterministic failure when no duo is available",
+      "endpoints": ["POST /bookings"],
+      "coverage": [
+        "Duo allocation failure detection",
+        "Error code: NO_DUO_AVAILABLE",
+        "Deterministic failure (no partial booking)",
+        "Database consistency (no orphaned data)"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-008",
+      "fileName": "MOD-BOOKING-008-cancel-already-cancelled-idempotent.json",
+      "scenarioName": "Cancel Already-Cancelled Booking - Idempotent Success (200)",
+      "flowType": "edge",
+      "objective": "Validate idempotent cancellation behavior",
+      "endpoints": ["POST /bookings/:id/cancel"],
+      "coverage": [
+        "Idempotent success (200) when already CANCELLED",
+        "No error on repeated cancellation",
+        "Safe retry behavior"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-009",
+      "fileName": "MOD-BOOKING-009-cancel-completed-booking-invalid-state.json",
+      "scenarioName": "Cancel Completed Booking - Invalid State Transition (400)",
+      "flowType": "edge",
+      "objective": "Validate rejection of cancellation for COMPLETED bookings",
+      "endpoints": ["POST /bookings/:id/cancel"],
+      "coverage": [
+        "Invalid state transition enforcement",
+        "Error code: INVALID_STATE_TRANSITION",
+        "COMPLETED is terminal state (cannot cancel)",
+        "Global state machine enforcement"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-010",
+      "fileName": "MOD-BOOKING-010-internal-edit-invalid-state-extended-progressed.json",
+      "scenarioName": "Internal Edit - Invalid State/Extended/Progressed (400)",
+      "flowType": "edge",
+      "objective": "Validate all safety constraints for internal edit endpoint",
+      "endpoints": ["PATCH /bookings/{id}"],
+      "testVariants": [
+        "Booking status is ACTIVE (not CONFIRMED)",
+        "Booking status is CANCELLED",
+        "Booking status is COMPLETED",
+        "Booking is extended (extended_at != NULL)",
+        "Booking has started (now >= start_at)",
+        "Presence has progressed (presence_status=ARRIVED)",
+        "Self-match has progressed (self_match_status=MATCHED)",
+        "Client-match has progressed (client_match_status=CLIENT_MATCHED)"
+      ],
+      "coverage": [
+        "Status constraint (must be CONFIRMED)",
+        "Extended constraint (extended_at must be NULL)",
+        "Temporal constraint (must not have started)",
+        "Match/presence progression constraints",
+        "Atomic failure (rollback on constraint violation)",
+        "Error code: INVALID_STATE_TRANSITION"
+      ]
+    }
+  ],
+  "coverageSummary": {
+    "happyPaths": 5,
+    "edgeCases": 5,
+    "totalTests": 10,
+    "endpoints": [
+      "POST /bookings",
+      "POST /bookings/:id/cancel",
+      "GET /bookings/:id/details",
+      "PATCH /bookings/{id} (INTERNAL ONLY)"
+    ],
+    "businessRulesValidated": [
+      "One non-terminal booking per client",
+      "Duo allocation (CAPTAIN + VICE_CAPTAIN)",
+      "Roster slot reservation and release",
+      "Booking artifacts generation and stability",
+      "State machine enforcement (CONFIRMED → ACTIVE → COMPLETED, CONFIRMED/ACTIVE → CANCELLED)",
+      "Internal edit safety constraints",
+      "Idempotent cancellation",
+      "Atomic transactions"
+    ],
+    "authorizationPatterns": [
+      "Bearer token (CLIENT role) for booking creation",
+      "Bearer token (booking owner, assigned companion, admin) for cancellation",
+      "Bearer token (authorized users) for details retrieval",
+      "Internal token (X-Internal-Token) for internal edit"
+    ],
+    "databaseEntities": [
+      "bookings",
+      "roster_slots",
+      "booking_companion_assignments",
+      "companion_profiles",
+      "venues",
+      "users"
+    ]
+  },
+  "designPrinciples": [
+    "Test designs are specification-driven (DRAFT_SPEC mode)",
+    "No hardcoded API payload values (use requiredPayloadFields and payloadRules)",
+    "Each step includes layman explanation for clarity",
+    "Tests are deterministic and measurable",
+    "Assertions cover API, DB, and business rules",
+    "Edge cases cover failure paths and constraint enforcement",
+    "Atomic transaction validation (all-or-nothing)",
+    "Artifact stability testing (qrCode, pinCode, etc. unchanged across edits)"
+  ],
+  "nextSteps": [
+    "Await implementation completion from Coding Agent",
+    "Transition to EXECUTABLE_FINALIZATION mode",
+    "Populate concrete endpoint paths, DB queries, and technical details",
+    "Add actual seeding logic and test execution flows",
+    "Validate with Test Validator Agent"
+  ],
+  "openQuestions": [
+    "Exact response contract for GET /bookings/:id/details (minimal fields not fully specified in SDS)",
+    "Whether companion assignment details are included in details endpoint response",
+    "Exact error message formats (only codes specified in SDS)"
+  ],
+  "notes": [
+    "All test designs reference Feature SDS v1.1.1 (latest version)",
+    "Tests cover all 4 endpoints mentioned in requirements",
+    "Internal edit endpoint has comprehensive safety constraint coverage",
+    "Idempotency and state machine enforcement are thoroughly tested",
+    "Designs follow Test Designer Agent instructions (step objects with layman descriptions, no hardcoded payloads)"
+  ]
+}

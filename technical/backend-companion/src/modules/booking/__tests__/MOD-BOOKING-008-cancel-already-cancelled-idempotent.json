@@ -1,0 +1,146 @@
+{
+  "testId": "MOD-BOOKING-008",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Cancel Already-Cancelled Booking - Idempotent Success (200)",
+  "flowType": "edge",
+  "linkedRequirement": "booking-and-allocation/cancel-idempotency",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-008-cancel-already-cancelled-idempotent.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that cancelling an already-cancelled booking returns idempotent success (200) without errors",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Client who owns the booking"
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CANCELLED",
+      "count": 1,
+      "description": "Existing CANCELLED booking"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "AVAILABLE",
+      "count": 2,
+      "description": "Roster slots already released (status=AVAILABLE, booking_id=NULL)"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "description": "Duo assignments (audit trail)"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/cancel",
+      "authType": "Bearer",
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [],
+      "payloadRules": {
+        "body": "Empty JSON {} or no body"
+      },
+      "layman": "Client attempts to cancel a booking that is already cancelled"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Verify booking exists",
+        "Verify caller owns the booking"
+      ],
+      "layman": "System verifies the client owns this booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Check booking.status is CANCELLED",
+        "Recognize idempotent cancellation (already cancelled)"
+      ],
+      "layman": "System detects the booking is already cancelled"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "id={{BOOKING_ID}}",
+        "status=CANCELLED"
+      ],
+      "layman": "System returns idempotent success (200) with current status"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "expectedRows": 1,
+      "expectedFields": {
+        "id": "{{BOOKING_ID}}",
+        "status": "CANCELLED"
+      },
+      "layman": "Verify booking status remains CANCELLED (no change)"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE companion_id IN ({{CAPTAIN_ID}}, {{VICE_CAPTAIN_ID}}) AND start_at={{BOOKING_START_AT}}",
+      "expectedFields": {
+        "status": "AVAILABLE",
+        "booking_id": null
+      },
+      "layman": "Verify roster slots remain AVAILABLE (already released, no double-release)"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200 (not 400 or 409)",
+      "Response contains id and status=CANCELLED",
+      "No error returned"
+    ],
+    "db": [
+      "Booking status unchanged (CANCELLED)",
+      "Roster slots unchanged (AVAILABLE, booking_id=NULL)",
+      "No unintended side effects"
+    ],
+    "businessRules": [
+      "Idempotent cancellation succeeds",
+      "Repeated cancellation requests are safe",
+      "System does not fail on already-cancelled bookings"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests idempotency of cancellation",
+    "Per SDS: if status is already CANCELLED, return idempotent success",
+    "Important for retry scenarios and client UX"
+  ]
+}

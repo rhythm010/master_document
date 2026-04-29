@@ -1,0 +1,286 @@
+{
+  "testId": "MOD-BOOKING-010",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Internal Edit - Invalid State/Extended/Progressed (400)",
+  "flowType": "edge",
+  "linkedRequirement": "booking-and-allocation/internal-edit-safety-constraints",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-010-internal-edit-invalid-state-extended-progressed.json",
+  "executionMode": "api+db+internalAuth",
+  "objective": "Validate that internal edit is rejected when booking is not CONFIRMED, is extended, has started, or has progressed past default match/presence statuses",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "Booking status is ACTIVE (not CONFIRMED)",
+      "seedOverride": {
+        "booking": {
+          "status": "ACTIVE"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Booking must be in CONFIRMED status to edit"
+    },
+    {
+      "variantId": "B",
+      "description": "Booking status is CANCELLED",
+      "seedOverride": {
+        "booking": {
+          "status": "CANCELLED"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Booking must be in CONFIRMED status to edit"
+    },
+    {
+      "variantId": "C",
+      "description": "Booking status is COMPLETED",
+      "seedOverride": {
+        "booking": {
+          "status": "COMPLETED"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Booking must be in CONFIRMED status to edit"
+    },
+    {
+      "variantId": "D",
+      "description": "Booking is extended (extended_at is NOT NULL)",
+      "seedOverride": {
+        "booking": {
+          "status": "CONFIRMED",
+          "extended_at": "{{PAST_TIMESTAMP}}"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Cannot edit an extended booking"
+    },
+    {
+      "variantId": "E",
+      "description": "Current server time >= booking.start_at (booking has started)",
+      "seedOverride": {
+        "booking": {
+          "status": "CONFIRMED",
+          "extended_at": null,
+          "start_at": "{{PAST_TIMESTAMP}}"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Cannot edit a booking that has already started"
+    },
+    {
+      "variantId": "F",
+      "description": "Companion presence has progressed (presence_status=ARRIVED)",
+      "seedOverride": {
+        "booking": {
+          "status": "CONFIRMED",
+          "extended_at": null,
+          "start_at": "{{FUTURE_TIMESTAMP}}"
+        },
+        "booking_companion_assignment": {
+          "presence_status": "ARRIVED",
+          "self_match_status": "NOT_MATCHED",
+          "client_match_status": "WAITING_FOR_CLIENT"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Cannot edit a booking with progressed match/presence statuses"
+    },
+    {
+      "variantId": "G",
+      "description": "Self-match has progressed (self_match_status=MATCHED)",
+      "seedOverride": {
+        "booking": {
+          "status": "CONFIRMED",
+          "extended_at": null,
+          "start_at": "{{FUTURE_TIMESTAMP}}"
+        },
+        "booking_companion_assignment": {
+          "presence_status": "ASSIGNED",
+          "self_match_status": "MATCHED",
+          "client_match_status": "WAITING_FOR_CLIENT"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Cannot edit a booking with progressed match/presence statuses"
+    },
+    {
+      "variantId": "H",
+      "description": "Client-match has progressed (client_match_status=CLIENT_MATCHED)",
+      "seedOverride": {
+        "booking": {
+          "status": "CONFIRMED",
+          "extended_at": null,
+          "start_at": "{{FUTURE_TIMESTAMP}}"
+        },
+        "booking_companion_assignment": {
+          "presence_status": "ASSIGNED",
+          "self_match_status": "NOT_MATCHED",
+          "client_match_status": "CLIENT_MATCHED"
+        }
+      },
+      "expectedError": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Cannot edit a booking with progressed match/presence statuses"
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "count": 1,
+      "description": "Booking with variant-specific overrides (see testVariants)"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "description": "Duo assignments with variant-specific statuses"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "method": "PATCH",
+      "endpoint": "/bookings/{id}",
+      "authType": "InternalToken",
+      "headers": {
+        "X-Internal-Token": "{{VALID_INTERNAL_TOKEN}}"
+      },
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": ["startAt"],
+      "payloadRules": {
+        "startAt": "Future ISO-8601 timestamp (attempting to change booking time)"
+      },
+      "layman": "Internal service attempts to edit a booking that violates safety constraints"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "internalAuth",
+      "expectedBehavior": [
+        "Validate X-Internal-Token"
+      ],
+      "layman": "System verifies internal authorization"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Booking exists",
+        "Lock booking FOR UPDATE",
+        "Check booking.status == CONFIRMED (variant A/B/C: fail here)",
+        "Check booking.extended_at IS NULL (variant D: fail here)",
+        "Check now < booking.start_at (variant E: fail here)",
+        "Load assignment rows FOR UPDATE",
+        "Check all assignments at default statuses (variants F/G/H: fail here)"
+      ],
+      "layman": "System validates safety constraints and detects violation based on test variant"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "transactionEnd": "ROLLBACK",
+      "layman": "System rolls back transaction due to validation failure"
+    },
+    {
+      "step": 5,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 400,
+      "expectedErrorCode": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "{{VARIANT_SPECIFIC_MESSAGE}}",
+      "layman": "System rejects the edit with appropriate error message"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "expectedRows": 1,
+      "expectedFields": {
+        "id": "{{BOOKING_ID}}",
+        "status": "{{ORIGINAL_STATUS}}",
+        "venue_id": "{{ORIGINAL_VENUE_ID}}",
+        "start_at": "{{ORIGINAL_START_AT}}",
+        "end_at": "{{ORIGINAL_END_AT}}",
+        "extended_at": "{{ORIGINAL_EXTENDED_AT}}"
+      },
+      "layman": "Verify booking remains completely unchanged (transaction rolled back)"
+    },
+    {
+      "step": 7,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE booking_id={{BOOKING_ID}}",
+      "expectedBehavior": "Original roster slots unchanged",
+      "layman": "Verify roster slots unchanged (no partial reservation/release)"
+    },
+    {
+      "step": 8,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_companion_assignments",
+      "query": "WHERE booking_id={{BOOKING_ID}}",
+      "expectedRows": 2,
+      "expectedFields": {
+        "companion_id": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+        "presence_status": "{{ORIGINAL_PRESENCE_STATUS}}",
+        "self_match_status": "{{ORIGINAL_SELF_MATCH_STATUS}}",
+        "client_match_status": "{{ORIGINAL_CLIENT_MATCH_STATUS}}"
+      },
+      "layman": "Verify companion assignments unchanged"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 400",
+      "Error code is INVALID_STATE_TRANSITION",
+      "Error message explains the specific constraint violation"
+    ],
+    "db": [
+      "Booking unchanged (all fields)",
+      "Roster slots unchanged",
+      "Companion assignments unchanged",
+      "No partial updates (atomic failure)"
+    ],
+    "businessRules": [
+      "PATCH /bookings/{id} only allowed on CONFIRMED bookings",
+      "Cannot edit extended bookings (extended_at != NULL)",
+      "Cannot edit bookings that have started (now >= start_at)",
+      "Cannot edit bookings with progressed match/presence statuses",
+      "All safety constraints enforced before any mutations",
+      "Transaction rolled back on constraint violation"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Comprehensive edge case test covering all edit safety constraints",
+    "Uses test variants to cover multiple rejection scenarios",
+    "Each variant tests a specific constraint violation",
+    "Validates atomic failure (rollback prevents partial state)",
+    "Per SDS section 6.C: detailed preconditions for PATCH /bookings/{id}"
+  ]
+}

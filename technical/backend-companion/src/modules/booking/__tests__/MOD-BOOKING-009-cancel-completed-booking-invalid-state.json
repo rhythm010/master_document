@@ -1,0 +1,146 @@
+{
+  "testId": "MOD-BOOKING-009",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Cancel Completed Booking - Invalid State Transition (400)",
+  "flowType": "edge",
+  "linkedRequirement": "booking-and-allocation/cancel-invalid-state",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-009-cancel-completed-booking-invalid-state.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that cancelling a COMPLETED booking is rejected with 400 INVALID_STATE_TRANSITION",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Client who owns the booking"
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "COMPLETED",
+      "count": 1,
+      "description": "Existing COMPLETED booking (session finished)"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "AVAILABLE",
+      "count": 2,
+      "description": "Roster slots already released after completion"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "presence_status": "ARRIVED",
+      "self_match_status": "MATCHED",
+      "client_match_status": "CLIENT_MATCHED",
+      "description": "Duo assignments with completed match/presence"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/cancel",
+      "authType": "Bearer",
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [],
+      "payloadRules": {
+        "body": "Empty JSON {} or no body"
+      },
+      "layman": "Client attempts to cancel a booking that has already completed"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Verify booking exists",
+        "Verify caller owns the booking"
+      ],
+      "layman": "System verifies the client owns this booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Check booking.status is COMPLETED",
+        "Reject cancellation (invalid state transition)"
+      ],
+      "layman": "System detects the booking is completed and cannot be cancelled"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 400,
+      "expectedErrorCode": "INVALID_STATE_TRANSITION",
+      "expectedErrorMessage": "Cannot cancel a COMPLETED booking",
+      "layman": "System rejects the cancellation with an invalid state transition error"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "expectedRows": 1,
+      "expectedFields": {
+        "id": "{{BOOKING_ID}}",
+        "status": "COMPLETED"
+      },
+      "layman": "Verify booking status remains COMPLETED (no change)"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE companion_id IN ({{CAPTAIN_ID}}, {{VICE_CAPTAIN_ID}}) AND start_at={{BOOKING_START_AT}}",
+      "expectedFields": {
+        "status": "AVAILABLE",
+        "booking_id": null
+      },
+      "layman": "Verify roster slots remain unchanged"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 400",
+      "Error code is INVALID_STATE_TRANSITION",
+      "Error message indicates COMPLETED bookings cannot be cancelled"
+    ],
+    "db": [
+      "Booking status unchanged (COMPLETED)",
+      "No data mutations occurred"
+    ],
+    "businessRules": [
+      "COMPLETED bookings cannot transition to CANCELLED",
+      "Valid cancellation sources are CONFIRMED and ACTIVE only",
+      "Global state machine enforced: COMPLETED is a terminal state"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests invalid state transition enforcement",
+    "Per Core SDS: COMPLETED is a terminal state",
+    "Only CONFIRMED and ACTIVE can transition to CANCELLED"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "taskId": "TASK-20260428-002",
+  "type": "clarity-artifact",
+  "summary": "Add an INTERNAL-only API to edit an existing booking; client apps must not be able to call it.",
+  "decisions": {
+    "endpoint": {
+      "method": "PATCH",
+      "path": "/bookings/{id}",
+      "auth": "internalAuth",
+      "requiredHeader": "X-Internal-Token",
+      "publicBearerAuth": "NOT_ALLOWED"
+    },
+    "allowedBookingStatuses": ["CONFIRMED"],
+    "editableFields": ["venueId", "startAt", "captainCompanionId", "viceCaptainCompanionId"],
+    "atLeastOneFieldRequired": true,
+    "manualCompanionReassignment": {
+      "enabled": true,
+      "requestMustSpecify": ["captainCompanionId", "viceCaptainCompanionId"],
+      "validation": {
+        "companionsMustBeDistinct": true,
+        "captainMustHaveDesignation": "CAPTAIN",
+        "viceCaptainMustHaveDesignation": "VICE_CAPTAIN",
+        "bothMustHaveAvailableRosterSlotsForWindow": true
+      }
+    },
+    "bookingDuration": {
+      "fixed": true,
+      "durationHours": 2,
+      "endAtDerivation": "endAt = startAt + 2 hours"
+    },
+    "transactionality": {
+      "mustBeAtomic": true,
+      "onSuccess": [
+        "release currently reserved roster slots for the booking",
+        "reserve the target duo for the edited booking window",
+        "update booking_companion_assignments to match the target duo"
+      ]
+    },
+    "artifacts": {
+      "mustRemainStableAcrossEdits": true,
+      "stableFields": [
+        "qrCode",
+        "pinCode",
+        "comMatchQrCode",
+        "comMatchPinCode",
+        "bookingColor"
+      ]
+    }
+  },
+  "approvedDecisions": {
+    "matchStatusPolicy": {
+      "policy": "FORBID_EDITS_AFTER_PROGRESS",
+      "rule": "Internal edits are allowed only while both assignment rows are still at default statuses (presence=ASSIGNED, selfMatch=NOT_MATCHED, clientMatch=WAITING_FOR_CLIENT). If any of these have progressed, reject with INVALID_STATE_TRANSITION. This constraint applies to all PATCH edits (time/venue edits and reassignment)."
+    }
+  }
+}

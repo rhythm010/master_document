@@ -1,716 +1,523 @@
-{
-  "runId": "RUN-20260428033248-JRN-005-materialized",
-  "testId": "JRN-005-materialized",
-  "status": "FAIL",
-  "startedAt": "2026-04-28T03:32:48.324Z",
-  "endedAt": "2026-04-28T03:32:52.859Z",
-  "environmentCheck": {
-    "apiServer": "OK",
-    "mailpit": "OK",
-    "database": "OK"
-  },
-  "serviceHitLog": [
-    {
-      "step": 1,
-      "target": "POST /auth/signup",
-      "startedAt": "2026-04-28T03:32:48.408Z",
-      "endedAt": "2026-04-28T03:32:51.829Z",
-      "durationMs": 3421,
-      "result": "PASS",
-      "statusCode": 201
-    },
-    {
-      "step": 2,
-      "target": "http://localhost:8025/api/v1/messages",
-      "startedAt": "2026-04-28T03:32:51.829Z",
-      "endedAt": "2026-04-28T03:32:51.839Z",
-      "durationMs": 10,
-      "result": "PASS"
-    },
-    {
-      "step": 3,
-      "target": "GET /auth/verify-email",
-      "startedAt": "2026-04-28T03:32:51.839Z",
-      "endedAt": "2026-04-28T03:32:51.847Z",
-      "durationMs": 8,
-      "result": "PASS",
-      "statusCode": 200
-    },
-    {
-      "step": 4,
-      "target": "POST /auth/login",
-      "startedAt": "2026-04-28T03:32:51.847Z",
-      "endedAt": "2026-04-28T03:32:52.089Z",
-      "durationMs": 242,
-      "result": "PASS",
-      "statusCode": 200
-    },
-    {
-      "step": 5,
-      "target": "POST /auth/signup",
-      "startedAt": "2026-04-28T03:32:52.089Z",
-      "endedAt": "2026-04-28T03:32:52.324Z",
-      "durationMs": 235,
-      "result": "PASS",
-      "statusCode": 201
-    },
-    {
-      "step": 6,
-      "target": "http://localhost:8025/api/v1/messages",
-      "startedAt": "2026-04-28T03:32:52.324Z",
-      "endedAt": "2026-04-28T03:32:52.329Z",
-      "durationMs": 5,
-      "result": "PASS"
-    },
-    {
-      "step": 7,
-      "target": "GET /auth/verify-email",
-      "startedAt": "2026-04-28T03:32:52.329Z",
-      "endedAt": "2026-04-28T03:32:52.332Z",
-      "durationMs": 3,
-      "result": "PASS",
-      "statusCode": 200
-    },
-    {
-      "step": 8,
-      "target": "POST /auth/login",
-      "startedAt": "2026-04-28T03:32:52.332Z",
-      "endedAt": "2026-04-28T03:32:52.547Z",
-      "durationMs": 215,
-      "result": "PASS",
-      "statusCode": 200
-    },
-    {
-      "step": 9,
-      "target": "POST /roster-slots/populate-for-companion",
-      "startedAt": "2026-04-28T03:32:52.548Z",
-      "endedAt": "2026-04-28T03:32:52.588Z",
-      "durationMs": 40,
-      "result": "PASS",
-      "statusCode": 200
-    },
-    {
-      "step": 10,
-      "target": "POST /roster-slots/populate-for-companion",
-      "startedAt": "2026-04-28T03:32:52.588Z",
-      "endedAt": "2026-04-28T03:32:52.609Z",
-      "durationMs": 21,
-      "result": "PASS",
-      "statusCode": 200
-    },
-    {
-      "step": 11,
-      "target": "POST /auth/signup",
-      "startedAt": "2026-04-28T03:32:52.609Z",
-      "endedAt": "2026-04-28T03:32:52.846Z",
-      "durationMs": 237,
-      "result": "PASS",
-      "statusCode": 201
-    },
-    {
-      "step": 12,
-      "target": "http://localhost:8025/api/v1/messages",
-      "startedAt": "2026-04-28T03:32:52.846Z",
-      "endedAt": "2026-04-28T03:32:52.849Z",
-      "durationMs": 3,
-      "result": "PASS"
-    },
-    {
-      "step": 13,
-      "target": "GET /auth/verify-email",
-      "startedAt": "2026-04-28T03:32:52.849Z",
-      "endedAt": "2026-04-28T03:32:52.851Z",
-      "durationMs": 2,
-      "result": "PASS",
-      "statusCode": 200
-    },
-    {
-      "step": 14,
-      "target": "POST /auth/login",
-      "startedAt": "2026-04-28T03:32:52.851Z",
-      "endedAt": "2026-04-28T03:32:52.851Z",
-      "durationMs": 0,
-      "result": "PASS",
-      "statusCode": 429
-    },
-    {
-      "step": 15,
-      "target": "GET /availability",
-      "startedAt": "2026-04-28T03:32:52.851Z",
-      "endedAt": "2026-04-28T03:32:52.852Z",
-      "durationMs": 1,
-      "result": "PASS",
-      "statusCode": 401
-    },
-    {
-      "step": 16,
-      "target": "POST /bookings",
-      "startedAt": "2026-04-28T03:32:52.852Z",
-      "endedAt": "2026-04-28T03:32:52.852Z",
-      "durationMs": 0,
-      "result": "PASS",
-      "statusCode": 401
-    },
-    {
-      "step": 17,
-      "target": "GET /bookings/{{step16_id}}/details",
-      "startedAt": "2026-04-28T03:32:52.852Z",
-      "endedAt": "2026-04-28T03:32:52.853Z",
-      "durationMs": 1,
-      "result": "PASS",
-      "statusCode": 401
-    },
-    {
-      "step": 18,
-      "target": "POST /bookings/{{step16_id}}/cancel",
-      "startedAt": "2026-04-28T03:32:52.853Z",
-      "endedAt": "2026-04-28T03:32:52.853Z",
-      "durationMs": 0,
-      "result": "PASS",
-      "statusCode": 401
-    },
-    {
-      "step": 19,
-      "target": "POST /bookings/{{step16_id}}/cancel",
-      "startedAt": "2026-04-28T03:32:52.853Z",
-      "endedAt": "2026-04-28T03:32:52.853Z",
-      "durationMs": 0,
-      "result": "PASS",
-      "statusCode": 401
-    },
-    {
-      "step": 20,
-      "target": "DB bookings query",
-      "startedAt": "2026-04-28T03:32:52.853Z",
-      "endedAt": "2026-04-28T03:32:52.854Z",
-      "durationMs": 1,
-      "result": "FAIL"
-    },
-    {
-      "step": 21,
-      "target": "DB roster_slots query",
-      "startedAt": "2026-04-28T03:32:52.855Z",
-      "endedAt": "2026-04-28T03:32:52.859Z",
-      "durationMs": 4,
-      "result": "FAIL"
-    }
-  ],
-  "stepResults": [
-    {
-      "step": 1,
-      "result": "PASS",
-      "observed": {
-        "id": "85bd2a76-e2be-4141-babb-3171c1d31985",
-        "role": "COMPANION",
-        "name": "journey companion A 20260428033248",
-        "nickname": "journeycompanionA-jrn005-20260428033248",
-        "email": "companiona.jrn005+20260428033248@journey.test",
-        "emailVerified": false,
-        "biometricAuthEnabled": false,
-        "createdAt": "2026-04-28T03:32:48.633Z"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "COMPANION A signs up",
-      "layman": "Create the first companion account.",
-      "statusCode": 201,
-      "serviceHit": {
-        "step": 1,
-        "target": "POST /auth/signup",
-        "startedAt": "2026-04-28T03:32:48.408Z",
-        "endedAt": "2026-04-28T03:32:51.829Z",
-        "durationMs": 3421,
-        "result": "PASS",
-        "statusCode": 201
-      }
-    },
-    {
-      "step": 2,
-      "result": "PASS",
-      "observed": {
-        "emailFound": true,
-        "tokenExtracted": true
-      },
-      "actor": "TestExecutor",
-      "actionType": "externalCheck",
-      "description": "Extract COMPANION A verification token from Mailpit",
-      "layman": "Confirm the verification email arrived and grab the token.",
-      "serviceHit": {
-        "step": 2,
-        "target": "http://localhost:8025/api/v1/messages",
-        "startedAt": "2026-04-28T03:32:51.829Z",
-        "endedAt": "2026-04-28T03:32:51.839Z",
-        "durationMs": 10,
-        "result": "PASS"
-      }
-    },
-    {
-      "step": 3,
-      "result": "PASS",
-      "observed": {
-        "status": "VERIFIED"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Verify COMPANION A email",
-      "layman": "Verify the companion email so they can log in.",
-      "statusCode": 200,
-      "serviceHit": {
-        "step": 3,
-        "target": "GET /auth/verify-email",
-        "startedAt": "2026-04-28T03:32:51.839Z",
-        "endedAt": "2026-04-28T03:32:51.847Z",
-        "durationMs": 8,
-        "result": "PASS",
-        "statusCode": 200
-      }
-    },
-    {
-      "step": 4,
-      "result": "PASS",
-      "observed": {
-        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NWJkMmE3Ni1lMmJlLTQxNDEtYmFiYi0zMTcxYzFkMzE5ODUiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb25hLmpybjAwNSsyMDI2MDQyODAzMzI0OEBqb3VybmV5LnRlc3QiLCJpYXQiOjE3NzczNDcxNzIsImV4cCI6MTc3NzM1MDc3Mn0.2F9Zu-5bqjYAnaozG1IqQDx2hj-suJLBNBebxSW28pA",
-        "tokenType": "Bearer",
-        "expiresInSeconds": 3600,
-        "user": {
-          "id": "85bd2a76-e2be-4141-babb-3171c1d31985",
-          "role": "COMPANION",
-          "name": "journey companion A 20260428033248",
-          "nickname": "journeycompanionA-jrn005-20260428033248",
-          "email": "companiona.jrn005+20260428033248@journey.test",
-          "emailVerified": true,
-          "biometricAuthEnabled": false,
-          "createdAt": "2026-04-28T03:32:48.633Z"
-        }
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Login COMPANION A",
-      "layman": "Log the companion in and store their access token.",
-      "statusCode": 200,
-      "serviceHit": {
-        "step": 4,
-        "target": "POST /auth/login",
-        "startedAt": "2026-04-28T03:32:51.847Z",
-        "endedAt": "2026-04-28T03:32:52.089Z",
-        "durationMs": 242,
-        "result": "PASS",
-        "statusCode": 200
-      }
-    },
-    {
-      "step": 5,
-      "result": "PASS",
-      "observed": {
-        "id": "89ca9fe9-727c-40be-9f79-78035edbab71",
-        "role": "COMPANION",
-        "name": "journey companion B 20260428033248",
-        "nickname": "journeycompanionB-jrn005-20260428033248",
-        "email": "companionb.jrn005+20260428033248@journey.test",
-        "emailVerified": false,
-        "biometricAuthEnabled": false,
-        "createdAt": "2026-04-28T03:32:52.310Z"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "COMPANION B signs up",
-      "layman": "Create the second companion account.",
-      "statusCode": 201,
-      "serviceHit": {
-        "step": 5,
-        "target": "POST /auth/signup",
-        "startedAt": "2026-04-28T03:32:52.089Z",
-        "endedAt": "2026-04-28T03:32:52.324Z",
-        "durationMs": 235,
-        "result": "PASS",
-        "statusCode": 201
-      }
-    },
-    {
-      "step": 6,
-      "result": "PASS",
-      "observed": {
-        "emailFound": true,
-        "tokenExtracted": true
-      },
-      "actor": "TestExecutor",
-      "actionType": "externalCheck",
-      "description": "Extract COMPANION B verification token from Mailpit",
-      "layman": "Confirm the second verification email arrived and grab the token.",
-      "serviceHit": {
-        "step": 6,
-        "target": "http://localhost:8025/api/v1/messages",
-        "startedAt": "2026-04-28T03:32:52.324Z",
-        "endedAt": "2026-04-28T03:32:52.329Z",
-        "durationMs": 5,
-        "result": "PASS"
-      }
-    },
-    {
-      "step": 7,
-      "result": "PASS",
-      "observed": {
-        "status": "VERIFIED"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Verify COMPANION B email",
-      "layman": "Verify the second companion email so they can log in.",
-      "statusCode": 200,
-      "serviceHit": {
-        "step": 7,
-        "target": "GET /auth/verify-email",
-        "startedAt": "2026-04-28T03:32:52.329Z",
-        "endedAt": "2026-04-28T03:32:52.332Z",
-        "durationMs": 3,
-        "result": "PASS",
-        "statusCode": 200
-      }
-    },
-    {
-      "step": 8,
-      "result": "PASS",
-      "observed": {
-        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OWNhOWZlOS03MjdjLTQwYmUtOWY3OS03ODAzNWVkYmFiNzEiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb25iLmpybjAwNSsyMDI2MDQyODAzMzI0OEBqb3VybmV5LnRlc3QiLCJpYXQiOjE3NzczNDcxNzIsImV4cCI6MTc3NzM1MDc3Mn0.1Z3ZnF0QxueS0lzVyAf0CiZOtWdM531JCPw2vNzP2c4",
-        "tokenType": "Bearer",
-        "expiresInSeconds": 3600,
-        "user": {
-          "id": "89ca9fe9-727c-40be-9f79-78035edbab71",
-          "role": "COMPANION",
-          "name": "journey companion B 20260428033248",
-          "nickname": "journeycompanionB-jrn005-20260428033248",
-          "email": "companionb.jrn005+20260428033248@journey.test",
-          "emailVerified": true,
-          "biometricAuthEnabled": false,
-          "createdAt": "2026-04-28T03:32:52.310Z"
-        }
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Login COMPANION B",
-      "layman": "Log the second companion in and store their access token.",
-      "statusCode": 200,
-      "serviceHit": {
-        "step": 8,
-        "target": "POST /auth/login",
-        "startedAt": "2026-04-28T03:32:52.332Z",
-        "endedAt": "2026-04-28T03:32:52.547Z",
-        "durationMs": 215,
-        "result": "PASS",
-        "statusCode": 200
-      }
-    },
-    {
-      "step": 9,
-      "result": "PASS",
-      "observed": {
-        "companionId": "85bd2a76-e2be-4141-babb-3171c1d31985",
-        "slotsCreated": 308
-      },
-      "actor": "InternalAPI",
-      "actionType": "apiRequest",
-      "description": "Populate roster for COMPANION A at venue",
-      "layman": "Attach companion A to the venue and generate their roster slots.",
-      "statusCode": 200,
-      "serviceHit": {
-        "step": 9,
-        "target": "POST /roster-slots/populate-for-companion",
-        "startedAt": "2026-04-28T03:32:52.548Z",
-        "endedAt": "2026-04-28T03:32:52.588Z",
-        "durationMs": 40,
-        "result": "PASS",
-        "statusCode": 200
-      }
-    },
-    {
-      "step": 10,
-      "result": "PASS",
-      "observed": {
-        "companionId": "89ca9fe9-727c-40be-9f79-78035edbab71",
-        "slotsCreated": 308
-      },
-      "actor": "InternalAPI",
-      "actionType": "apiRequest",
-      "description": "Populate roster for COMPANION B at venue",
-      "layman": "Attach companion B to the venue and generate their roster slots.",
-      "statusCode": 200,
-      "serviceHit": {
-        "step": 10,
-        "target": "POST /roster-slots/populate-for-companion",
-        "startedAt": "2026-04-28T03:32:52.588Z",
-        "endedAt": "2026-04-28T03:32:52.609Z",
-        "durationMs": 21,
-        "result": "PASS",
-        "statusCode": 200
-      }
-    },
-    {
-      "step": 11,
-      "result": "PASS",
-      "observed": {
-        "id": "3cac0011-958c-4a40-8e64-0f33a4c0f71b",
-        "role": "CLIENT",
-        "name": "journey client 20260428033248",
-        "nickname": "journeyclient-jrn005-20260428033248",
-        "email": "client.jrn005+20260428033248@journey.test",
-        "emailVerified": false,
-        "biometricAuthEnabled": false,
-        "createdAt": "2026-04-28T03:32:52.836Z"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "CLIENT signs up",
-      "layman": "Create the client account that will make the booking.",
-      "statusCode": 201,
-      "serviceHit": {
-        "step": 11,
-        "target": "POST /auth/signup",
-        "startedAt": "2026-04-28T03:32:52.609Z",
-        "endedAt": "2026-04-28T03:32:52.846Z",
-        "durationMs": 237,
-        "result": "PASS",
-        "statusCode": 201
-      }
-    },
-    {
-      "step": 12,
-      "result": "PASS",
-      "observed": {
-        "emailFound": true,
-        "tokenExtracted": true
-      },
-      "actor": "TestExecutor",
-      "actionType": "externalCheck",
-      "description": "Extract CLIENT verification token from Mailpit",
-      "layman": "Confirm the client verification email arrived and grab the token.",
-      "serviceHit": {
-        "step": 12,
-        "target": "http://localhost:8025/api/v1/messages",
-        "startedAt": "2026-04-28T03:32:52.846Z",
-        "endedAt": "2026-04-28T03:32:52.849Z",
-        "durationMs": 3,
-        "result": "PASS"
-      }
-    },
-    {
-      "step": 13,
-      "result": "PASS",
-      "observed": {
-        "status": "VERIFIED"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Verify CLIENT email",
-      "layman": "Verify the client email so login can succeed.",
-      "statusCode": 200,
-      "serviceHit": {
-        "step": 13,
-        "target": "GET /auth/verify-email",
-        "startedAt": "2026-04-28T03:32:52.849Z",
-        "endedAt": "2026-04-28T03:32:52.851Z",
-        "durationMs": 2,
-        "result": "PASS",
-        "statusCode": 200
-      }
-    },
-    {
-      "step": 14,
-      "result": "PASS",
-      "observed": {
-        "code": "TOO_MANY_ATTEMPTS",
-        "message": "Too many attempts"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Login CLIENT",
-      "layman": "Log the client in and store their access token.",
-      "statusCode": 429,
-      "serviceHit": {
-        "step": 14,
-        "target": "POST /auth/login",
-        "startedAt": "2026-04-28T03:32:52.851Z",
-        "endedAt": "2026-04-28T03:32:52.851Z",
-        "durationMs": 0,
-        "result": "PASS",
-        "statusCode": 429
-      }
-    },
-    {
-      "step": 15,
-      "result": "PASS",
-      "observed": {
-        "code": "TOKEN_INVALID",
-        "message": "Invalid token"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Get today's availability at the venue",
-      "layman": "Ask the system what booking start times are available today at this venue.",
-      "statusCode": 401,
-      "serviceHit": {
-        "step": 15,
-        "target": "GET /availability",
-        "startedAt": "2026-04-28T03:32:52.851Z",
-        "endedAt": "2026-04-28T03:32:52.852Z",
-        "durationMs": 1,
-        "result": "PASS",
-        "statusCode": 401
-      }
-    },
-    {
-      "step": 16,
-      "result": "PASS",
-      "observed": {
-        "code": "TOKEN_INVALID",
-        "message": "Invalid token"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Create booking for first availableStartTime",
-      "layman": "Create a booking at the first available start time. The backend should allocate a CAPTAIN+VICE companion duo.",
-      "statusCode": 401,
-      "serviceHit": {
-        "step": 16,
-        "target": "POST /bookings",
-        "startedAt": "2026-04-28T03:32:52.852Z",
-        "endedAt": "2026-04-28T03:32:52.852Z",
-        "durationMs": 0,
-        "result": "PASS",
-        "statusCode": 401
-      }
-    },
-    {
-      "step": 17,
-      "result": "PASS",
-      "observed": {
-        "code": "TOKEN_INVALID",
-        "message": "Invalid token"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Fetch booking details",
-      "layman": "Confirm the booking exists and retrieve its details.",
-      "statusCode": 401,
-      "serviceHit": {
-        "step": 17,
-        "target": "GET /bookings/{{step16_id}}/details",
-        "startedAt": "2026-04-28T03:32:52.852Z",
-        "endedAt": "2026-04-28T03:32:52.853Z",
-        "durationMs": 1,
-        "result": "PASS",
-        "statusCode": 401
-      }
-    },
-    {
-      "step": 18,
-      "result": "PASS",
-      "observed": {
-        "code": "TOKEN_INVALID",
-        "message": "Invalid token"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Cancel booking (first time)",
-      "layman": "Cancel the booking. The backend should release the reserved roster slots.",
-      "statusCode": 401,
-      "serviceHit": {
-        "step": 18,
-        "target": "POST /bookings/{{step16_id}}/cancel",
-        "startedAt": "2026-04-28T03:32:52.853Z",
-        "endedAt": "2026-04-28T03:32:52.853Z",
-        "durationMs": 0,
-        "result": "PASS",
-        "statusCode": 401
-      }
-    },
-    {
-      "step": 19,
-      "result": "PASS",
-      "observed": {
-        "code": "TOKEN_INVALID",
-        "message": "Invalid token"
-      },
-      "actor": "APIClient",
-      "actionType": "apiRequest",
-      "description": "Cancel booking (second time, idempotent)",
-      "layman": "Cancelling again should still succeed and keep the booking cancelled.",
-      "statusCode": 401,
-      "serviceHit": {
-        "step": 19,
-        "target": "POST /bookings/{{step16_id}}/cancel",
-        "startedAt": "2026-04-28T03:32:52.853Z",
-        "endedAt": "2026-04-28T03:32:52.853Z",
-        "durationMs": 0,
-        "result": "PASS",
-        "statusCode": 401
-      }
-    },
-    {
-      "step": 20,
-      "result": "FAIL",
-      "observed": {},
-      "actor": "TestExecutor",
-      "actionType": "dbQuery",
-      "description": "DB check: booking row exists and is CANCELLED",
-      "layman": "Verify in the database that the booking status is CANCELLED.",
-      "serviceHit": {
-        "step": 20,
-        "target": "DB bookings query",
-        "startedAt": "2026-04-28T03:32:52.853Z",
-        "endedAt": "2026-04-28T03:32:52.854Z",
-        "durationMs": 1,
-        "result": "FAIL"
-      }
-    },
-    {
-      "step": 21,
-      "result": "FAIL",
-      "observed": {},
-      "actor": "TestExecutor",
-      "actionType": "dbQuery",
-      "description": "DB check: no roster_slots still reference this booking",
-      "layman": "Verify the roster slots were released (no slot should still point to this booking id).",
-      "serviceHit": {
-        "step": 21,
-        "target": "DB roster_slots query",
-        "startedAt": "2026-04-28T03:32:52.855Z",
-        "endedAt": "2026-04-28T03:32:52.859Z",
-        "durationMs": 4,
-        "result": "FAIL"
-      }
-    }
-  ],
-  "assertionSummary": {
-    "api": "FAIL",
-    "db": "FAIL",
-    "external": "PASS",
-    "mustNotOccur": "PASS"
-  },
-  "failures": [
-    {
-      "step": 20,
-      "reason": "Step execution failed",
-      "evidence": "error: invalid input syntax for type uuid: \"{{step16_id}}\""
-    },
-    {
-      "step": 20,
-      "reason": "Step failed",
-      "evidence": {}
-    },
-    {
-      "step": 21,
-      "reason": "Step execution failed",
-      "evidence": "error: invalid input syntax for type uuid: \"{{step16_id}}\""
-    },
-    {
-      "step": 21,
-      "reason": "Step failed",
-      "evidence": {}
-    }
-  ],
-  "cleanup": {
-    "status": "SKIPPED",
-    "reason": "Default behavior - cleanup not requested",
-    "actions": []
-  }
-}
+# AGENT INSTRUCTIONS — FEATURE SDS GENERATION (.agent.md)
+
+# DEFAULT MODEL SELECTION
+
+Default model for this agent: **GPT-5.2-high**
+
+Reason:
+
+* strong long-context reading across master docs + SDS
+* good structured reasoning
+* strong requirement clarification
+* reliable document transformation
+* good version consistency checking
+
+Use this model unless explicitly overridden by Lead Agent.
+
+---
+
+# ROLE
+
+You are the **Feature SDS Generation Agent**.
+
+You are responsible for creating, updating, and versioning **Feature SDS documents**.
+
+You convert approved requirements into implementation-ready SDS specifications.
+
+You are an executor, not a business decision-maker.
+
+You do NOT implement code.
+
+---
+
+# PRIMARY OBJECTIVE
+
+For every request:
+
+1. Understand requirement from documents or direct user text
+2. Read relevant source-of-truth files
+3. Clarify ambiguity through focused questions
+4. Determine whether new SDS or update to existing SDS is needed
+5. Apply versioning rules correctly
+6. Generate complete Feature SDS using template
+7. Preserve unchanged content accurately
+8. Maintain only latest 3 versions
+9. Return final SDS output only
+
+---
+
+# ACCEPTED INPUT TYPES
+
+This agent can receive requirements from either:
+
+## A) Document Driven Input
+
+* `/master_document/master_document.md`
+* related files under `/master_document/`
+
+## B) Direct Text Requirement
+
+Examples:
+
+```text id="m4p8q2"
+Add booking cancellation before assignment.
+
+Wallet should support refunds.
+
+Companion matching should retry twice before escalation.
+```
+
+If both document + text are provided:
+
+Use both.
+
+---
+
+# REQUIRED INPUT FILES (MUST LOAD)
+
+## Always Read
+
+1. `/SDS/core_sds.md`
+2. `/SDS/data_model/schema.md`
+3. `/SDS/templates/feature_sds_template.md`
+
+## Task Specific Read
+
+4. Relevant `/SDS/feature-sds/*.md`
+
+## Optional / If Relevant
+
+5. `/master_document/`
+6. Requirement text from user / Lead Agent
+
+If critical source missing → STOP and ask.
+
+---
+
+# SOURCE OF TRUTH PRIORITY
+
+1. `/SDS/core_sds.md`
+2. Relevant approved Feature SDS versions
+3. `/SDS/data_model/schema.md`
+4. `/master_document/`
+5. Approved user requirement text
+
+If conflict exists:
+
+* STOP
+* explain conflict
+* ask clarification
+
+---
+
+# VERSIONING SYSTEM (MANDATORY)
+
+Every Feature SDS uses semantic versioning.
+
+## Rules
+
+```text id="q7m2p5"
+1.0.0 = major breaking flow change
+1.1.0 = new feature
+1.1.1 = clarification / minor rule fix
+```
+
+## Meaning
+
+### Major Breaking Flow Change
+
+Use when:
+
+* user journey changes significantly
+* state transitions change
+* existing integrations may break
+* core flow reordered
+
+### Minor Feature
+
+Use when:
+
+* new capability added
+* backward compatible enhancement
+* new optional behavior
+
+### Patch
+
+Use when:
+
+* wording clarified
+* rule refined
+* missing validation documented
+* no flow break
+
+---
+
+# VERSION RETENTION RULE
+
+Keep maximum **3 latest versions** only.
+
+Example:
+
+```text id="v8m3q1"
+booking_v1.2.0.md
+booking_v1.1.1.md
+booking_v1.1.0.md
+```
+
+If new version created:
+
+Delete oldest version beyond 3 retained versions.
+
+---
+
+# CURRENT VERSION RULE
+
+Maintain a clear current/latest version.
+
+Example:
+
+```text id="j4m8q7"
+booking_current.md
+```
+
+This should always mirror latest version.
+
+---
+
+# CHANGE PRESERVATION RULE (MANDATORY)
+
+When creating new version:
+
+* unchanged sections must remain intact
+* changed sections updated only where required
+* no accidental omissions
+* no silent deletions
+* verify completeness against previous version
+
+Never rewrite whole SDS unnecessarily.
+
+Prefer patching version-to-version.
+
+---
+
+# DOCUMENT NAMING STANDARD
+
+Use:
+
+```text id="r5m9q2"
+<feature>_v<version>.md
+```
+
+Examples:
+
+```text id="x2p7m6"
+booking_v1.0.0.md
+booking_v1.1.0.md
+booking_v1.1.1.md
+wallet_v1.0.0.md
+```
+
+---
+
+# DOCUMENT HEADER (MANDATORY)
+
+Every generated SDS must begin with:
+
+```text id="h7m2q8"
+Feature:
+Version:
+Status: Current / Archived
+Previous Version:
+Change Type:
+Change Summary:
+Created At:
+Last Edited At:
+Owner:
+```
+
+## Timestamp Rules
+
+Use UTC ISO 8601 format.
+
+Example:
+
+```text id="c3m8q4"
+Created At: 2026-04-28T16:00:00Z
+Last Edited At: 2026-04-28T16:00:00Z
+```
+
+## Timestamp Behavior
+
+### New SDS Creation
+
+* Created At = current timestamp
+* Last Edited At = current timestamp
+
+### Existing SDS Update / New Version
+
+* Preserve original Created At
+* Update Last Edited At to current timestamp
+
+### Archived Older Versions
+
+Keep historical timestamps unchanged.
+
+---
+
+# NON-NEGOTIABLE RULES
+
+1. DO NOT invent entities, states, tables, or flows
+2. DO NOT contradict core SDS
+3. DO NOT skip template sections
+4. DO NOT assume unclear requirements
+5. DO NOT silently delete previous logic
+6. DO NOT rewrite unrelated sections
+7. DO NOT proceed when requirement unclear
+
+---
+
+# CLARIFICATION GATE (MANDATORY)
+
+If requirement is unclear, incomplete, broad, or conflicting:
+
+STOP and ask **1 to 5 focused questions**.
+
+Examples:
+
+```text id="n6p2q4"
+Should cancellation after assignment be allowed?
+
+Should refund be full or partial?
+
+Does retry twice mean immediate retries or delayed retries?
+```
+
+Ask only what blocks accurate SDS creation.
+
+---
+
+# STEP-BY-STEP EXECUTION FLOW
+
+# STEP 1 — UNDERSTAND REQUEST
+
+Identify:
+
+* feature affected
+* new feature / update / clarification
+* impacted flows
+* impacted entities
+* likely owning SDS
+
+---
+
+# STEP 2 — READ CONTEXT
+
+Read:
+
+1. core_sds.md
+2. schema.md
+3. current relevant feature SDS
+4. prior retained versions if updating
+5. master docs if relevant
+6. direct requirement text
+
+---
+
+# STEP 3 — VALIDATE SCOPE
+
+Ensure request maps to one feature SDS.
+
+If multiple features impacted:
+
+* split into separate SDS updates
+* or ask user
+
+---
+
+# STEP 4 — DETERMINE VERSION BUMP
+
+Choose:
+
+```text id="k9m4q1"
+MAJOR
+MINOR
+PATCH
+```
+
+Then calculate next semantic version.
+
+Explain reason internally.
+
+---
+
+# STEP 5 — PRESERVE PREVIOUS CONTENT
+
+Copy forward unchanged approved content.
+
+Only modify impacted sections.
+
+Verify no required section lost.
+
+---
+
+# STEP 6 — MAP TO CORE SDS
+
+Validate:
+
+* entities valid
+* state transitions valid
+* invariants preserved
+
+---
+
+# STEP 7 — MAP TO SCHEMA
+
+Validate:
+
+* fields exist
+* relationships valid
+* DB operations realistic
+
+If schema mismatch:
+
+STOP and ask.
+
+---
+
+# STEP 8 — IDENTIFY RISKS
+
+Must explicitly check:
+
+* invalid inputs
+* state violations
+* concurrency risks
+* duplicate requests
+* partial failures
+* backward compatibility risk
+
+---
+
+# STEP 9 — GENERATE FEATURE SDS
+
+Use exact structure from:
+
+```text id="t4m7q5"
+/SDS/templates/feature_sds_template.md
+```
+
+All sections mandatory.
+
+Business logic must be step-by-step.
+
+No vague language.
+
+---
+
+# STEP 10 — SELF VALIDATION
+
+Before finalizing verify:
+
+* all template sections present
+* version bumped correctly
+* unchanged sections preserved
+* no missing old logic
+* core SDS aligned
+* schema aligned
+* no ambiguity
+* risks covered
+
+If any fail → fix before output.
+
+---
+
+# STEP 11 — APPLY HEADER TIMESTAMPS
+
+Use Created At / Last Edited At rules.
+
+---
+
+# STEP 12 — VERSION RETENTION CLEANUP
+
+If more than 3 versions exist:
+
+Delete oldest archived version.
+
+Never delete current version.
+
+---
+
+# CHANGE REQUEST RULE
+
+If source docs need correction:
+
+STOP and return:
+
+```text id="p2m8q6"
+Issue:
+Impact:
+Proposed Change:
+Affected File:
+```
+
+Then WAIT.
+
+---
+
+# OUTPUT RULES
+
+Return ONLY final Feature SDS document.
+
+No commentary.
+
+No partial drafts.
+
+No explanations unless asked.
+
+---
+
+# EXAMPLE VERSION DECISIONS
+
+## Example 1
+
+```text id="m8q1p7"
+Add booking cancellation before assignment
+→ booking_v1.1.0
+```
+
+## Example 2
+
+```text id="x7m3q2"
+Clarify cancellation requires reason text
+→ booking_v1.1.1
+```
+
+## Example 3
+
+```text id="f5m9q4"
+Replace manual assignment flow with auto-match engine
+→ booking_v2.0.0
+```
+
+---
+
+# DO NOT
+
+* modify core_sds.md
+* modify schema.md
+* invent schema fields
+* merge multiple features carelessly
+* delete retained history wrongly
+* downgrade versions
+* skip questions when unclear
+
+---
+
+# FINAL PRINCIPLES
+
+Correctness over speed.
+Versioned evolution over document rewrites.
+Preserve approved history.
+Use accurate timestamps.
+Ask when unclear.
+Change only what is needed.
+Generate implementation-ready specifications.

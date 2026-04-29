@@ -1,0 +1,181 @@
+{
+  "testId": "MOD-BOOKING-001",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Create Booking - Happy Path",
+  "flowType": "happy",
+  "linkedRequirement": "booking-and-allocation/create-booking",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-001-create-booking-happy-path.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that a client can successfully create a booking with duo allocation from available roster slots",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Client user with verified email and no existing non-terminal bookings"
+    },
+    {
+      "entity": "venue",
+      "count": 1,
+      "description": "Active venue with valid operating hours"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1,
+      "description": "Active captain companion"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1,
+      "description": "Active vice captain companion"
+    },
+    {
+      "entity": "roster_slot",
+      "count": 2,
+      "status": "AVAILABLE",
+      "description": "Two available roster slots for captain and vice captain at target venue/time (2-hour window)"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings",
+      "authType": "Bearer",
+      "requiredPayloadFields": ["venueId", "startAt"],
+      "payloadRules": {
+        "venueId": "Reference to seeded venue",
+        "startAt": "Future ISO-8601 timestamp matching available roster slots (2-hour window expected)"
+      },
+      "layman": "Client requests a booking by providing venue and start time"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Validate client role is CLIENT",
+        "Check client has no non-terminal bookings",
+        "Validate venue exists",
+        "Calculate endAt = startAt + 2 hours"
+      ],
+      "layman": "System validates the client is eligible and calculates the 2-hour booking window"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "allocation",
+      "expectedBehavior": [
+        "Find one CAPTAIN with available roster slot for [startAt, endAt)",
+        "Find one VICE_CAPTAIN with available roster slot for [startAt, endAt)",
+        "Lock both roster slots using FOR UPDATE SKIP LOCKED"
+      ],
+      "layman": "System allocates a duo (captain + vice captain) from available roster"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "expectedBehavior": [
+        "Create booking record with status=CONFIRMED",
+        "Generate qrCode, pinCode, comMatchQrCode, comMatchPinCode, bookingColor",
+        "Mark 2 roster slots as BOOKED with booking_id reference",
+        "Create 2 booking_companion_assignments (CAPTAIN + VICE_CAPTAIN) with default statuses"
+      ],
+      "layman": "System creates the booking, reserves slots, and assigns the duo atomically"
+    },
+    {
+      "step": 5,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "id",
+        "status=CONFIRMED",
+        "clientId",
+        "venueId",
+        "startAt",
+        "endAt",
+        "createdAt"
+      ],
+      "layman": "System returns the confirmed booking with booking ID and details"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "expectedRows": 1,
+      "expectedFields": {
+        "status": "CONFIRMED",
+        "client_id": "{{CLIENT_ID}}",
+        "venue_id": "{{VENUE_ID}}",
+        "qr_code": "{{NOT_NULL}}",
+        "pin_code": "{{NOT_NULL}}",
+        "com_match_qr_code": "{{NOT_NULL}}",
+        "com_match_pin_code": "{{NOT_NULL}}",
+        "booking_color": "{{NOT_NULL}}",
+        "extended_at": null
+      },
+      "layman": "Verify booking exists in database with all required artifacts generated"
+    },
+    {
+      "step": 7,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "expectedRows": 2,
+      "expectedFields": {
+        "status": "BOOKED",
+        "booking_id": "{{BOOKING_ID}}"
+      },
+      "layman": "Verify exactly 2 roster slots are marked as BOOKED for this booking"
+    },
+    {
+      "step": 8,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_companion_assignments",
+      "expectedRows": 2,
+      "expectedFields": {
+        "booking_id": "{{BOOKING_ID}}",
+        "designations": ["CAPTAIN", "VICE_CAPTAIN"],
+        "presence_status": "ASSIGNED",
+        "self_match_status": "NOT_MATCHED",
+        "client_match_status": "WAITING_FOR_CLIENT"
+      },
+      "layman": "Verify duo assignments exist with correct designations and default match statuses"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 201",
+      "Booking ID is returned",
+      "Status is CONFIRMED",
+      "endAt equals startAt + 2 hours"
+    ],
+    "db": [
+      "Exactly 1 booking created",
+      "Exactly 2 roster slots marked BOOKED",
+      "Exactly 2 companion assignments created (1 CAPTAIN, 1 VICE_CAPTAIN)",
+      "All booking artifacts (qrCode, pinCode, etc.) are generated",
+      "extended_at is NULL"
+    ],
+    "businessRules": [
+      "Client has no other non-terminal bookings",
+      "Duo integrity: one CAPTAIN + one VICE_CAPTAIN",
+      "Roster slots reserved for exact 2-hour window"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "This is the primary happy path for booking creation",
+    "Tests First-Available duo allocation strategy",
+    "Validates atomic transaction: booking + roster + assignments"
+  ]
+}

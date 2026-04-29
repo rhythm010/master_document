@@ -1,0 +1,138 @@
+{
+  "testId": "MOD-BOOKING-007",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Create Booking - No Duo Available (409)",
+  "flowType": "edge",
+  "linkedRequirement": "booking-and-allocation/no-duo-available",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-007-create-booking-no-duo-available.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that booking creation fails deterministically when no duo (CAPTAIN + VICE_CAPTAIN) is available for the requested venue and time",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Client with no existing non-terminal bookings"
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "roster_slot",
+      "status": "BOOKED",
+      "count": 2,
+      "description": "All roster slots for the requested time are already BOOKED (no availability)"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings",
+      "authType": "Bearer",
+      "requiredPayloadFields": ["venueId", "startAt"],
+      "payloadRules": {
+        "venueId": "Reference to venue",
+        "startAt": "Future ISO-8601 timestamp where no duo is available"
+      },
+      "layman": "Client requests a booking for a time slot where no duo is available"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Authenticate client",
+        "Validate no non-terminal bookings",
+        "Validate venue exists",
+        "Calculate endAt = startAt + 2 hours"
+      ],
+      "layman": "System validates the basic booking request"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "allocation",
+      "expectedBehavior": [
+        "Attempt to find CAPTAIN with AVAILABLE roster slot for [startAt, endAt)",
+        "Attempt to find VICE_CAPTAIN with AVAILABLE roster slot for [startAt, endAt)",
+        "Fail to allocate duo (one or both not available)"
+      ],
+      "layman": "System attempts duo allocation but finds no available duo"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 409,
+      "expectedErrorCode": "NO_DUO_AVAILABLE",
+      "expectedErrorMessage": "No duo available for the requested venue and time",
+      "layman": "System rejects the booking with a deterministic error"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "query": "WHERE client_id={{CLIENT_ID}}",
+      "expectedRows": 0,
+      "layman": "Verify no booking was created"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_companion_assignments",
+      "query": "WHERE booking_id IS NOT NULL",
+      "expectedBehavior": "No new assignments created",
+      "layman": "Verify no companion assignments were created"
+    },
+    {
+      "step": 7,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE status='BOOKED'",
+      "expectedBehavior": "Existing BOOKED slots remain unchanged (no additional reservations)",
+      "layman": "Verify roster slot states unchanged (no partial reservations)"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 409",
+      "Error code is NO_DUO_AVAILABLE",
+      "Error message is descriptive"
+    ],
+    "db": [
+      "No booking record created",
+      "No companion assignments created",
+      "No roster slots changed state",
+      "Database remains consistent (no partial/orphaned data)"
+    ],
+    "businessRules": [
+      "Duo allocation requires both CAPTAIN and VICE_CAPTAIN",
+      "Allocation failure is deterministic (no partial booking)",
+      "System does not create booking without successful duo allocation"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests the NO_DUO_AVAILABLE failure path",
+    "Validates deterministic failure (no partial state)",
+    "Can vary: only captain available, only vice captain available, both unavailable"
+  ]
+}

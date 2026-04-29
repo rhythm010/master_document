@@ -1,0 +1,256 @@
+{
+  "testId": "MOD-BOOKING-005",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Internal Edit - Manual Duo Reassignment (Happy Path)",
+  "flowType": "happy",
+  "linkedRequirement": "booking-and-allocation/internal-edit-reassignment",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-005-internal-edit-reassign-duo-happy-path.json",
+  "executionMode": "api+db+internalAuth",
+  "objective": "Validate that an internal service can manually reassign a different duo to a CONFIRMED booking while preserving booking artifacts",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 2,
+      "description": "Original captain and target captain"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 2,
+      "description": "Original vice captain and target vice captain"
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "extended_at": null,
+      "count": 1,
+      "description": "Future booking assigned to original duo"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "BOOKED",
+      "count": 2,
+      "description": "Slots reserved for original duo"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "AVAILABLE",
+      "count": 2,
+      "description": "Available slots for target duo (different companions) at same venue/time"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "presence_status": "ASSIGNED",
+      "self_match_status": "NOT_MATCHED",
+      "client_match_status": "WAITING_FOR_CLIENT",
+      "description": "Original duo assignments at default statuses"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "method": "PATCH",
+      "endpoint": "/bookings/{id}",
+      "authType": "InternalToken",
+      "headers": {
+        "X-Internal-Token": "{{VALID_INTERNAL_TOKEN}}"
+      },
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": ["captainCompanionId", "viceCaptainCompanionId"],
+      "payloadRules": {
+        "captainCompanionId": "Reference to target captain (different from original)",
+        "viceCaptainCompanionId": "Reference to target vice captain (different from original)",
+        "note": "Both companion IDs MUST be provided for reassignment"
+      },
+      "layman": "Internal service requests to manually reassign a different duo to the booking"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "internalAuth",
+      "expectedBehavior": [
+        "Validate X-Internal-Token"
+      ],
+      "layman": "System verifies internal authorization"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Booking exists and status is CONFIRMED",
+        "extended_at is NULL",
+        "Server time < start_at",
+        "Both captainCompanionId and viceCaptainCompanionId provided",
+        "Companions are distinct (not the same ID)",
+        "captainCompanionId has designation=CAPTAIN",
+        "viceCaptainCompanionId has designation=VICE_CAPTAIN"
+      ],
+      "layman": "System validates the booking can be edited and the target duo is valid"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "transactionStart": true,
+      "expectedBehavior": [
+        "Lock booking FOR UPDATE",
+        "Load and lock assignment rows FOR UPDATE",
+        "Verify assignments at default statuses"
+      ],
+      "layman": "System locks the booking and verifies no progression"
+    },
+    {
+      "step": 5,
+      "actor": "System",
+      "actionType": "slotRelease",
+      "expectedBehavior": [
+        "Release current roster slots for original duo",
+        "Verify exactly 2 rows affected"
+      ],
+      "layman": "System releases the original duo's roster slots"
+    },
+    {
+      "step": 6,
+      "actor": "System",
+      "actionType": "slotReservation",
+      "expectedBehavior": [
+        "Lock target duo's roster slots using FOR UPDATE SKIP LOCKED",
+        "Verify exactly 2 rows locked (target duo available)",
+        "Reserve slots for target duo",
+        "Verify exactly 2 rows affected"
+      ],
+      "layman": "System reserves roster slots for the new duo"
+    },
+    {
+      "step": 7,
+      "actor": "System",
+      "actionType": "dbUpdate",
+      "expectedBehavior": [
+        "Update CAPTAIN assignment: SET companion_id={{TARGET_CAPTAIN_ID}}, reset to defaults (presence_status='ASSIGNED', etc.)",
+        "Update VICE_CAPTAIN assignment: SET companion_id={{TARGET_VICE_CAPTAIN_ID}}, reset to defaults",
+        "Do NOT change booking artifacts (qrCode, pinCode, etc.)"
+      ],
+      "layman": "System updates the companion assignments to the new duo and resets match statuses"
+    },
+    {
+      "step": 8,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "transactionEnd": "COMMIT",
+      "layman": "System commits all changes atomically"
+    },
+    {
+      "step": 9,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "id",
+        "status=CONFIRMED"
+      ],
+      "layman": "System returns success with updated booking"
+    },
+    {
+      "step": 10,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "expectedRows": 1,
+      "expectedFields": {
+        "id": "{{BOOKING_ID}}",
+        "status": "CONFIRMED",
+        "qr_code": "{{ORIGINAL_QR_CODE}}",
+        "pin_code": "{{ORIGINAL_PIN_CODE}}",
+        "com_match_qr_code": "{{ORIGINAL_COM_MATCH_QR}}",
+        "com_match_pin_code": "{{ORIGINAL_COM_MATCH_PIN}}",
+        "booking_color": "{{ORIGINAL_BOOKING_COLOR}}"
+      },
+      "layman": "Verify booking artifacts remain unchanged despite duo change"
+    },
+    {
+      "step": 11,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE companion_id IN ({{ORIGINAL_CAPTAIN_ID}}, {{ORIGINAL_VICE_CAPTAIN_ID}}) AND start_at={{BOOKING_START_AT}}",
+      "expectedFields": {
+        "status": "AVAILABLE",
+        "booking_id": null
+      },
+      "layman": "Verify original duo's slots are released"
+    },
+    {
+      "step": 12,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE booking_id={{BOOKING_ID}}",
+      "expectedRows": 2,
+      "expectedFields": {
+        "companion_id": ["{{TARGET_CAPTAIN_ID}}", "{{TARGET_VICE_CAPTAIN_ID}}"],
+        "status": "BOOKED"
+      },
+      "layman": "Verify new duo's slots are reserved for this booking"
+    },
+    {
+      "step": 13,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_companion_assignments",
+      "query": "WHERE booking_id={{BOOKING_ID}}",
+      "expectedRows": 2,
+      "expectedFields": {
+        "companion_id": ["{{TARGET_CAPTAIN_ID}}", "{{TARGET_VICE_CAPTAIN_ID}}"],
+        "designation": ["CAPTAIN", "VICE_CAPTAIN"],
+        "presence_status": "ASSIGNED",
+        "self_match_status": "NOT_MATCHED",
+        "client_match_status": "WAITING_FOR_CLIENT"
+      },
+      "layman": "Verify assignments updated to new duo with statuses reset to defaults"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200"
+    ],
+    "db": [
+      "Companion assignments updated to target duo",
+      "Assignment statuses reset to defaults",
+      "Original duo's roster slots released",
+      "Target duo's roster slots reserved",
+      "Booking artifacts unchanged",
+      "Exactly 2 slots released, 2 slots reserved"
+    ],
+    "businessRules": [
+      "Manual reassignment requires BOTH companion IDs",
+      "Companions must have correct designations (CAPTAIN, VICE_CAPTAIN)",
+      "Companions must be distinct",
+      "Target duo must be available at booking window",
+      "Artifacts remain stable across reassignment"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests manual duo reassignment",
+    "Validates that match statuses are reset when companions change",
+    "Tests artifact stability even when duo changes",
+    "Validates atomic slot release + reservation"
+  ]
+}

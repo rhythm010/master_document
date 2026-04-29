@@ -1,0 +1,128 @@
+{
+  "testId": "MOD-BOOKING-006",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Create Booking - Client Already Has Non-Terminal Booking (409)",
+  "flowType": "edge",
+  "linkedRequirement": "booking-and-allocation/one-non-terminal-booking-rule",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-006-create-booking-client-has-non-terminal.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that a client cannot create a new booking if they already have a non-terminal booking (CONFIRMED or ACTIVE)",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Client user with existing non-terminal booking"
+    },
+    {
+      "entity": "venue",
+      "count": 2,
+      "description": "Venue for existing booking and target venue for new booking attempt"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "description": "Existing CONFIRMED booking owned by the client (non-terminal)"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "AVAILABLE",
+      "count": 2,
+      "description": "Available roster slots for new booking attempt"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings",
+      "authType": "Bearer",
+      "requiredPayloadFields": ["venueId", "startAt"],
+      "payloadRules": {
+        "venueId": "Reference to target venue (different from existing booking)",
+        "startAt": "Future ISO-8601 timestamp (different time from existing booking)"
+      },
+      "layman": "Client attempts to create a second booking while having an active CONFIRMED booking"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Authenticate client",
+        "Check for existing non-terminal bookings: SELECT id FROM bookings WHERE client_id={{CLIENT_ID}} AND status IN ('CONFIRMED', 'ACTIVE') LIMIT 1",
+        "Find existing non-terminal booking"
+      ],
+      "layman": "System detects the client already has a non-terminal booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 409,
+      "expectedErrorCode": "CLIENT_ALREADY_HAS_NON_TERMINAL_BOOKING",
+      "expectedErrorMessage": "Client already has a non-terminal booking (CONFIRMED or ACTIVE)",
+      "layman": "System rejects the request with a conflict error"
+    },
+    {
+      "step": 4,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "query": "WHERE client_id={{CLIENT_ID}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "id": "{{EXISTING_BOOKING_ID}}",
+        "status": "CONFIRMED"
+      },
+      "layman": "Verify only the original booking exists (no new booking created)"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE status='AVAILABLE' AND companion_id IN ({{CAPTAIN_ID}}, {{VICE_CAPTAIN_ID}})",
+      "expectedBehavior": "Target roster slots remain AVAILABLE (not reserved)",
+      "layman": "Verify no roster slots were reserved for the rejected booking"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 409",
+      "Error code is CLIENT_ALREADY_HAS_NON_TERMINAL_BOOKING",
+      "Error message explains the constraint"
+    ],
+    "db": [
+      "No new booking created",
+      "Existing booking unchanged",
+      "No roster slots reserved"
+    ],
+    "businessRules": [
+      "One non-terminal booking per client rule enforced",
+      "Non-terminal statuses are CONFIRMED and ACTIVE",
+      "CANCELLED and COMPLETED bookings do not block new bookings"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests the one non-terminal booking per client invariant",
+    "DB unique index provides ultimate enforcement",
+    "Pre-check provides cleaner error message",
+    "Can also test with ACTIVE status variant"
+  ]
+}

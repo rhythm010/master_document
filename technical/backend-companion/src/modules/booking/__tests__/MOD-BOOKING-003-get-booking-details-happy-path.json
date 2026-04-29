@@ -1,0 +1,141 @@
+{
+  "testId": "MOD-BOOKING-003",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Get Booking Details - Happy Path",
+  "flowType": "happy",
+  "linkedRequirement": "booking-and-allocation/get-booking-details",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-003-get-booking-details-happy-path.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that an authorized user can retrieve minimal booking details",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Client user who owns the booking"
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "description": "Existing booking with all artifacts populated"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "description": "Duo assignments for the booking"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:id/details",
+      "authType": "Bearer",
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [],
+      "layman": "Client requests to view their booking details"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Verify booking exists",
+        "Verify caller is authorized (owner client, assigned companion, or admin)"
+      ],
+      "layman": "System verifies the caller has access to this booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "dbQuery",
+      "expectedBehavior": [
+        "Fetch booking by ID",
+        "Include minimal details as per endpoint contract"
+      ],
+      "layman": "System retrieves the booking information from database"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "id",
+        "status",
+        "clientId",
+        "venueId",
+        "startAt",
+        "endAt",
+        "createdAt"
+      ],
+      "expectedOptionalFields": [
+        "qrCode",
+        "pinCode",
+        "bookingColor",
+        "extendedAt"
+      ],
+      "layman": "System returns the booking details to the caller"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "responseValidation",
+      "expectedBehavior": [
+        "Validate all required fields are present",
+        "Validate data types (UUIDs, ISO-8601 timestamps, status enum)",
+        "Validate endAt = startAt + 2 hours (or +3 if extended)",
+        "Validate status is one of: CONFIRMED, ACTIVE, COMPLETED, CANCELLED"
+      ],
+      "layman": "Verify the response contains correct and complete booking information"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "All required fields present",
+      "Field types match schema",
+      "No sensitive companion data exposed (this is minimal details endpoint)"
+    ],
+    "authorization": [
+      "Only authorized users can access booking details",
+      "Booking owner can view",
+      "Assigned companions can view",
+      "Admin can view"
+    ],
+    "businessRules": [
+      "Booking details reflect current state",
+      "Timestamps are in ISO-8601 format",
+      "Status is valid booking state"
+    ]
+  },
+  "openQuestions": [
+    "Exact fields returned by /details endpoint (contract not fully specified in SDS)",
+    "Whether companion assignments are included in response"
+  ],
+  "notes": [
+    "Tests basic read operation",
+    "Validates minimal details contract",
+    "Does not test full booking details with assignments (if separate endpoint exists)"
+  ]
+}

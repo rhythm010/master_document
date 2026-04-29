@@ -1,0 +1,175 @@
+{
+  "testId": "MOD-BOOKING-002",
+  "artifactStatus": "DRAFT_SPEC",
+  "scenarioName": "Cancel Booking - Happy Path (Pre-Session)",
+  "flowType": "happy",
+  "linkedRequirement": "booking-and-allocation/cancel-booking",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-002-cancel-booking-happy-path.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that a client can successfully cancel a CONFIRMED booking and roster slots are released",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Client user who owns the booking"
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "description": "Existing confirmed booking owned by the client"
+    },
+    {
+      "entity": "roster_slot",
+      "status": "BOOKED",
+      "count": 2,
+      "description": "Two roster slots marked as BOOKED for the existing booking"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "description": "Two assignments (CAPTAIN + VICE_CAPTAIN) for the booking"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/cancel",
+      "authType": "Bearer",
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [],
+      "payloadRules": {
+        "body": "Empty JSON {} or no body"
+      },
+      "layman": "Client requests to cancel their confirmed booking"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Verify booking exists",
+        "Verify caller is the booking owner (bookings.client_id == caller.userId)"
+      ],
+      "layman": "System verifies the client owns this booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Check booking status is CONFIRMED or ACTIVE",
+        "Reject if status is COMPLETED"
+      ],
+      "layman": "System checks that the booking can be cancelled (not completed)"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "expectedBehavior": [
+        "Lock booking for update",
+        "Update booking.status to CANCELLED",
+        "Update all roster_slots with booking_id: set status=AVAILABLE, booking_id=NULL"
+      ],
+      "layman": "System cancels the booking and releases the reserved roster slots"
+    },
+    {
+      "step": 5,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "id",
+        "status=CANCELLED"
+      ],
+      "layman": "System confirms the booking has been cancelled"
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "expectedRows": 1,
+      "expectedFields": {
+        "id": "{{BOOKING_ID}}",
+        "status": "CANCELLED"
+      },
+      "layman": "Verify booking status is now CANCELLED in database"
+    },
+    {
+      "step": 7,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE booking_id = {{BOOKING_ID}}",
+      "expectedRows": 0,
+      "layman": "Verify no roster slots are linked to this booking anymore"
+    },
+    {
+      "step": 8,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "roster_slots",
+      "query": "WHERE companion_id IN ({{CAPTAIN_ID}}, {{VICE_CAPTAIN_ID}}) AND start_at = {{ORIGINAL_START_AT}}",
+      "expectedFields": {
+        "status": "AVAILABLE",
+        "booking_id": null
+      },
+      "layman": "Verify the duo's roster slots are marked AVAILABLE again"
+    },
+    {
+      "step": 9,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_companion_assignments",
+      "query": "WHERE booking_id = {{BOOKING_ID}}",
+      "expectedRows": 2,
+      "expectedBehavior": "Assignments still exist (immutable audit trail)",
+      "layman": "Verify assignments remain in database (audit trail preserved)"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "Booking status is CANCELLED"
+    ],
+    "db": [
+      "Booking status updated to CANCELLED",
+      "All roster slots released (status=AVAILABLE, booking_id=NULL)",
+      "Companion assignments preserved (immutable audit)"
+    ],
+    "businessRules": [
+      "Only booking owner can cancel",
+      "Roster slots become available for new bookings",
+      "Cancellation from CONFIRMED is allowed"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests pre-session cancellation (CONFIRMED → CANCELLED)",
+    "Validates roster slot release mechanism",
+    "Companion assignments remain as audit trail"
+  ]
+}
