@@ -1,0 +1,180 @@
+{
+  "testId": "MOD-BOOKING-012",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get Booking Details - CANCELLED/COMPLETED Status (Companions Hidden)",
+  "flowType": "edge",
+  "linkedRequirement": "booking-and-allocation/get-booking-details-timed-reveal",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-012-get-booking-details-cancelled-completed-null-companions.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that companion information is hidden (companions: null) when booking status is CANCELLED or COMPLETED, regardless of timing",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.2.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "Booking status is CANCELLED",
+      "seedOverride": {
+        "booking": {
+          "status": "CANCELLED",
+          "startAt": "{{FUTURE_TIMESTAMP_WITHIN_5H_WINDOW}}"
+        }
+      },
+      "expectedCompanions": null
+    },
+    {
+      "variantId": "B",
+      "description": "Booking status is COMPLETED",
+      "seedOverride": {
+        "booking": {
+          "status": "COMPLETED",
+          "startAt": "{{PAST_TIMESTAMP}}"
+        }
+      },
+      "expectedCompanions": null
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "fields": {
+        "nickname": "TestClient"
+      },
+      "description": "Client user who owns the booking"
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 1,
+      "fields": {
+        "nickname": "CaptainNick"
+      }
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 1,
+      "fields": {
+        "nickname": "ViceCaptainNick"
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1,
+      "fields": {
+        "languages": ["English"],
+        "profilePictureUrl": "https://example.com/captain.jpg",
+        "averageRating": 4.5
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1,
+      "fields": {
+        "languages": ["English"],
+        "profilePictureUrl": "https://example.com/vice.jpg",
+        "averageRating": 4.5
+      }
+    },
+    {
+      "entity": "booking",
+      "count": 1,
+      "description": "Booking with variant-specific status (CANCELLED or COMPLETED)"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "description": "Duo assignments (exist but should not be revealed for terminal statuses)"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:id/details",
+      "authType": "Bearer",
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [],
+      "layman": "Client requests to view their CANCELLED or COMPLETED booking details"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Verify booking exists",
+        "Verify caller is CLIENT role and booking owner"
+      ],
+      "layman": "System verifies authorization"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "dbQuery",
+      "expectedBehavior": [
+        "Fetch booking by ID",
+        "Check status: CANCELLED or COMPLETED",
+        "Result: statusBlocksReveal = true"
+      ],
+      "layman": "System determines companions should NOT be revealed because status is terminal (CANCELLED or COMPLETED)"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "id",
+        "status",
+        "clientId",
+        "venueId",
+        "startAt",
+        "endAt",
+        "createdAt",
+        "companions"
+      ],
+      "expectedCompanionsValue": null,
+      "layman": "System returns booking details with companions set to null"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "responseValidation",
+      "expectedBehavior": [
+        "Validate companions field is null",
+        "Validate status is CANCELLED or COMPLETED",
+        "Validate no companion info leaked"
+      ],
+      "layman": "Verify companions field is null for terminal booking statuses"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "companions field is null"
+    ],
+    "businessRules": [
+      "Companions hidden when status is CANCELLED",
+      "Companions hidden when status is COMPLETED",
+      "Status blocks reveal regardless of timing",
+      "Per SDS v1.2.0 section 4.D: companions null when status is CANCELLED or COMPLETED"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests status-based reveal blocking (CANCELLED, COMPLETED)",
+    "Validates companions: null for terminal statuses",
+    "Uses test variants to cover both CANCELLED and COMPLETED",
+    "Per SDS v1.2.0 section 4.D: statusBlocksReveal = (status === CANCELLED || status === COMPLETED)"
+  ]
+}

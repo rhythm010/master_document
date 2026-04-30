@@ -34,9 +34,15 @@ export const companionProfileService = {
       languages = Array.from(new Set(languages));
     }
 
+    let profilePictureUrl = input.profilePictureUrl;
+    if (profilePictureUrl !== undefined) {
+      // Trim whitespace from profile picture URL. Empty string is allowed (removes picture).
+      profilePictureUrl = profilePictureUrl.trim();
+    }
+
     const updated = await companionProfileRepository.updateProfile(prisma, userId, {
       languages,
-      profilePictureUrl: input.profilePictureUrl
+      profilePictureUrl
     });
 
     return toCompanionProfile(updated);

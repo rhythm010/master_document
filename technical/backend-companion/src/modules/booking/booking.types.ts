@@ -35,5 +35,13 @@ export type BookingDetailsDTO = {
   startAt: string;
   endAt: string;
   createdAt: string;
-  companions?: BookingCompanionPublicInfoDTO[] | null;
+  companions: BookingCompanionPublicInfoDTO[] | null;
+};
+
+export type InternalEditBookingRequestDTO = {
+  bookingId: string;
+  venueId?: string;
+  startAt?: string;
+  captainCompanionId?: string;
+  viceCaptainCompanionId?: string;
 };

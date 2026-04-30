@@ -1,6 +1,6 @@
 {
-  "designMode": "SPEC_DRIVEN_DRAFT",
-  "artifactStatus": "DRAFT_SPEC",
+  "designMode": "EXECUTABLE_FINALIZATION",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scopeChosen": "Feature Module Tests - Booking & Allocation",
   "linkedRequirements": [
     "booking-and-allocation/create-booking",
@@ -15,7 +15,7 @@
   ],
   "analyzedInputs": [
     "/SDS/core_sds.md",
-    "/SDS/feature-sds/booking-and-allocation.feature-sds.md (v1.1.1)"
+    "/SDS/feature-sds/booking-and-allocation.feature-sds.md (v1.2.0)"
   ],
   "module": "booking",
   "modulePath": "technical/backend-companion/src/modules/booking",
@@ -56,13 +56,16 @@
     {
       "testId": "MOD-BOOKING-003",
       "fileName": "MOD-BOOKING-003-get-booking-details-happy-path.json",
-      "scenarioName": "Get Booking Details - Happy Path",
+      "scenarioName": "Get Booking Details - Happy Path (Companions Revealed)",
       "flowType": "happy",
-      "objective": "Validate authorized retrieval of minimal booking details",
+      "objective": "Validate authorized retrieval of booking details with companion information revealed (within T-5h window)",
       "endpoints": ["GET /bookings/:id/details"],
       "coverage": [
-        "Authorization (owner, assigned companion, admin)",
-        "Minimal details response contract",
+        "Authorization (CLIENT role only, booking owner)",
+        "Booking details response contract (SDS v1.2.0)",
+        "Companion reveal timing logic (current time >= startAt - 5 hours)",
+        "Companions array structure and ordering (CAPTAIN first, VICE_CAPTAIN second)",
+        "Companion public info fields (displayName, languages, profilePictureUrl, averageRating)",
         "Field type validation (UUIDs, ISO-8601, enums)"
       ]
     },
@@ -72,7 +75,7 @@
       "scenarioName": "Internal Edit - Change Venue and Time (Happy Path)",
       "flowType": "happy",
       "objective": "Validate internal edit of venue/time with atomic roster swap and artifact stability",
-      "endpoints": ["PATCH /bookings/{id}"],
+      "endpoints": ["PATCH /bookings/:id"],
       "coverage": [
         "Internal token authentication (X-Internal-Token)",
         "Booking safety validations (CONFIRMED, not extended, not started, not progressed)",
@@ -88,7 +91,7 @@
       "scenarioName": "Internal Edit - Manual Duo Reassignment (Happy Path)",
       "flowType": "happy",
       "objective": "Validate manual duo reassignment with roster swap and status reset",
-      "endpoints": ["PATCH /bookings/{id}"],
+      "endpoints": ["PATCH /bookings/:id"],
       "coverage": [
         "Manual reassignment (both companion IDs required)",
         "Designation validation (CAPTAIN, VICE_CAPTAIN)",
@@ -160,7 +163,7 @@
       "scenarioName": "Internal Edit - Invalid State/Extended/Progressed (400)",
       "flowType": "edge",
       "objective": "Validate all safety constraints for internal edit endpoint",
-      "endpoints": ["PATCH /bookings/{id}"],
+      "endpoints": ["PATCH /bookings/:id"],
       "testVariants": [
         "Booking status is ACTIVE (not CONFIRMED)",
         "Booking status is CANCELLED",
@@ -179,17 +182,49 @@
         "Atomic failure (rollback on constraint violation)",
         "Error code: INVALID_STATE_TRANSITION"
       ]
+    },
+    {
+      "testId": "MOD-BOOKING-011",
+      "fileName": "MOD-BOOKING-011-get-booking-details-before-reveal-window.json",
+      "scenarioName": "Get Booking Details - Before T-5h Reveal Window (Companions Hidden)",
+      "flowType": "edge",
+      "objective": "Validate that companion information is hidden (companions: null) when current time is before the T-5h reveal window",
+      "endpoints": ["GET /bookings/:id/details"],
+      "coverage": [
+        "Timed reveal boundary condition (current time < startAt - 5 hours)",
+        "companions field is null before reveal window",
+        "Privacy protection for companion information",
+        "Authorization (CLIENT role, booking owner only)"
+      ]
+    },
+    {
+      "testId": "MOD-BOOKING-012",
+      "fileName": "MOD-BOOKING-012-get-booking-details-cancelled-completed-null-companions.json",
+      "scenarioName": "Get Booking Details - CANCELLED/COMPLETED Status (Companions Hidden)",
+      "flowType": "edge",
+      "objective": "Validate that companion information is hidden (companions: null) when booking status is CANCELLED or COMPLETED",
+      "endpoints": ["GET /bookings/:id/details"],
+      "testVariants": [
+        "Booking status is CANCELLED",
+        "Booking status is COMPLETED"
+      ],
+      "coverage": [
+        "Status-based reveal blocking (CANCELLED, COMPLETED)",
+        "companions field is null for terminal statuses",
+        "Status blocks reveal regardless of timing",
+        "Privacy protection for terminal bookings"
+      ]
     }
   ],
   "coverageSummary": {
     "happyPaths": 5,
-    "edgeCases": 5,
-    "totalTests": 10,
+    "edgeCases": 7,
+    "totalTests": 12,
     "endpoints": [
       "POST /bookings",
       "POST /bookings/:id/cancel",
       "GET /bookings/:id/details",
-      "PATCH /bookings/{id} (INTERNAL ONLY)"
+      "PATCH /bookings/:id (INTERNAL ONLY)"
     ],
     "businessRulesValidated": [
       "One non-terminal booking per client",
@@ -199,12 +234,15 @@
       "State machine enforcement (CONFIRMED → ACTIVE → COMPLETED, CONFIRMED/ACTIVE → CANCELLED)",
       "Internal edit safety constraints",
       "Idempotent cancellation",
-      "Atomic transactions"
+      "Atomic transactions",
+      "Timed companion reveal (T-5h window)",
+      "Status-based companion reveal blocking (CANCELLED, COMPLETED)",
+      "CLIENT-only authorization for booking details endpoint"
     ],
     "authorizationPatterns": [
       "Bearer token (CLIENT role) for booking creation",
       "Bearer token (booking owner, assigned companion, admin) for cancellation",
-      "Bearer token (authorized users) for details retrieval",
+      "Bearer token (CLIENT role, booking owner only) for details retrieval",
       "Internal token (X-Internal-Token) for internal edit"
     ],
     "databaseEntities": [
@@ -227,22 +265,17 @@
     "Artifact stability testing (qrCode, pinCode, etc. unchanged across edits)"
   ],
   "nextSteps": [
-    "Await implementation completion from Coding Agent",
-    "Transition to EXECUTABLE_FINALIZATION mode",
-    "Populate concrete endpoint paths, DB queries, and technical details",
-    "Add actual seeding logic and test execution flows",
     "Validate with Test Validator Agent"
   ],
-  "openQuestions": [
-    "Exact response contract for GET /bookings/:id/details (minimal fields not fully specified in SDS)",
-    "Whether companion assignment details are included in details endpoint response",
-    "Exact error message formats (only codes specified in SDS)"
-  ],
+  "openQuestions": [],
   "notes": [
-    "All test designs reference Feature SDS v1.1.1 (latest version)",
-    "Tests cover all 4 endpoints mentioned in requirements",
+    "All test designs updated to reference Feature SDS v1.2.0",
+    "Tests cover all 4 endpoints: POST /bookings, POST /bookings/:id/cancel, GET /bookings/:id/details, PATCH /bookings/:id",
+    "GET /bookings/:id/details now includes timed companion reveal logic (T-5h window)",
+    "PATCH /bookings/:id endpoint path corrected from /bookings/{id}",
     "Internal edit endpoint has comprehensive safety constraint coverage",
     "Idempotency and state machine enforcement are thoroughly tested",
-    "Designs follow Test Designer Agent instructions (step objects with layman descriptions, no hardcoded payloads)"
+    "Designs follow Test Designer Agent instructions (step objects with layman descriptions, no hardcoded payloads)",
+    "Transitioned from DRAFT_SPEC to FINALIZED_EXECUTABLE after Coding Agent implementation"
   ]
 }

@@ -6,7 +6,9 @@ import { bookingService } from "./booking.service";
 import {
   bookingDetailsParamsSchema,
   cancelBookingParamsSchema,
-  createBookingSchema
+  createBookingSchema,
+  internalEditBookingBodySchema,
+  internalEditBookingParamsSchema
 } from "./booking.schema";
 
 export const bookingController = {
@@ -42,6 +44,22 @@ export const bookingController = {
     const result = await bookingService.getBookingDetails({
       bookingId: params.id,
       clientId: req.user!.id
+    });
+
+    res.status(200).json(result);
+  }),
+
+  // Internal-only edit of a CONFIRMED booking (time/venue and optional duo reassignment).
+  internalEditBooking: asyncHandler(async (req: Request, res: Response) => {
+    const params = internalEditBookingParamsSchema.parse(req.params);
+    const input = internalEditBookingBodySchema.parse(req.body);
+
+    const result = await bookingService.internalEditBooking({
+      bookingId: params.id,
+      venueId: input.venueId,
+      startAt: input.startAt,
+      captainCompanionId: input.captainCompanionId,
+      viceCaptainCompanionId: input.viceCaptainCompanionId
     });
 
     res.status(200).json(result);

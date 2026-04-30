@@ -92,6 +92,50 @@ describe("companionProfileService", () => {
     ).rejects.toMatchObject({ code: ErrorCodes.INVALID_LANGUAGE });
   });
 
+  test("updateProfile trims profilePictureUrl", async () => {
+    const { companionProfileRepository } = requireMock("../companion-profile.repository");
+
+    companionProfileRepository.findByUserId.mockResolvedValue(profileRecord);
+    companionProfileRepository.updateProfile.mockResolvedValue({
+      ...profileRecord,
+      profilePictureUrl: "https://example.com/pic.jpg"
+    });
+
+    await companionProfileService.updateProfile("user-1", {
+      profilePictureUrl: "  https://example.com/pic.jpg  "
+    });
+
+    expect(companionProfileRepository.updateProfile).toHaveBeenCalledWith(
+      expect.any(Object),
+      "user-1",
+      expect.objectContaining({
+        profilePictureUrl: "https://example.com/pic.jpg"
+      })
+    );
+  });
+
+  test("updateProfile allows empty string for profilePictureUrl", async () => {
+    const { companionProfileRepository } = requireMock("../companion-profile.repository");
+
+    companionProfileRepository.findByUserId.mockResolvedValue(profileRecord);
+    companionProfileRepository.updateProfile.mockResolvedValue({
+      ...profileRecord,
+      profilePictureUrl: ""
+    });
+
+    await companionProfileService.updateProfile("user-1", {
+      profilePictureUrl: "   "
+    });
+
+    expect(companionProfileRepository.updateProfile).toHaveBeenCalledWith(
+      expect.any(Object),
+      "user-1",
+      expect.objectContaining({
+        profilePictureUrl: ""
+      })
+    );
+  });
+
   test("toggleActive updates the profile", async () => {
     const { companionProfileRepository } = requireMock("../companion-profile.repository");
 

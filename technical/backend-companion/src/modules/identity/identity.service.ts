@@ -81,6 +81,22 @@ export const identityService = {
       return createdUser;
     });
 
+    // Trigger roster provisioning for companions after profile creation commits.
+    if (input.role === "COMPANION") {
+      try {
+        const venues = await prisma.venue.findMany({ select: { id: true } });
+        if (venues.length > 0) {
+          const { rosterService } = await import("../roster");
+          await rosterService.populateForCompanion({
+            companionId: user.id,
+            venueIds: venues.map((v) => v.id)
+          });
+        }
+      } catch (error) {
+        logger.error({ error, userId: user.id }, "roster provisioning failed during companion signup");
+      }
+    }
+
     // Send a verification email; do not fail signup if delivery fails.
     const token = signEmailVerifyToken({ sub: user.id, email: user.email });
     try {

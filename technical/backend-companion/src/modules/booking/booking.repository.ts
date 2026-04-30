@@ -188,5 +188,130 @@ export const bookingRepository = {
           }
         }
       }
+    }),
+
+  // Lock and return booking fields required for internal edits.
+  lockBookingForInternalEdit: (db: DbClient, bookingId: string) =>
+    db.$queryRaw<
+      {
+        id: string;
+        status: "CONFIRMED" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+        clientId: string;
+        venueId: string;
+        startAt: Date;
+        endAt: Date;
+        extendedAt: Date | null;
+        createdAt: Date;
+      }[]
+    >(Prisma.sql`
+      SELECT
+        b.id,
+        b.status,
+        b.client_id as "clientId",
+        b.venue_id as "venueId",
+        b.start_at as "startAt",
+        b.end_at as "endAt",
+        b.extended_at as "extendedAt",
+        b.created_at as "createdAt"
+      FROM "bookings" b
+      WHERE b.id = ${bookingId}::uuid
+      FOR UPDATE
+    `),
+
+  // Lock and return assignment rows for internal edit precondition checks.
+  lockAssignmentsForBooking: (db: DbClient, bookingId: string) =>
+    db.$queryRaw<
+      {
+        id: string;
+        designation: "CAPTAIN" | "VICE_CAPTAIN";
+        companionId: string;
+        presenceStatus: "ASSIGNED" | "ARRIVED";
+        selfMatchStatus: "NOT_MATCHED" | "MATCHED";
+        clientMatchStatus: "WAITING_FOR_CLIENT" | "CLIENT_MATCHED";
+      }[]
+    >(Prisma.sql`
+      SELECT
+        bca.id,
+        bca.designation,
+        bca.companion_id as "companionId",
+        bca.presence_status as "presenceStatus",
+        bca.self_match_status as "selfMatchStatus",
+        bca.client_match_status as "clientMatchStatus"
+      FROM "booking_companion_assignments" bca
+      WHERE bca.booking_id = ${bookingId}::uuid
+      FOR UPDATE
+    `),
+
+  // Fetch a companion's stored designation for internal validation.
+  findCompanionDesignation: async (db: DbClient, companionId: string) => {
+    const profile = await db.companionProfile.findUnique({
+      where: { userId: companionId },
+      select: { designation: true }
+    });
+
+    return profile?.designation ?? null;
+  },
+
+  // Lock AVAILABLE roster slots for a specific duo/window in a single deterministic statement.
+  lockAvailableRosterSlotsForCompanions: (
+    db: DbClient,
+    input: { venueId: string; startAt: Date; endAt: Date; companionIds: [string, string] }
+  ) =>
+    db.$queryRaw<{ id: string; companionId: string }[]>(Prisma.sql`
+      SELECT rs.id, rs.companion_id as "companionId"
+      FROM "roster_slots" rs
+      WHERE rs.venue_id = ${input.venueId}::uuid
+        AND rs.start_at = ${input.startAt}::timestamptz
+        AND rs.end_at = ${input.endAt}::timestamptz
+        AND rs.status = 'AVAILABLE'
+        AND rs.companion_id IN (${Prisma.join(
+          input.companionIds.map((companionId) => Prisma.sql`${companionId}::uuid`)
+        )})
+      FOR UPDATE OF rs SKIP LOCKED
+    `),
+
+  // Book a set of locked roster slots for the given booking.
+  bookRosterSlotsForBooking: (db: DbClient, input: { slotIds: string[]; bookingId: string }) =>
+    db.rosterSlot.updateMany({
+      where: {
+        id: { in: input.slotIds },
+        status: "AVAILABLE"
+      },
+      data: {
+        status: "BOOKED",
+        bookingId: input.bookingId
+      }
+    }),
+
+  // Update booking venue/start/end without touching any booking artifacts.
+  updateBookingVenueTime: (
+    db: DbClient,
+    bookingId: string,
+    input: { venueId: string; startAt: Date; endAt: Date }
+  ) =>
+    db.booking.update({
+      where: { id: bookingId },
+      data: {
+        venueId: input.venueId,
+        startAt: input.startAt,
+        endAt: input.endAt
+      },
+      select: {
+        id: true,
+        status: true,
+        clientId: true,
+        venueId: true,
+        startAt: true,
+        endAt: true,
+        createdAt: true
+      }
+    }),
+
+  // Remove existing companion assignments for the booking.
+  deleteAssignmentsForBooking: (db: DbClient, bookingId: string) =>
+    db.bookingCompanionAssignment.deleteMany({
+      where: {
+        bookingId
+      }
     })
 };
