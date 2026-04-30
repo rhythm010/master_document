@@ -1,13 +1,13 @@
 {
   "testId": "MOD-BOOKING-010",
-  "artifactStatus": "DRAFT_SPEC",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scenarioName": "Internal Edit - Invalid State/Extended/Progressed (400)",
   "flowType": "edge",
   "linkedRequirement": "booking-and-allocation/internal-edit-safety-constraints",
   "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-010-internal-edit-invalid-state-extended-progressed.json",
   "executionMode": "api+db+internalAuth",
   "objective": "Validate that internal edit is rejected when booking is not CONFIRMED, is extended, has started, or has progressed past default match/presence statuses",
-  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.2.0",
   "testVariants": [
     {
       "variantId": "A",
@@ -159,7 +159,7 @@
       "actor": "InternalService",
       "actionType": "apiRequest",
       "method": "PATCH",
-      "endpoint": "/bookings/{id}",
+      "endpoint": "/bookings/:id",
       "authType": "InternalToken",
       "headers": {
         "X-Internal-Token": "{{VALID_INTERNAL_TOKEN}}"

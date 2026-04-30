@@ -1,13 +1,13 @@
 {
   "testId": "MOD-BOOKING-005",
-  "artifactStatus": "DRAFT_SPEC",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scenarioName": "Internal Edit - Manual Duo Reassignment (Happy Path)",
   "flowType": "happy",
   "linkedRequirement": "booking-and-allocation/internal-edit-reassignment",
   "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-005-internal-edit-reassign-duo-happy-path.json",
   "executionMode": "api+db+internalAuth",
   "objective": "Validate that an internal service can manually reassign a different duo to a CONFIRMED booking while preserving booking artifacts",
-  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.2.0",
   "seedData": [
     {
       "entity": "user",
@@ -64,7 +64,7 @@
       "actor": "InternalService",
       "actionType": "apiRequest",
       "method": "PATCH",
-      "endpoint": "/bookings/{id}",
+      "endpoint": "/bookings/:id",
       "authType": "InternalToken",
       "headers": {
         "X-Internal-Token": "{{VALID_INTERNAL_TOKEN}}"

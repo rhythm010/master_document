@@ -1,18 +1,21 @@
 {
   "testId": "MOD-BOOKING-003",
-  "artifactStatus": "DRAFT_SPEC",
-  "scenarioName": "Get Booking Details - Happy Path",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get Booking Details - Happy Path (Companions Revealed)",
   "flowType": "happy",
   "linkedRequirement": "booking-and-allocation/get-booking-details",
   "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-003-get-booking-details-happy-path.json",
   "executionMode": "api+db+auth",
-  "objective": "Validate that an authorized user can retrieve minimal booking details",
-  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.1.1",
+  "objective": "Validate that the booking owner can retrieve booking details with companion information revealed when within the T-5h window before booking start time",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.2.0",
   "seedData": [
     {
       "entity": "user",
       "role": "CLIENT",
       "count": 1,
+      "fields": {
+        "nickname": "TestClient"
+      },
       "description": "Client user who owns the booking"
     },
     {
@@ -20,25 +23,59 @@
       "count": 1
     },
     {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 1,
+      "fields": {
+        "nickname": "CaptainNick"
+      },
+      "description": "User account for captain companion"
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 1,
+      "fields": {
+        "nickname": "ViceCaptainNick"
+      },
+      "description": "User account for vice captain companion"
+    },
+    {
       "entity": "companion_profile",
       "designation": "CAPTAIN",
-      "count": 1
+      "count": 1,
+      "fields": {
+        "languages": ["English", "Spanish"],
+        "profilePictureUrl": "https://example.com/captain.jpg",
+        "averageRating": 4.85
+      },
+      "description": "Captain companion profile linked to CaptainNick user"
     },
     {
       "entity": "companion_profile",
       "designation": "VICE_CAPTAIN",
-      "count": 1
+      "count": 1,
+      "fields": {
+        "languages": ["English", "French"],
+        "profilePictureUrl": "https://example.com/vice.jpg",
+        "averageRating": 4.72
+      },
+      "description": "Vice Captain companion profile linked to ViceCaptainNick user"
     },
     {
       "entity": "booking",
       "status": "CONFIRMED",
       "count": 1,
-      "description": "Existing booking with all artifacts populated"
+      "fields": {
+        "startAt": "{{FUTURE_TIMESTAMP_WITHIN_5H_WINDOW}}",
+        "endAt": "{{FUTURE_TIMESTAMP_WITHIN_5H_WINDOW + 2 hours}}"
+      },
+      "description": "Existing booking with startAt within T-5h reveal window (current time >= startAt - 5 hours)"
     },
     {
       "entity": "booking_companion_assignment",
       "count": 2,
-      "description": "Duo assignments for the booking"
+      "description": "Duo assignments for the booking (CAPTAIN and VICE_CAPTAIN)"
     }
   ],
   "steps": [
@@ -61,22 +98,34 @@
       "actionType": "authorization",
       "expectedBehavior": [
         "Verify booking exists",
-        "Verify caller is authorized (owner client, assigned companion, or admin)"
+        "Verify caller is CLIENT role",
+        "Verify caller is the booking owner (booking.clientId === authenticated user ID)"
       ],
-      "layman": "System verifies the caller has access to this booking"
+      "layman": "System verifies the caller is the booking owner with CLIENT role"
     },
     {
       "step": 3,
       "actor": "System",
       "actionType": "dbQuery",
       "expectedBehavior": [
-        "Fetch booking by ID",
-        "Include minimal details as per endpoint contract"
+        "Fetch booking by ID from bookings table",
+        "Calculate if companions should be revealed: currentTime >= (startAt - 5 hours) AND status NOT IN (CANCELLED, COMPLETED)"
       ],
-      "layman": "System retrieves the booking information from database"
+      "layman": "System retrieves booking and determines if companion info should be revealed based on timing and status"
     },
     {
       "step": 4,
+      "actor": "System",
+      "actionType": "dbQuery",
+      "expectedBehavior": [
+        "Fetch companion public info from booking_companion_assignments JOIN companion_profiles JOIN users",
+        "Include fields: designation, displayName (from users.nickname), languages, profilePictureUrl, averageRating",
+        "Order by designation (CAPTAIN first, VICE_CAPTAIN second)"
+      ],
+      "layman": "System retrieves companion public information for the booking"
+    },
+    {
+      "step": 5,
       "actor": "System",
       "actionType": "apiResponse",
       "expectedStatus": 200,
@@ -87,55 +136,72 @@
         "venueId",
         "startAt",
         "endAt",
-        "createdAt"
+        "createdAt",
+        "companions"
       ],
-      "expectedOptionalFields": [
-        "qrCode",
-        "pinCode",
-        "bookingColor",
-        "extendedAt"
-      ],
-      "layman": "System returns the booking details to the caller"
+      "expectedCompanionsStructure": {
+        "type": "array",
+        "length": 2,
+        "order": ["CAPTAIN", "VICE_CAPTAIN"],
+        "itemShape": {
+          "designation": "CAPTAIN | VICE_CAPTAIN",
+          "displayName": "string (from users.nickname)",
+          "languages": ["array of strings"],
+          "profilePictureUrl": "string",
+          "averageRating": "number"
+        }
+      },
+      "layman": "System returns booking details with companions array containing 2 companion objects"
     },
     {
-      "step": 5,
+      "step": 6,
       "actor": "TestExecutor",
       "actionType": "responseValidation",
       "expectedBehavior": [
         "Validate all required fields are present",
         "Validate data types (UUIDs, ISO-8601 timestamps, status enum)",
-        "Validate endAt = startAt + 2 hours (or +3 if extended)",
-        "Validate status is one of: CONFIRMED, ACTIVE, COMPLETED, CANCELLED"
+        "Validate companions is an array with exactly 2 items",
+        "Validate companions[0].designation === 'CAPTAIN'",
+        "Validate companions[1].designation === 'VICE_CAPTAIN'",
+        "Validate each companion has: designation, displayName, languages (array), profilePictureUrl, averageRating",
+        "Validate displayName matches users.nickname (NOT full name/email/phone)",
+        "Validate no PII exposed (no qrCode, pinCode, comMatchQrCode, comMatchPinCode in response)"
       ],
-      "layman": "Verify the response contains correct and complete booking information"
+      "layman": "Verify the response contains correct booking information with properly structured companion data"
     }
   ],
   "assertions": {
     "api": [
       "Response status is 200",
-      "All required fields present",
-      "Field types match schema",
-      "No sensitive companion data exposed (this is minimal details endpoint)"
+      "All required fields present in response",
+      "Field types match schema (UUIDs, ISO-8601, enums)",
+      "companions is an array with exactly 2 items",
+      "companions[0].designation === 'CAPTAIN'",
+      "companions[1].designation === 'VICE_CAPTAIN'",
+      "Each companion object has: designation, displayName, languages, profilePictureUrl, averageRating",
+      "No PII exposed (no qrCode, pinCode, comMatchQrCode, comMatchPinCode)"
     ],
     "authorization": [
-      "Only authorized users can access booking details",
-      "Booking owner can view",
-      "Assigned companions can view",
-      "Admin can view"
+      "Only CLIENT role can access this endpoint",
+      "Only booking owner can view their booking details",
+      "Forbidden for other clients"
     ],
     "businessRules": [
-      "Booking details reflect current state",
-      "Timestamps are in ISO-8601 format",
-      "Status is valid booking state"
+      "Companions revealed when current time >= (startAt - 5 hours) AND status IN (CONFIRMED, ACTIVE)",
+      "displayName is from users.nickname (no full name, email, phone)",
+      "Companion array ordered: CAPTAIN first, VICE_CAPTAIN second",
+      "languages is an array from companion_profiles.languages",
+      "profilePictureUrl is from companion_profiles.profile_picture_url",
+      "averageRating is from companion_profiles.average_rating"
     ]
   },
-  "openQuestions": [
-    "Exact fields returned by /details endpoint (contract not fully specified in SDS)",
-    "Whether companion assignments are included in response"
-  ],
+  "openQuestions": [],
   "notes": [
-    "Tests basic read operation",
-    "Validates minimal details contract",
-    "Does not test full booking details with assignments (if separate endpoint exists)"
+    "Tests booking details retrieval with companion reveal logic",
+    "Validates timed reveal window (T-5h)",
+    "Validates CLIENT-only authorization (SDS v1.2.0 section 5)",
+    "Validates companion array structure and ordering",
+    "Validates no PII exposure (displayName from nickname only)",
+    "Per SDS v1.2.0 section 4.D: companions field with timed reveal rules"
   ]
 }

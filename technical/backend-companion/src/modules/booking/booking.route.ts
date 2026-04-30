@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { authMiddleware } from "../../shared/middleware/auth";
+import { internalAuth } from "../../shared/middleware/internalAuth";
 import { requireRole } from "../../shared/middleware/requireRole";
 
 import { bookingController } from "./booking.controller";
@@ -20,5 +21,8 @@ router.get(
   requireRole("CLIENT"),
   bookingController.getBookingDetails
 );
+
+// Internal-only edit endpoint for admin tooling/services.
+router.patch("/bookings/:id", internalAuth, bookingController.internalEditBooking);
 
 export { router as bookingRouter };

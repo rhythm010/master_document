@@ -15,7 +15,10 @@ jest.mock("../../../shared/config", () => ({
 
 jest.mock("../../../shared/db/prisma", () => ({
   prisma: {
-    $transaction: jest.fn()
+    $transaction: jest.fn(),
+    venue: {
+      findMany: jest.fn()
+    }
   }
 }));
 
@@ -102,6 +105,7 @@ describe("identityService", () => {
       const tx = {};
       return callback(tx);
     });
+    prisma.venue.findMany.mockResolvedValue([]);
 
     const { __limiter } = requireMock("../../../shared/utils/rateLimiter");
     __limiter.isLimited.mockReturnValue(false);
@@ -151,9 +155,10 @@ describe("identityService", () => {
     );
   });
 
-  test("signup creates a companion profile and does not populate roster", async () => {
+  test("signup creates a companion profile and populates roster when venues exist", async () => {
     const { identityRepository } = requireMock("../identity.repository");
     const { rosterService } = requireMock("../../roster");
+    const { prisma } = requireMock("../../../shared/db/prisma");
 
     identityRepository.findUserByEmail.mockResolvedValue(null);
     identityRepository.countCompanionsByDesignation
@@ -161,12 +166,21 @@ describe("identityService", () => {
       .mockResolvedValueOnce(2);
     identityRepository.createUser.mockResolvedValue({
       ...baseUser,
+      id: "companion-user-1",
       role: "COMPANION" as const
     });
     identityRepository.createCompanionProfile.mockResolvedValue({
       id: "profile-1",
-      userId: "user-1",
+      userId: "companion-user-1",
       designation: "CAPTAIN"
+    });
+    prisma.venue.findMany.mockResolvedValue([
+      { id: "venue-1" },
+      { id: "venue-2" }
+    ]);
+    rosterService.populateForCompanion.mockResolvedValue({
+      companionId: "companion-user-1",
+      slotsCreated: 100
     });
 
     await identityService.signup({
@@ -182,6 +196,48 @@ describe("identityService", () => {
       expect.any(Object),
       expect.objectContaining({ designation: "CAPTAIN" })
     );
+    expect(prisma.venue.findMany).toHaveBeenCalledWith({ select: { id: true } });
+    expect(rosterService.populateForCompanion).toHaveBeenCalledWith({
+      companionId: "companion-user-1",
+      venueIds: ["venue-1", "venue-2"]
+    });
+  });
+
+  test("signup creates a companion profile but does not populate roster when no venues exist", async () => {
+    const { identityRepository } = requireMock("../identity.repository");
+    const { rosterService } = requireMock("../../roster");
+    const { prisma } = requireMock("../../../shared/db/prisma");
+
+    identityRepository.findUserByEmail.mockResolvedValue(null);
+    identityRepository.countCompanionsByDesignation
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(2);
+    identityRepository.createUser.mockResolvedValue({
+      ...baseUser,
+      id: "companion-user-2",
+      role: "COMPANION" as const
+    });
+    identityRepository.createCompanionProfile.mockResolvedValue({
+      id: "profile-2",
+      userId: "companion-user-2",
+      designation: "CAPTAIN"
+    });
+    prisma.venue.findMany.mockResolvedValue([]);
+
+    await identityService.signup({
+      role: "COMPANION",
+      name: "Test User",
+      nickname: "Tester",
+      email: "companion2@example.com",
+      password: "Passw0rd!",
+      biometricAuthEnabled: false
+    });
+
+    expect(identityRepository.createCompanionProfile).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ designation: "CAPTAIN" })
+    );
+    expect(prisma.venue.findMany).toHaveBeenCalledWith({ select: { id: true } });
     expect(rosterService.populateForCompanion).not.toHaveBeenCalled();
   });
 

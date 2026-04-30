@@ -13,6 +13,8 @@ export const bookingErrors = {
       "Client already has a non-terminal booking",
       409
     ),
+  // Raised when a CAPTAIN+VICE_CAPTAIN pair cannot be reserved.
+  noDuoAvailable: () => new AppError(ErrorCodes.NO_DUO_AVAILABLE, "No duo available", 409),
   // Raised when attempting an invalid booking state transition.
   invalidStateTransition: () =>
     new AppError(ErrorCodes.INVALID_STATE_TRANSITION, "Invalid state transition", 400),
@@ -21,6 +23,10 @@ export const bookingErrors = {
     new AppError(ErrorCodes.COMPANION_NOT_ASSIGNED, "Companion not assigned", 403),
   // Raised when a caller is authenticated but not allowed to act on the booking.
   forbidden: () => new AppError(ErrorCodes.FORBIDDEN, "Forbidden", 403),
+  // Raised for malformed or missing input.
+  validationError: (message: string) => new AppError(ErrorCodes.VALIDATION_ERROR, message, 400),
   // Raised when timestamp parsing fails.
-  invalidTimestamp: () => new AppError(ErrorCodes.VALIDATION_ERROR, "Invalid timestamp", 400)
+  invalidTimestamp: () => new AppError(ErrorCodes.VALIDATION_ERROR, "Invalid timestamp", 400),
+  // Raised when a data-integrity check fails inside a transactional workflow.
+  internalError: (message: string) => new AppError(ErrorCodes.INTERNAL_ERROR, message, 500)
 };

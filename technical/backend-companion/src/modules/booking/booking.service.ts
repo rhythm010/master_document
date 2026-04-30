@@ -179,6 +179,51 @@ export const bookingService = {
       ...response,
       companions: companions ?? null
     };
+  },
+
+  // Internal-only edit of a booking (CONFIRMED only) with atomic release+reserve+assignment update.
+  async internalEditBooking(input: {
+    bookingId: string;
+    venueId?: string;
+    startAt?: string;
+    captainCompanionId?: string;
+    viceCaptainCompanionId?: string;
+  }): Promise<BookingSummaryDTO> {
+    const parsedStartAt = input.startAt ? parseIsoInstant(input.startAt) : undefined;
+
+    const maxAttempts = 3;
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      try {
+        const result = await prisma.$transaction(async (tx) =>
+          internalEditBookingCore(tx, {
+            bookingId: input.bookingId,
+            venueId: input.venueId,
+            startAt: parsedStartAt,
+            captainCompanionId: input.captainCompanionId,
+            viceCaptainCompanionId: input.viceCaptainCompanionId
+          })
+        );
+
+        return {
+          id: result.id,
+          status: result.status,
+          clientId: result.clientId,
+          venueId: result.venueId,
+          startAt: result.startAt.toISOString(),
+          endAt: result.endAt.toISOString(),
+          createdAt: result.createdAt.toISOString()
+        };
+      } catch (error) {
+        const retriesRemaining = attempt < maxAttempts - 1;
+        if (!retriesRemaining || !isRetryableInternalEditError(error)) {
+          throw error;
+        }
+
+        await sleepWithJitter({ baseMs: 25, jitterMs: 50 });
+      }
+    }
+
+    throw bookingErrors.internalError("Internal edit retries exhausted");
   }
 };
 
@@ -318,4 +363,198 @@ async function ensureCancelAuthorized(
   }
 
   throw bookingErrors.forbidden();
+}
+
+// Perform the internal edit workflow inside a caller-owned transaction.
+async function internalEditBookingCore(
+  tx: Prisma.TransactionClient,
+  input: {
+    bookingId: string;
+    venueId?: string;
+    startAt?: Date;
+    captainCompanionId?: string;
+    viceCaptainCompanionId?: string;
+  }
+) {
+  const [booking] = await bookingRepository.lockBookingForInternalEdit(tx, input.bookingId);
+  if (!booking) {
+    throw bookingErrors.bookingNotFound();
+  }
+
+  if (booking.status !== "CONFIRMED") {
+    throw bookingErrors.invalidStateTransition();
+  }
+
+  if (booking.extendedAt) {
+    throw bookingErrors.invalidStateTransition();
+  }
+
+  const now = new Date();
+  if (now.getTime() >= booking.startAt.getTime()) {
+    throw bookingErrors.invalidStateTransition();
+  }
+
+  if (input.venueId) {
+    const venue = await bookingRepository.findVenueById(tx, input.venueId);
+    if (!venue) {
+      throw bookingErrors.venueNotFound();
+    }
+  }
+
+  const assignments = await bookingRepository.lockAssignmentsForBooking(tx, booking.id);
+  const captainAssignment = assignments.find((row) => row.designation === "CAPTAIN");
+  const viceAssignment = assignments.find((row) => row.designation === "VICE_CAPTAIN");
+
+  if (assignments.length !== 2 || !captainAssignment || !viceAssignment) {
+    throw bookingErrors.invalidStateTransition();
+  }
+
+  for (const row of assignments) {
+    const isDefaultStatuses =
+      row.presenceStatus === "ASSIGNED" &&
+      row.selfMatchStatus === "NOT_MATCHED" &&
+      row.clientMatchStatus === "WAITING_FOR_CLIENT";
+
+    if (!isDefaultStatuses) {
+      throw bookingErrors.invalidStateTransition();
+    }
+  }
+
+  const targetVenueId = input.venueId ?? booking.venueId;
+  const targetStartAt = input.startAt ?? booking.startAt;
+
+  if (now.getTime() >= targetStartAt.getTime()) {
+    throw bookingErrors.invalidStateTransition();
+  }
+
+  const targetEndAt = new Date(targetStartAt.getTime() + BOOKING_DURATION_MS);
+
+  const hasCaptainOverride = input.captainCompanionId !== undefined;
+  const hasViceOverride = input.viceCaptainCompanionId !== undefined;
+  if (hasCaptainOverride !== hasViceOverride) {
+    throw bookingErrors.validationError(
+      "Both captainCompanionId and viceCaptainCompanionId must be provided together"
+    );
+  }
+
+  const currentCaptainId = captainAssignment.companionId;
+  const currentViceCaptainId = viceAssignment.companionId;
+
+  let targetCaptainId = currentCaptainId;
+  let targetViceCaptainId = currentViceCaptainId;
+
+  if (hasCaptainOverride && hasViceOverride) {
+    if (input.captainCompanionId === input.viceCaptainCompanionId) {
+      throw bookingErrors.validationError("captainCompanionId and viceCaptainCompanionId must be distinct");
+    }
+
+    const [captainDesignation, viceDesignation] = await Promise.all([
+      bookingRepository.findCompanionDesignation(tx, input.captainCompanionId!),
+      bookingRepository.findCompanionDesignation(tx, input.viceCaptainCompanionId!)
+    ]);
+
+    if (captainDesignation !== "CAPTAIN") {
+      throw bookingErrors.validationError("captainCompanionId must refer to a CAPTAIN");
+    }
+
+    if (viceDesignation !== "VICE_CAPTAIN") {
+      throw bookingErrors.validationError("viceCaptainCompanionId must refer to a VICE_CAPTAIN");
+    }
+
+    targetCaptainId = input.captainCompanionId!;
+    targetViceCaptainId = input.viceCaptainCompanionId!;
+  }
+
+  // Release current slots inside this transaction so edit operations remain atomic.
+  const released = await rosterService.releaseSlotsWithDb(tx, booking.id);
+  if (released.slotsReleased !== 2) {
+    throw bookingErrors.internalError("Unexpected roster slot release count");
+  }
+
+  // Lock both target slots deterministically to avoid deadlocks.
+  const lockedSlots = await bookingRepository.lockAvailableRosterSlotsForCompanions(tx, {
+    venueId: targetVenueId,
+    startAt: targetStartAt,
+    endAt: targetEndAt,
+    companionIds: [targetCaptainId, targetViceCaptainId]
+  });
+
+  if (lockedSlots.length !== 2) {
+    throw bookingErrors.noDuoAvailable();
+  }
+
+  const slotIds = lockedSlots.map((slot) => slot.id);
+  const booked = await bookingRepository.bookRosterSlotsForBooking(tx, {
+    slotIds,
+    bookingId: booking.id
+  });
+
+  if ((booked.count ?? 0) !== 2) {
+    throw bookingErrors.noDuoAvailable();
+  }
+
+  const updatedBooking = await bookingRepository.updateBookingVenueTime(tx, booking.id, {
+    venueId: targetVenueId,
+    startAt: targetStartAt,
+    endAt: targetEndAt
+  });
+
+  const duoChanged =
+    targetCaptainId !== currentCaptainId || targetViceCaptainId !== currentViceCaptainId;
+
+  if (duoChanged) {
+    await bookingRepository.deleteAssignmentsForBooking(tx, booking.id);
+    await bookingRepository.createAssignments(tx, [
+      {
+        bookingId: booking.id,
+        companionId: targetCaptainId,
+        designation: "CAPTAIN"
+      },
+      {
+        bookingId: booking.id,
+        companionId: targetViceCaptainId,
+        designation: "VICE_CAPTAIN"
+      }
+    ]);
+  }
+
+  return updatedBooking;
+}
+
+// Determine whether an internal edit transaction error should trigger a retry.
+function isRetryableInternalEditError(error: unknown) {
+  const maybeAppError = error as { statusCode?: unknown; code?: unknown };
+  if (typeof maybeAppError?.statusCode === "number" && typeof maybeAppError?.code === "string") {
+    return false;
+  }
+
+  const prismaError = error as { code?: unknown; meta?: { code?: unknown } };
+
+  // Prisma wraps deadlocks/serialization failures in P2034 for interactive transactions.
+  if (prismaError?.code === "P2034") {
+    return true;
+  }
+
+  // Raw query failures often expose the Postgres SQLSTATE on meta.code.
+  const sqlState = prismaError?.meta?.code;
+  if (sqlState === "40P01" || sqlState === "40001") {
+    return true;
+  }
+
+  // As a fallback, honor errors that surface SQLSTATE directly.
+  if (prismaError?.code === "40P01" || prismaError?.code === "40001") {
+    return true;
+  }
+
+  return false;
+}
+
+// Sleep for a small jittered backoff duration between retry attempts.
+async function sleepWithJitter(input: { baseMs: number; jitterMs: number }) {
+  const jitter = Math.floor(Math.random() * (input.jitterMs + 1));
+  const delayMs = input.baseMs + jitter;
+
+  await new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), delayMs);
+  });
 }

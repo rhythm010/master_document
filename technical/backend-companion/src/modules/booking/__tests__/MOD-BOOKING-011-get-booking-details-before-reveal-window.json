@@ -1,0 +1,169 @@
+{
+  "testId": "MOD-BOOKING-011",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get Booking Details - Before T-5h Reveal Window (Companions Hidden)",
+  "flowType": "edge",
+  "linkedRequirement": "booking-and-allocation/get-booking-details-timed-reveal",
+  "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-011-get-booking-details-before-reveal-window.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate that companion information is hidden (companions: null) when current time is before the T-5h reveal window",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.2.0",
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "fields": {
+        "nickname": "TestClient"
+      },
+      "description": "Client user who owns the booking"
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 1,
+      "fields": {
+        "nickname": "CaptainNick"
+      },
+      "description": "User account for captain companion"
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 1,
+      "fields": {
+        "nickname": "ViceCaptainNick"
+      },
+      "description": "User account for vice captain companion"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1,
+      "fields": {
+        "languages": ["English", "Spanish"],
+        "profilePictureUrl": "https://example.com/captain.jpg",
+        "averageRating": 4.85
+      },
+      "description": "Captain companion profile"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1,
+      "fields": {
+        "languages": ["English", "French"],
+        "profilePictureUrl": "https://example.com/vice.jpg",
+        "averageRating": 4.72
+      },
+      "description": "Vice Captain companion profile"
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "fields": {
+        "startAt": "{{FUTURE_TIMESTAMP_OUTSIDE_5H_WINDOW}}",
+        "endAt": "{{FUTURE_TIMESTAMP_OUTSIDE_5H_WINDOW + 2 hours}}"
+      },
+      "description": "Booking with startAt MORE than 5 hours in the future (current time < startAt - 5 hours)"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "description": "Duo assignments for the booking (exist in DB but should not be revealed)"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:id/details",
+      "authType": "Bearer",
+      "pathParams": {
+        "id": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [],
+      "layman": "Client requests to view their booking details before the T-5h reveal window"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Verify booking exists",
+        "Verify caller is CLIENT role",
+        "Verify caller is the booking owner"
+      ],
+      "layman": "System verifies the caller is the booking owner"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "dbQuery",
+      "expectedBehavior": [
+        "Fetch booking by ID",
+        "Calculate reveal condition: currentTime >= (startAt - 5 hours)",
+        "Result: reveal = false (current time < startAt - 5 hours)"
+      ],
+      "layman": "System determines companions should NOT be revealed because we're outside the T-5h window"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "id",
+        "status",
+        "clientId",
+        "venueId",
+        "startAt",
+        "endAt",
+        "createdAt",
+        "companions"
+      ],
+      "expectedCompanionsValue": null,
+      "layman": "System returns booking details with companions set to null"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "responseValidation",
+      "expectedBehavior": [
+        "Validate all required fields are present",
+        "Validate companions field exists and is null",
+        "Validate no companion information leaked in response"
+      ],
+      "layman": "Verify companions field is null and no companion info is exposed before reveal window"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "companions field is present and equals null",
+      "No companion information in response"
+    ],
+    "authorization": [
+      "Only booking owner (CLIENT role) can access"
+    ],
+    "businessRules": [
+      "Companions hidden when current time < (startAt - 5 hours)",
+      "Timed reveal enforced per SDS v1.2.0 section 4.D",
+      "Privacy protection: companions not revealed too early"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Tests timed reveal boundary: before T-5h window",
+    "Validates companions: null when reveal condition not met",
+    "Per SDS v1.2.0 section 4.D: companions null when current time < (startAt - 5 hours)",
+    "Companion assignments exist in DB but are not revealed to client yet"
+  ]
+}
