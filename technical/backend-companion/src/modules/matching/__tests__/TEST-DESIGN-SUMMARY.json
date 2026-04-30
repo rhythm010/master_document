@@ -1,0 +1,249 @@
+{
+  "designMode": "EXECUTABLE_FINALIZATION",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scopeChosen": "Feature Module Tests - Matching Flow",
+  "linkedRequirements": [
+    "matching-flow/com-match-context",
+    "matching-flow/com-match-verify",
+    "matching-flow/matching-context",
+    "matching-flow/client-match-start",
+    "matching-flow/matching-location",
+    "matching-flow/client-match-verify"
+  ],
+  "analyzedInputs": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/matching-flow_current.md",
+    "technical/backend-companion/src/modules/matching/*"
+  ],
+  "module": "matching",
+  "modulePath": "technical/backend-companion/src/modules/matching",
+  "testArtifactsLocation": "technical/backend-companion/src/modules/matching/__tests__/",
+  "createdAt": "2026-04-30T00:00:00Z",
+  "filesCreated": [
+    {
+      "testId": "MOD-MATCHING-001",
+      "fileName": "MOD-MATCHING-001-com-match-context-roles.json",
+      "scenarioName": "Com-Match Context - Captain vs Vice Captain",
+      "flowType": "happy",
+      "objective": "Role-specific com-match context responses",
+      "endpoints": [
+        "GET /bookings/:bookingId/com-match/context"
+      ],
+      "coverage": [
+        "Presence gate enforcement",
+        "Role-specific QR/PIN exposure",
+        "CAPTAIN/VICE_CAPTAIN authorization"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-002",
+      "fileName": "MOD-MATCHING-002-com-match-context-presence-not-arrived.json",
+      "scenarioName": "Com-Match Context - Presence Not Arrived (400)",
+      "flowType": "edge",
+      "objective": "Reject context when presence not arrived",
+      "endpoints": [
+        "GET /bookings/:bookingId/com-match/context"
+      ],
+      "coverage": [
+        "PRESENCE_NOT_ARRIVED error",
+        "No QR/PIN exposure"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-003",
+      "fileName": "MOD-MATCHING-003-com-match-verify-happy-idempotent.json",
+      "scenarioName": "Com-Match Verify - Happy Path and Idempotent",
+      "flowType": "happy",
+      "objective": "Verify com-match with QR/PIN and idempotent success",
+      "endpoints": [
+        "POST /bookings/:bookingId/com-match/verify"
+      ],
+      "coverage": [
+        "VICE_CAPTAIN-only verification",
+        "QR/PIN validation",
+        "Self match updates",
+        "Idempotent response"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-004",
+      "fileName": "MOD-MATCHING-004-com-match-verify-invalid-qr-pin.json",
+      "scenarioName": "Com-Match Verify - Invalid QR/PIN (400)",
+      "flowType": "edge",
+      "objective": "Reject invalid QR/PIN",
+      "endpoints": [
+        "POST /bookings/:bookingId/com-match/verify"
+      ],
+      "coverage": [
+        "INVALID_QR_OR_PIN error",
+        "No status updates"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-005",
+      "fileName": "MOD-MATCHING-005-matching-context-client.json",
+      "scenarioName": "Matching Context - Client View",
+      "flowType": "happy",
+      "objective": "Return client matching context with QR/PIN and locations",
+      "endpoints": [
+        "GET /bookings/:bookingId/matching/context"
+      ],
+      "coverage": [
+        "QR/PIN returned regardless of T-30",
+        "Companion summaries",
+        "clientMatchStarted derived from location row"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-006",
+      "fileName": "MOD-MATCHING-006-matching-context-companion.json",
+      "scenarioName": "Matching Context - Companion View",
+      "flowType": "happy",
+      "objective": "Return companion matching context with client nickname and canVerifyClientMatch",
+      "endpoints": [
+        "GET /bookings/:bookingId/matching/context"
+      ],
+      "coverage": [
+        "CAPTAIN vs VICE_CAPTAIN behavior",
+        "clientLocation only when clientMatchStarted",
+        "No QR/PIN exposure"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-007",
+      "fileName": "MOD-MATCHING-007-client-match-start-happy-idempotent.json",
+      "scenarioName": "Client Match Start - Happy Path and Idempotent",
+      "flowType": "happy",
+      "objective": "Start client matching with GPS permissions and idempotent success",
+      "endpoints": [
+        "POST /bookings/:bookingId/client-match/start"
+      ],
+      "coverage": [
+        "GPS permission enforcement",
+        "Venue radius check",
+        "Idempotent behavior",
+        "Location row upsert"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-008",
+      "fileName": "MOD-MATCHING-008-client-match-start-validation-errors.json",
+      "scenarioName": "Client Match Start - Validation Errors (400)",
+      "flowType": "edge",
+      "objective": "Reject invalid GPS/coordinates/radius/state",
+      "endpoints": [
+        "POST /bookings/:bookingId/client-match/start"
+      ],
+      "coverage": [
+        "GPS_PERMISSION_REQUIRED",
+        "GPS_DISABLED",
+        "INVALID_COORDINATES",
+        "OUTSIDE_VENUE_RADIUS",
+        "INVALID_STATE"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-009",
+      "fileName": "MOD-MATCHING-009-matching-location-update.json",
+      "scenarioName": "Matching Location Update - Client and Companion",
+      "flowType": "happy",
+      "objective": "Update matching locations and reject client before start",
+      "endpoints": [
+        "POST /bookings/:bookingId/matching/location"
+      ],
+      "coverage": [
+        "Client and companion updates",
+        "CLIENT_MATCH_NOT_STARTED",
+        "GPS permission enforcement"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-010",
+      "fileName": "MOD-MATCHING-010-client-match-verify-happy-idempotent.json",
+      "scenarioName": "Client Match Verify - Happy Path and Idempotent",
+      "flowType": "happy",
+      "objective": "Verify client match and activate booking",
+      "endpoints": [
+        "POST /bookings/:bookingId/client-match/verify"
+      ],
+      "coverage": [
+        "CAPTAIN-only verification",
+        "QR/PIN validation",
+        "Status transition CONFIRMED→ACTIVE",
+        "Idempotent success"
+      ]
+    },
+    {
+      "testId": "MOD-MATCHING-011",
+      "fileName": "MOD-MATCHING-011-client-match-verify-validation-errors.json",
+      "scenarioName": "Client Match Verify - Validation Errors (400/403)",
+      "flowType": "edge",
+      "objective": "Reject invalid client match verification attempts",
+      "endpoints": [
+        "POST /bookings/:bookingId/client-match/verify"
+      ],
+      "coverage": [
+        "SELF_MATCH_INCOMPLETE",
+        "INVALID_QR_OR_PIN",
+        "FORBIDDEN",
+        "INVALID_STATE"
+      ]
+    }
+  ],
+  "coverageSummary": {
+    "happyPaths": 5,
+    "edgeCases": 6,
+    "totalTests": 11,
+    "endpoints": [
+      "GET /bookings/:bookingId/com-match/context",
+      "POST /bookings/:bookingId/com-match/verify",
+      "GET /bookings/:bookingId/matching/context",
+      "POST /bookings/:bookingId/client-match/start",
+      "POST /bookings/:bookingId/matching/location",
+      "POST /bookings/:bookingId/client-match/verify"
+    ],
+    "businessRulesValidated": [
+      "Presence ARRIVED gate for com-match",
+      "Role-based access and response shaping (CAPTAIN vs VICE_CAPTAIN)",
+      "QR/PIN verification against booking artifacts",
+      "No T-30 backend gating for matching context",
+      "GPS permission and GPS enabled required",
+      "Venue radius (<=400m) enforcement",
+      "ClientMatchStarted derived from participant location",
+      "Client match verification requires self match complete",
+      "Status transition CONFIRMED → ACTIVE",
+      "Idempotency for com-match verify, client match start, client match verify",
+      "Client location updates blocked before match start"
+    ],
+    "authorizationPatterns": [
+      "Bearer token for client and companion access",
+      "CAPTAIN-only for client-match verify",
+      "VICE_CAPTAIN-only for com-match verify"
+    ],
+    "databaseEntities": [
+      "bookings",
+      "booking_companion_assignments",
+      "booking_participant_locations",
+      "venues",
+      "users",
+      "companion_profiles"
+    ]
+  },
+  "designPrinciples": [
+    "Executable finalization based on current matching routes and schemas",
+    "No hardcoded payload values; use required fields and references",
+    "Every step includes layman explanation",
+    "Deterministic assertions for API and DB outcomes",
+    "Explicit coverage of GPS permission flags and no T-30 gating"
+  ],
+  "nextSteps": [
+    "Validate with Test Validator Agent"
+  ],
+  "openQuestions": [],
+  "notes": [
+    "All tests align to matching-flow_current.md v1.0.0",
+    "Routes verified against technical/backend-companion/src/modules/matching",
+    "GPS permission flags gpsPermissionGranted/gpsEnabled included in start and location updates",
+    "Matching context tests explicitly assert no backend T-30 gating"
+  ]
+}

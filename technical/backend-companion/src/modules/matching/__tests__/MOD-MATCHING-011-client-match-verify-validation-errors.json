@@ -1,0 +1,146 @@
+{
+  "testId": "MOD-MATCHING-011",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Client Match Verify - Validation Errors (400/403)",
+  "flowType": "edge",
+  "linkedRequirement": "matching-flow/client-match-verify",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-011-client-match-verify-validation-errors.json",
+  "executionMode": "api+db+auth",
+  "objective": "Reject client match verification when preconditions fail or caller is unauthorized",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "Self match incomplete",
+      "seedOverride": {
+        "booking_companion_assignment": {
+          "self_match_status": "NOT_MATCHED"
+        }
+      },
+      "expectedStatus": 400,
+      "expectedError": "SELF_MATCH_INCOMPLETE"
+    },
+    {
+      "variantId": "B",
+      "description": "Invalid QR/PIN",
+      "payloadOverride": {
+        "verificationMethod": "QR",
+        "qrCode": "{{INVALID_QR}}"
+      },
+      "expectedStatus": 400,
+      "expectedError": "INVALID_QR_OR_PIN"
+    },
+    {
+      "variantId": "C",
+      "description": "Caller is VICE_CAPTAIN (forbidden)",
+      "callerDesignation": "VICE_CAPTAIN",
+      "expectedStatus": 403,
+      "expectedError": "FORBIDDEN"
+    },
+    {
+      "variantId": "D",
+      "description": "Booking status invalid (CANCELLED)",
+      "seedOverride": {
+        "booking": {
+          "status": "CANCELLED"
+        }
+      },
+      "expectedStatus": 400,
+      "expectedError": "INVALID_STATE"
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 2
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "fields": {
+        "qrCode": "{{BOOKING_QR}}",
+        "pinCode": "{{BOOKING_PIN}}"
+      }
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "fields": {
+        "self_match_status": "MATCHED",
+        "client_match_status": "WAITING_FOR_CLIENT"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Companion",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:bookingId/client-match/verify",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [
+        "verificationMethod"
+      ],
+      "payloadRules": {
+        "verificationMethod": "QR or PIN",
+        "qrCode": "May be invalid per variant",
+        "pinCode": "May be invalid per variant"
+      },
+      "layman": "Companion attempts to verify the client match with invalid preconditions"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Reject when self match incomplete",
+        "Reject invalid QR/PIN",
+        "Reject non-captain caller",
+        "Reject invalid booking status"
+      ],
+      "layman": "System enforces all client match verification requirements"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": "{{VARIANT_STATUS}}",
+      "expectedErrorCode": "{{VARIANT_ERROR}}",
+      "layman": "System returns the appropriate error"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status matches variant",
+      "Error code matches variant"
+    ],
+    "db": [
+      "Booking status and assignment statuses remain unchanged"
+    ],
+    "businessRules": [
+      "Self match must be complete",
+      "Only CAPTAIN can verify client match",
+      "Booking must be CONFIRMED unless idempotent"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Aggregates client-match verification rejection paths"
+  ]
+}

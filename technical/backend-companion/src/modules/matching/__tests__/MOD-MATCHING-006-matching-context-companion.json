@@ -1,0 +1,147 @@
+{
+  "testId": "MOD-MATCHING-006",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Matching Context - Companion View",
+  "flowType": "happy",
+  "linkedRequirement": "matching-flow/matching-context",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-006-matching-context-companion.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate companion matching context shows client nickname, client location when started, and canVerifyClientMatch only for CAPTAIN",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "Caller is CAPTAIN, clientMatchStarted=false",
+      "callerDesignation": "CAPTAIN",
+      "seedOverride": {
+        "booking_participant_location": null
+      },
+      "expectedCanVerify": true,
+      "expectedClientLocation": false
+    },
+    {
+      "variantId": "B",
+      "description": "Caller is CAPTAIN, clientMatchStarted=true",
+      "callerDesignation": "CAPTAIN",
+      "seedOverride": {
+        "booking_participant_location": {
+          "userRole": "CLIENT"
+        }
+      },
+      "expectedCanVerify": true,
+      "expectedClientLocation": true
+    },
+    {
+      "variantId": "C",
+      "description": "Caller is VICE_CAPTAIN, clientMatchStarted=true",
+      "callerDesignation": "VICE_CAPTAIN",
+      "seedOverride": {
+        "booking_participant_location": {
+          "userRole": "CLIENT"
+        }
+      },
+      "expectedCanVerify": false,
+      "expectedClientLocation": true
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "fields": {
+        "nickname": "{{CLIENT_NICKNAME}}"
+      }
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 2
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Companion",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:bookingId/matching/context",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "layman": "Companion opens the matching context screen"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Caller is assigned to booking",
+        "Caller designation is CAPTAIN or VICE_CAPTAIN"
+      ],
+      "layman": "System confirms the companion is assigned to the booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "dbQuery",
+      "expectedBehavior": [
+        "Load booking + client nickname",
+        "Determine clientMatchStarted based on client location row"
+      ],
+      "layman": "System assembles the companion context from booking data"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "bookingId",
+        "bookingStatus",
+        "bookingColor",
+        "clientNickname",
+        "clientMatchStarted",
+        "canVerifyClientMatch",
+        "clientLocation?"
+      ],
+      "layman": "System returns the companion matching context"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "clientNickname matches booking client nickname",
+      "canVerifyClientMatch=true only for CAPTAIN",
+      "clientLocation present only when clientMatchStarted=true"
+    ],
+    "businessRules": [
+      "Companion context does not expose QR/PIN",
+      "Client location appears only after client match start"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Validates companion role behavior and client location gating"
+  ]
+}

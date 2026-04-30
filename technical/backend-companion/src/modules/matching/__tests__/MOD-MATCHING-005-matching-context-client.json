@@ -1,0 +1,144 @@
+{
+  "testId": "MOD-MATCHING-005",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Matching Context - Client View",
+  "flowType": "happy",
+  "linkedRequirement": "matching-flow/matching-context",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-005-matching-context-client.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate client matching context returns companions, locations, and QR/PIN with no T-30 gating",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "clientMatchStarted=false (no client location row)",
+      "seedOverride": {
+        "booking_participant_location": null
+      },
+      "expectedClientMatchStarted": false
+    },
+    {
+      "variantId": "B",
+      "description": "clientMatchStarted=true (client location row exists)",
+      "seedOverride": {
+        "booking_participant_location": {
+          "userRole": "CLIENT"
+        }
+      },
+      "expectedClientMatchStarted": true
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 2,
+      "description": "Captain and Vice Captain"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "fields": {
+        "startAt": "{{FUTURE_TIMESTAMP_OUTSIDE_T30}}",
+        "qrCode": "{{BOOKING_QR}}",
+        "pinCode": "{{BOOKING_PIN}}"
+      },
+      "description": "Start time outside T-30 window to confirm no backend gating"
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2
+    },
+    {
+      "entity": "booking_participant_location",
+      "count": 2,
+      "description": "Companion locations for map context"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:bookingId/matching/context",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "layman": "Client opens the matching page"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Caller role is CLIENT",
+        "Caller is booking owner"
+      ],
+      "layman": "System confirms the client owns the booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "dbQuery",
+      "expectedBehavior": [
+        "Load booking, assignments, companion profiles, and participant locations",
+        "Determine clientMatchStarted based on client location row existence",
+        "No T-30 gating on QR/PIN"
+      ],
+      "layman": "System builds the client matching context from booking data"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "bookingId",
+        "bookingStatus",
+        "bookingColor",
+        "companions",
+        "companionLocations",
+        "qrCode",
+        "pinCode",
+        "clientMatchStarted"
+      ],
+      "layman": "System returns the matching context for the client"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "qrCode and pinCode are always present (no T-30 backend gating)",
+      "companions is a list of 2 companion summaries",
+      "companionLocations includes rows for companions with location updates",
+      "clientMatchStarted reflects whether client location row exists"
+    ],
+    "businessRules": [
+      "Backend does not enforce T-30 timing for matching context",
+      "ClientMatchStarted derives from booking_participant_locations"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Validates client response fields per matching.types",
+    "Explicitly checks that QR/PIN are returned even when startAt is outside T-30"
+  ]
+}

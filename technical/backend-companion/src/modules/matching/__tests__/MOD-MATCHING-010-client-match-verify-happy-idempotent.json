@@ -1,0 +1,165 @@
+{
+  "testId": "MOD-MATCHING-010",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Client Match Verify - Happy Path and Idempotent",
+  "flowType": "happy",
+  "linkedRequirement": "matching-flow/client-match-verify",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-010-client-match-verify-happy-idempotent.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate CAPTAIN can verify client match via QR/PIN and idempotent success when booking already ACTIVE",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "QR verification succeeds",
+      "payloadTemplate": {
+        "verificationMethod": "QR",
+        "qrCode": "{{BOOKING_QR}}"
+      }
+    },
+    {
+      "variantId": "B",
+      "description": "PIN verification succeeds",
+      "payloadTemplate": {
+        "verificationMethod": "PIN",
+        "pinCode": "{{BOOKING_PIN}}"
+      }
+    },
+    {
+      "variantId": "C",
+      "description": "Idempotent when booking ACTIVE and already client matched",
+      "seedOverride": {
+        "booking": {
+          "status": "ACTIVE"
+        },
+        "booking_companion_assignment": {
+          "client_match_status": "CLIENT_MATCHED"
+        }
+      },
+      "payloadTemplate": {
+        "verificationMethod": "QR",
+        "qrCode": "{{BOOKING_QR}}"
+      }
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 2
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "fields": {
+        "qrCode": "{{BOOKING_QR}}",
+        "pinCode": "{{BOOKING_PIN}}"
+      }
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "fields": {
+        "self_match_status": "MATCHED",
+        "client_match_status": "WAITING_FOR_CLIENT"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:bookingId/client-match/verify",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [
+        "verificationMethod"
+      ],
+      "payloadRules": {
+        "verificationMethod": "QR or PIN",
+        "qrCode": "Required when verificationMethod=QR; must match booking.qrCode",
+        "pinCode": "Required when verificationMethod=PIN; must match booking.pinCode"
+      },
+      "layman": "Captain verifies the client using the client's QR or PIN"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Caller is assigned to booking",
+        "Caller designation is CAPTAIN"
+      ],
+      "layman": "System ensures only the captain can verify the client match"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "If booking ACTIVE and assignments already client matched, return idempotent success",
+        "Otherwise booking status must be CONFIRMED",
+        "Both assignments self_match_status=MATCHED",
+        "QR/PIN must match booking"
+      ],
+      "layman": "System validates booking state and QR/PIN before updating"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "expectedBehavior": [
+        "Update both assignments client_match_status=CLIENT_MATCHED",
+        "Update booking.status=ACTIVE"
+      ],
+      "layman": "System atomically marks the client match complete and activates the booking"
+    },
+    {
+      "step": 5,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "bookingId",
+        "bookingStatus",
+        "clientMatchStatus"
+      ],
+      "layman": "System returns the client match verification response"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "bookingStatus is ACTIVE",
+      "clientMatchStatus is CLIENT_MATCHED"
+    ],
+    "db": [
+      "Booking status updated to ACTIVE",
+      "Both assignments client_match_status=CLIENT_MATCHED"
+    ],
+    "businessRules": [
+      "Only CAPTAIN can verify client match",
+      "Self match must be complete",
+      "Idempotent success when already ACTIVE"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Covers client match verification and ACTIVE transition"
+  ]
+}

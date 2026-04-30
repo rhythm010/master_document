@@ -1,0 +1,155 @@
+{
+  "testId": "MOD-MATCHING-001",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Com-Match Context - Captain vs Vice Captain",
+  "flowType": "happy",
+  "linkedRequirement": "matching-flow/com-match-context",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-001-com-match-context-roles.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate com-match context returns QR/PIN to CAPTAIN and scannerEnabled to VICE_CAPTAIN when both companions are arrived",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "Caller is CAPTAIN and receives comMatchQrCode + comMatchPinCode",
+      "callerDesignation": "CAPTAIN",
+      "expectedResponseFields": [
+        "bookingId",
+        "comMatchQrCode",
+        "comMatchPinCode"
+      ]
+    },
+    {
+      "variantId": "B",
+      "description": "Caller is VICE_CAPTAIN and receives scannerEnabled only",
+      "callerDesignation": "VICE_CAPTAIN",
+      "expectedResponseFields": [
+        "bookingId",
+        "scannerEnabled"
+      ]
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "description": "Booking owner"
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 2,
+      "description": "Captain and Vice Captain users"
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "companion_profile",
+      "designation": "VICE_CAPTAIN",
+      "count": 1
+    },
+    {
+      "entity": "venue",
+      "count": 1
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1,
+      "fields": {
+        "comMatchQrCode": "{{COM_MATCH_QR}}",
+        "comMatchPinCode": "{{COM_MATCH_PIN}}"
+      }
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2,
+      "fields": {
+        "presence_status": "ARRIVED",
+        "self_match_status": "NOT_MATCHED",
+        "client_match_status": "WAITING_FOR_CLIENT"
+      },
+      "description": "Both companions are ARRIVED"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Companion",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:bookingId/com-match/context",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "layman": "Captain or vice captain opens the com-match context screen"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Caller is authenticated",
+        "Caller is assigned to booking as CAPTAIN or VICE_CAPTAIN"
+      ],
+      "layman": "System confirms the companion is assigned to the booking"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Booking status is CONFIRMED or ACTIVE",
+        "Both assignments presence_status=ARRIVED"
+      ],
+      "layman": "System confirms the booking is valid and both companions have arrived"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseShapeByVariant": {
+        "A": {
+          "fields": [
+            "bookingId",
+            "comMatchQrCode",
+            "comMatchPinCode"
+          ]
+        },
+        "B": {
+          "fields": [
+            "bookingId",
+            "scannerEnabled"
+          ]
+        }
+      },
+      "layman": "System returns the com-match context for the caller role"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "CAPTAIN receives comMatchQrCode and comMatchPinCode",
+      "VICE_CAPTAIN receives scannerEnabled=true and no QR/PIN"
+    ],
+    "authorization": [
+      "Only assigned companions can access com-match context",
+      "CAPTAIN and VICE_CAPTAIN are both allowed"
+    ],
+    "businessRules": [
+      "Presence must be ARRIVED for both companions",
+      "QR/PIN are only exposed to CAPTAIN"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Validates role-specific response fields per matching-flow_current.md",
+    "Ensures QR/PIN are never returned to VICE_CAPTAIN"
+  ]
+}

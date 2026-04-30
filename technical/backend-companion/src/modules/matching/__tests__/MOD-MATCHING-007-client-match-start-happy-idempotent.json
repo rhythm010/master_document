@@ -1,0 +1,139 @@
+{
+  "testId": "MOD-MATCHING-007",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Client Match Start - Happy Path and Idempotent",
+  "flowType": "happy",
+  "linkedRequirement": "matching-flow/client-match-start",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-007-client-match-start-happy-idempotent.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate client can start matching with GPS permissions and idempotent success when already started",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "First-time start (booking CONFIRMED, within radius)",
+      "seedOverride": {
+        "booking": {
+          "status": "CONFIRMED"
+        },
+        "booking_participant_location": null
+      }
+    },
+    {
+      "variantId": "B",
+      "description": "Idempotent start (existing client location, booking ACTIVE)",
+      "seedOverride": {
+        "booking": {
+          "status": "ACTIVE"
+        },
+        "booking_participant_location": {
+          "userRole": "CLIENT"
+        }
+      }
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1
+    },
+    {
+      "entity": "venue",
+      "count": 1,
+      "fields": {
+        "latitude": "{{VENUE_LAT}}",
+        "longitude": "{{VENUE_LON}}"
+      }
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:bookingId/client-match/start",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [
+        "latitude",
+        "longitude",
+        "gpsPermissionGranted",
+        "gpsEnabled"
+      ],
+      "payloadRules": {
+        "latitude": "Valid numeric latitude within 400m of venue",
+        "longitude": "Valid numeric longitude within 400m of venue",
+        "gpsPermissionGranted": "true",
+        "gpsEnabled": "true"
+      },
+      "layman": "Client starts matching by sharing their GPS location"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "GPS permission granted and GPS enabled",
+        "Coordinates valid",
+        "Booking status CONFIRMED (or idempotent when ACTIVE and location exists)",
+        "Client is within 400m of venue"
+      ],
+      "layman": "System validates GPS requirements, booking status, and venue radius"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "dbUpsert",
+      "target": "booking_participant_locations",
+      "expectedBehavior": [
+        "Upsert client location row",
+        "Set updated_at to now"
+      ],
+      "layman": "System records the client's location"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "bookingId",
+        "clientMatchStarted",
+        "locationSharingState"
+      ],
+      "layman": "System confirms that matching has started for the client"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 200",
+      "clientMatchStarted is true",
+      "locationSharingState is TWO_WAY"
+    ],
+    "db": [
+      "Client location row exists in booking_participant_locations"
+    ],
+    "businessRules": [
+      "GPS permission required (no alternative path)",
+      "Client must be within 400m radius",
+      "Idempotent success when location already exists"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Covers start-matching success and idempotent behavior"
+  ]
+}

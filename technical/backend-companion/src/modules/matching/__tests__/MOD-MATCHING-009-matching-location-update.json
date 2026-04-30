@@ -1,0 +1,148 @@
+{
+  "testId": "MOD-MATCHING-009",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Matching Location Update - Client and Companion",
+  "flowType": "happy",
+  "linkedRequirement": "matching-flow/matching-location",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-009-matching-location-update.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate location updates for client and companion, and reject client updates before match start",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "Client update after match started",
+      "callerRole": "CLIENT",
+      "seedOverride": {
+        "booking_participant_location": {
+          "userRole": "CLIENT"
+        }
+      },
+      "expectedStatus": 200
+    },
+    {
+      "variantId": "B",
+      "description": "Companion update",
+      "callerRole": "COMPANION",
+      "expectedStatus": 200
+    },
+    {
+      "variantId": "C",
+      "description": "Client update before match start",
+      "callerRole": "CLIENT",
+      "seedOverride": {
+        "booking_participant_location": null
+      },
+      "expectedStatus": 400,
+      "expectedError": "CLIENT_MATCH_NOT_STARTED"
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1
+    },
+    {
+      "entity": "user",
+      "role": "COMPANION",
+      "count": 2
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2
+    },
+    {
+      "entity": "booking_participant_location",
+      "count": 1,
+      "description": "Existing client row for variant A"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Participant",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:bookingId/matching/location",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [
+        "latitude",
+        "longitude",
+        "gpsPermissionGranted",
+        "gpsEnabled"
+      ],
+      "payloadRules": {
+        "latitude": "Valid numeric latitude",
+        "longitude": "Valid numeric longitude",
+        "gpsPermissionGranted": "true",
+        "gpsEnabled": "true"
+      },
+      "layman": "Client or companion sends a GPS location update"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "authorization",
+      "expectedBehavior": [
+        "Caller is booking client OR assigned companion"
+      ],
+      "layman": "System ensures only booking participants can update location"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "GPS permission granted and GPS enabled",
+        "Coordinates valid",
+        "If caller is client, clientMatchStarted must be true"
+      ],
+      "layman": "System validates GPS inputs and client match start state"
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "dbUpsert",
+      "target": "booking_participant_locations",
+      "layman": "System records the updated location"
+    },
+    {
+      "step": 5,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": "{{VARIANT_STATUS}}",
+      "expectedResponseFields": [
+        "bookingId",
+        "updatedAt"
+      ],
+      "layman": "System returns updated location timestamp or an error"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Variants A/B return 200 with updatedAt",
+      "Variant C returns CLIENT_MATCH_NOT_STARTED"
+    ],
+    "db": [
+      "Location row is upserted for valid updates"
+    ],
+    "businessRules": [
+      "GPS permission required",
+      "Client cannot update location before starting match"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Covers both client and companion location updates",
+    "Includes client-not-started rejection"
+  ]
+}

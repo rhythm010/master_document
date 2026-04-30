@@ -1,0 +1,148 @@
+{
+  "testId": "MOD-MATCHING-008",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Client Match Start - Validation Errors (400)",
+  "flowType": "edge",
+  "linkedRequirement": "matching-flow/client-match-start",
+  "filePath": "technical/backend-companion/src/modules/matching/__tests__/MOD-MATCHING-008-client-match-start-validation-errors.json",
+  "executionMode": "api+db+auth",
+  "objective": "Reject client match start when GPS flags, coordinates, venue radius, or booking status are invalid",
+  "featureSdsVersion": "matching-flow_current.md v1.0.0",
+  "testVariants": [
+    {
+      "variantId": "A",
+      "description": "gpsPermissionGranted=false",
+      "payloadOverride": {
+        "gpsPermissionGranted": false
+      },
+      "expectedError": "GPS_PERMISSION_REQUIRED"
+    },
+    {
+      "variantId": "B",
+      "description": "gpsEnabled=false",
+      "payloadOverride": {
+        "gpsEnabled": false
+      },
+      "expectedError": "GPS_DISABLED"
+    },
+    {
+      "variantId": "C",
+      "description": "Invalid coordinates",
+      "payloadOverride": {
+        "latitude": "INVALID",
+        "longitude": null
+      },
+      "expectedError": "INVALID_COORDINATES"
+    },
+    {
+      "variantId": "D",
+      "description": "Outside venue radius",
+      "payloadOverride": {
+        "latitude": "{{OUTSIDE_RADIUS_LAT}}",
+        "longitude": "{{OUTSIDE_RADIUS_LON}}"
+      },
+      "expectedError": "OUTSIDE_VENUE_RADIUS"
+    },
+    {
+      "variantId": "E",
+      "description": "Booking status invalid (CANCELLED)",
+      "seedOverride": {
+        "booking": {
+          "status": "CANCELLED"
+        }
+      },
+      "expectedError": "INVALID_STATE"
+    }
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1
+    },
+    {
+      "entity": "venue",
+      "count": 1,
+      "fields": {
+        "latitude": "{{VENUE_LAT}}",
+        "longitude": "{{VENUE_LON}}"
+      }
+    },
+    {
+      "entity": "booking",
+      "status": "CONFIRMED",
+      "count": 1
+    },
+    {
+      "entity": "booking_companion_assignment",
+      "count": 2
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:bookingId/client-match/start",
+      "authType": "Bearer",
+      "pathParams": {
+        "bookingId": "{{BOOKING_ID}}"
+      },
+      "requiredPayloadFields": [
+        "latitude",
+        "longitude",
+        "gpsPermissionGranted",
+        "gpsEnabled"
+      ],
+      "payloadRules": {
+        "latitude": "May be invalid per variant",
+        "longitude": "May be invalid per variant",
+        "gpsPermissionGranted": "Variant override",
+        "gpsEnabled": "Variant override"
+      },
+      "layman": "Client attempts to start matching with invalid inputs or state"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "validation",
+      "expectedBehavior": [
+        "Reject missing GPS permission",
+        "Reject GPS disabled",
+        "Reject invalid coordinates",
+        "Reject outside venue radius",
+        "Reject invalid booking status"
+      ],
+      "layman": "System enforces all start-matching validation rules"
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 400,
+      "expectedErrorCode": "{{VARIANT_SPECIFIC_ERROR}}",
+      "layman": "System returns the appropriate validation error"
+    }
+  ],
+  "assertions": {
+    "api": [
+      "Response status is 400",
+      "Error code matches variant"
+    ],
+    "db": [
+      "No client location row is created"
+    ],
+    "businessRules": [
+      "GPS permission required",
+      "GPS enabled required",
+      "Coordinates must be valid",
+      "Client must be within 400m radius",
+      "Booking must be CONFIRMED when not idempotent"
+    ]
+  },
+  "openQuestions": [],
+  "notes": [
+    "Aggregates start-matching validation errors into variants"
+  ]
+}
