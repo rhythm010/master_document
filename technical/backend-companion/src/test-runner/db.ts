@@ -152,6 +152,12 @@ export async function applySeedData(
           operatingHoursEnd
         ]);
 
+        if (context["ORIGINAL_VENUE_ID"] === undefined) {
+          context["ORIGINAL_VENUE_ID"] = id;
+        } else if (context["TARGET_VENUE_ID"] === undefined) {
+          context["TARGET_VENUE_ID"] = id;
+        }
+
         if (context["VENUE_ID"] === undefined) {
           context["VENUE_ID"] = id;
         }
@@ -310,11 +316,39 @@ export async function applySeedData(
       const valuesRaw = (seed.values ?? {}) as Record<string, unknown>;
       const rendered = substitute(valuesRaw, context) as Record<string, unknown>;
 
-      const rowVenueId = String(pick(rendered, ["venueId", "venue_id"]) ?? venueId);
-      const startAt = String(pick(rendered, ["startAt", "start_at"]) ?? startAtIso);
-      const endAt = String(pick(rendered, ["endAt", "end_at"]) ?? endAtIso);
+      const explicitVenue = pick<string>(rendered, ["venueId", "venue_id"]);
+      const explicitStartAt = pick<string>(rendered, ["startAt", "start_at"]);
+      const explicitEndAt = pick<string>(rendered, ["endAt", "end_at"]);
+
+      const originalVenueId = String(context["ORIGINAL_VENUE_ID"] ?? "");
+      const targetVenueId = String(context["TARGET_VENUE_ID"] ?? "");
+      const originalStartAt = String(context["ORIGINAL_START_AT"] ?? "");
+      const originalEndAt = String(context["ORIGINAL_END_AT"] ?? "");
+      const targetStartAt = String(context["TARGET_START_AT"] ?? "");
+      const targetEndAt = String(context["TARGET_END_AT"] ?? "");
+
+      // Heuristic support for internal-edit tests that seed two venues and two windows.
+      const inferredVenueId =
+        status === "BOOKED" && originalVenueId ? originalVenueId :
+        status === "AVAILABLE" && targetVenueId ? targetVenueId :
+        venueId;
+
+      const inferredStartAt =
+        status === "BOOKED" && originalStartAt ? originalStartAt :
+        status === "AVAILABLE" && targetStartAt ? targetStartAt :
+        startAtIso;
+
+      const inferredEndAt =
+        status === "BOOKED" && originalEndAt ? originalEndAt :
+        status === "AVAILABLE" && targetEndAt ? targetEndAt :
+        endAtIso;
+
+      const rowVenueId = String(explicitVenue ?? inferredVenueId);
+      const startAt = String(explicitStartAt ?? inferredStartAt);
+      const endAt = String(explicitEndAt ?? inferredEndAt);
+
       const renderedBookingId = pick<string | null>(rendered, ["bookingId", "booking_id"]);
-      const bookingIdValue = renderedBookingId !== undefined ? renderedBookingId : status === "BOOKED" ? bookingId : null;
+      let bookingIdValue = renderedBookingId !== undefined ? renderedBookingId : status === "BOOKED" ? bookingId : null;
 
       const companions: string[] = [];
       const explicitCompanion = pick<string>(rendered, ["companionId", "companion_id"]);
@@ -336,7 +370,51 @@ export async function applySeedData(
         throw new Error("roster_slot seeding requires companion ids (CAPTAIN_ID / VICE_CAPTAIN_ID missing)");
       }
       if (status === "BOOKED" && !bookingIdValue) {
-        throw new Error("roster_slot seeding status=BOOKED requires BOOKING_ID");
+        // Self-heal: some scenarios reserve slots with "BOOKED" status to simulate
+        // unavailability, without impacting the primary scenario client.
+
+        const placeholderClientId = crypto.randomUUID();
+        const placeholderEmail = `placeholder.client.${context["RUN_ID"] ?? "run"}.${placeholderClientId}@test.local`;
+
+        await pool.query(
+          "INSERT INTO users (id, role, name, nickname, email, password_hash, email_verified, biometric_auth_enabled) " +
+            "VALUES ($1, 'CLIENT', $2, $3, $4, $5, true, false) ON CONFLICT (id) DO NOTHING;",
+          [
+            placeholderClientId,
+            "Placeholder Client",
+            `placeholder_${context["RUN_ID"] ?? "run"}`,
+            placeholderEmail,
+            "seeded_hash_not_used"
+          ]
+        );
+
+        const placeholderBookingId = crypto.randomUUID();
+        const qrCode = `qr_${placeholderBookingId}`;
+        const pinCode = "111111";
+        const bookingColor = "BLUE";
+        const comMatchQrCode = `com_qr_${placeholderBookingId}`;
+        const comMatchPinCode = "222222";
+
+        const bookingInsert =
+          "INSERT INTO bookings (id, client_id, venue_id, start_at, end_at, status, qr_code, pin_code, booking_color, com_match_qr_code, com_match_pin_code, extended_at) " +
+          "VALUES ($1, $2, $3, $4, $5, 'CONFIRMED', $6, $7, $8, $9, $10, NULL) " +
+          "ON CONFLICT (id) DO NOTHING;";
+
+        await pool.query(bookingInsert, [
+          placeholderBookingId,
+          placeholderClientId,
+          rowVenueId,
+          startAt,
+          endAt,
+          qrCode,
+          pinCode,
+          bookingColor,
+          comMatchQrCode,
+          comMatchPinCode
+        ]);
+
+        bookingIdValue = placeholderBookingId;
+        actions.push(`Seeded placeholder booking ${placeholderBookingId} for BOOKED roster_slot`);
       }
 
       // Seed one slot per companion (minimum viable for booking happy paths).
@@ -420,8 +498,52 @@ export async function applySeedData(
         if (context["BOOKING_ID"] === undefined) {
           context["BOOKING_ID"] = id;
         }
+        if (context["EXISTING_BOOKING_ID"] === undefined) {
+          context["EXISTING_BOOKING_ID"] = id;
+        }
+        if (context["BOOKING_START_AT"] === undefined) {
+          context["BOOKING_START_AT"] = startAt;
+        }
+        if (context["BOOKING_END_AT"] === undefined) {
+          context["BOOKING_END_AT"] = endAt;
+        }
+
+        // Store "original" booking fields used by internal-edit scenarios.
         if (context["ORIGINAL_START_AT"] === undefined) {
           context["ORIGINAL_START_AT"] = startAt;
+        }
+        if (context["ORIGINAL_END_AT"] === undefined) {
+          context["ORIGINAL_END_AT"] = endAt;
+        }
+        if (context["ORIGINAL_QR_CODE"] === undefined) {
+          context["ORIGINAL_QR_CODE"] = qrCode;
+        }
+        if (context["ORIGINAL_PIN_CODE"] === undefined) {
+          context["ORIGINAL_PIN_CODE"] = pinCode;
+        }
+        if (context["ORIGINAL_BOOKING_COLOR"] === undefined) {
+          context["ORIGINAL_BOOKING_COLOR"] = bookingColor;
+        }
+        if (context["ORIGINAL_COM_MATCH_QR"] === undefined) {
+          context["ORIGINAL_COM_MATCH_QR"] = comMatchQrCode;
+        }
+        if (context["ORIGINAL_COM_MATCH_PIN"] === undefined) {
+          context["ORIGINAL_COM_MATCH_PIN"] = comMatchPinCode;
+        }
+
+        // Default target edit window used by internal-edit scenarios.
+        if (context["TARGET_START_AT"] === undefined || context["TARGET_END_AT"] === undefined) {
+          try {
+            const startMs = Date.parse(startAt);
+            const endMs = Date.parse(endAt);
+            if (!Number.isNaN(startMs) && !Number.isNaN(endMs)) {
+              const delta = 24 * 60 * 60 * 1000;
+              context["TARGET_START_AT"] = new Date(startMs + delta).toISOString();
+              context["TARGET_END_AT"] = new Date(endMs + delta).toISOString();
+            }
+          } catch {
+            // ignore
+          }
         }
 
         actions.push(`Seeded booking ${id} (${status})`);

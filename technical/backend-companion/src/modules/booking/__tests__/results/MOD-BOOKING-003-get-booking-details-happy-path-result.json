@@ -1,9 +1,9 @@
 {
-  "runId": "RUN-20260429051851195-MOD-BOOKING-003",
+  "runId": "RUN-20260430030805152-MOD-BOOKING-003",
   "testId": "MOD-BOOKING-003",
   "status": "PASS",
-  "startedAt": "2026-04-29T05:18:51.195Z",
-  "endedAt": "2026-04-29T05:18:51.222Z",
+  "startedAt": "2026-04-30T03:08:05.152Z",
+  "endedAt": "2026-04-30T03:08:05.169Z",
   "environmentCheck": {
     "apiServer": "OK",
     "mailpit": "OK",
@@ -12,9 +12,9 @@
   "serviceHitLog": [
     {
       "step": 1,
-      "target": "GET /bookings/bc595917-0985-4e65-83f9-24304f27b228/details",
-      "startedAt": "2026-04-29T05:18:51.219Z",
-      "endedAt": "2026-04-29T05:18:51.222Z",
+      "target": "GET /bookings/7ee4b0da-6a17-4922-a4fd-37d57e0af21d/details",
+      "startedAt": "2026-04-30T03:08:05.166Z",
+      "endedAt": "2026-04-30T03:08:05.169Z",
       "durationMs": 3,
       "result": "PASS",
       "statusCode": 200
@@ -22,24 +22,24 @@
     {
       "step": 2,
       "target": "authorization (noop)",
-      "startedAt": "2026-04-29T05:18:51.222Z",
-      "endedAt": "2026-04-29T05:18:51.222Z",
+      "startedAt": "2026-04-30T03:08:05.169Z",
+      "endedAt": "2026-04-30T03:08:05.169Z",
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 3,
       "target": "DB query (skipped: missing target)",
-      "startedAt": "2026-04-29T05:18:51.222Z",
-      "endedAt": "2026-04-29T05:18:51.222Z",
+      "startedAt": "2026-04-30T03:08:05.169Z",
+      "endedAt": "2026-04-30T03:08:05.169Z",
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 4,
       "target": "API response validation",
-      "startedAt": "2026-04-29T05:18:51.222Z",
-      "endedAt": "2026-04-29T05:18:51.222Z",
+      "startedAt": "2026-04-30T03:08:05.169Z",
+      "endedAt": "2026-04-30T03:08:05.169Z",
       "durationMs": 0,
       "result": "PASS",
       "statusCode": 200
@@ -47,8 +47,8 @@
     {
       "step": 5,
       "target": "responseValidation (noop)",
-      "startedAt": "2026-04-29T05:18:51.222Z",
-      "endedAt": "2026-04-29T05:18:51.222Z",
+      "startedAt": "2026-04-30T03:08:05.169Z",
+      "endedAt": "2026-04-30T03:08:05.169Z",
       "durationMs": 0,
       "result": "PASS"
     }
@@ -58,13 +58,14 @@
       "step": 1,
       "result": "PASS",
       "observed": {
-        "id": "bc595917-0985-4e65-83f9-24304f27b228",
+        "id": "7ee4b0da-6a17-4922-a4fd-37d57e0af21d",
         "status": "CONFIRMED",
-        "clientId": "7213780c-670b-4581-9ecc-b0ddbe084c0e",
-        "venueId": "07b5cd38-d93c-4092-819f-6c03f435aadd",
-        "startAt": "2026-04-30T10:00:00.000Z",
-        "endAt": "2026-04-30T12:00:00.000Z",
-        "createdAt": "2026-04-29T05:18:51.216Z"
+        "clientId": "7b35270a-7e7b-4845-8c82-c5ed6c91d824",
+        "venueId": "50f4e91b-cd11-428a-a1f9-1088eac6508e",
+        "startAt": "2026-05-01T10:00:00.000Z",
+        "endAt": "2026-05-01T12:00:00.000Z",
+        "createdAt": "2026-04-30T03:08:05.164Z",
+        "companions": null
       },
       "actor": "Client",
       "actionType": "apiRequest",
@@ -72,9 +73,9 @@
       "statusCode": 200,
       "serviceHit": {
         "step": 1,
-        "target": "GET /bookings/bc595917-0985-4e65-83f9-24304f27b228/details",
-        "startedAt": "2026-04-29T05:18:51.219Z",
-        "endedAt": "2026-04-29T05:18:51.222Z",
+        "target": "GET /bookings/7ee4b0da-6a17-4922-a4fd-37d57e0af21d/details",
+        "startedAt": "2026-04-30T03:08:05.166Z",
+        "endedAt": "2026-04-30T03:08:05.169Z",
         "durationMs": 3,
         "result": "PASS",
         "statusCode": 200
@@ -96,8 +97,8 @@
       "serviceHit": {
         "step": 2,
         "target": "authorization (noop)",
-        "startedAt": "2026-04-29T05:18:51.222Z",
-        "endedAt": "2026-04-29T05:18:51.222Z",
+        "startedAt": "2026-04-30T03:08:05.169Z",
+        "endedAt": "2026-04-30T03:08:05.169Z",
         "durationMs": 0,
         "result": "PASS"
       }
@@ -118,8 +119,8 @@
       "serviceHit": {
         "step": 3,
         "target": "DB query (skipped: missing target)",
-        "startedAt": "2026-04-29T05:18:51.222Z",
-        "endedAt": "2026-04-29T05:18:51.222Z",
+        "startedAt": "2026-04-30T03:08:05.169Z",
+        "endedAt": "2026-04-30T03:08:05.169Z",
         "durationMs": 0,
         "result": "PASS"
       }
@@ -130,13 +131,14 @@
       "observed": {
         "lastApiRequestStep": 1,
         "response": {
-          "id": "bc595917-0985-4e65-83f9-24304f27b228",
+          "id": "7ee4b0da-6a17-4922-a4fd-37d57e0af21d",
           "status": "CONFIRMED",
-          "clientId": "7213780c-670b-4581-9ecc-b0ddbe084c0e",
-          "venueId": "07b5cd38-d93c-4092-819f-6c03f435aadd",
-          "startAt": "2026-04-30T10:00:00.000Z",
-          "endAt": "2026-04-30T12:00:00.000Z",
-          "createdAt": "2026-04-29T05:18:51.216Z"
+          "clientId": "7b35270a-7e7b-4845-8c82-c5ed6c91d824",
+          "venueId": "50f4e91b-cd11-428a-a1f9-1088eac6508e",
+          "startAt": "2026-05-01T10:00:00.000Z",
+          "endAt": "2026-05-01T12:00:00.000Z",
+          "createdAt": "2026-04-30T03:08:05.164Z",
+          "companions": null
         },
         "checks": [
           {
@@ -148,7 +150,7 @@
           {
             "type": "present",
             "field": "id",
-            "actual": "bc595917-0985-4e65-83f9-24304f27b228",
+            "actual": "7ee4b0da-6a17-4922-a4fd-37d57e0af21d",
             "pass": true
           },
           {
@@ -160,31 +162,31 @@
           {
             "type": "present",
             "field": "clientId",
-            "actual": "7213780c-670b-4581-9ecc-b0ddbe084c0e",
+            "actual": "7b35270a-7e7b-4845-8c82-c5ed6c91d824",
             "pass": true
           },
           {
             "type": "present",
             "field": "venueId",
-            "actual": "07b5cd38-d93c-4092-819f-6c03f435aadd",
+            "actual": "50f4e91b-cd11-428a-a1f9-1088eac6508e",
             "pass": true
           },
           {
             "type": "present",
             "field": "startAt",
-            "actual": "2026-04-30T10:00:00.000Z",
+            "actual": "2026-05-01T10:00:00.000Z",
             "pass": true
           },
           {
             "type": "present",
             "field": "endAt",
-            "actual": "2026-04-30T12:00:00.000Z",
+            "actual": "2026-05-01T12:00:00.000Z",
             "pass": true
           },
           {
             "type": "present",
             "field": "createdAt",
-            "actual": "2026-04-29T05:18:51.216Z",
+            "actual": "2026-04-30T03:08:05.164Z",
             "pass": true
           }
         ]
@@ -196,8 +198,8 @@
       "serviceHit": {
         "step": 4,
         "target": "API response validation",
-        "startedAt": "2026-04-29T05:18:51.222Z",
-        "endedAt": "2026-04-29T05:18:51.222Z",
+        "startedAt": "2026-04-30T03:08:05.169Z",
+        "endedAt": "2026-04-30T03:08:05.169Z",
         "durationMs": 0,
         "result": "PASS",
         "statusCode": 200
@@ -221,8 +223,8 @@
       "serviceHit": {
         "step": 5,
         "target": "responseValidation (noop)",
-        "startedAt": "2026-04-29T05:18:51.222Z",
-        "endedAt": "2026-04-29T05:18:51.222Z",
+        "startedAt": "2026-04-30T03:08:05.169Z",
+        "endedAt": "2026-04-30T03:08:05.169Z",
         "durationMs": 0,
         "result": "PASS"
       }
