@@ -1,5 +1,6 @@
 {
   "testId": "MOD-ROSTER-001",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "roster",
   "priority": "P1",
@@ -89,7 +90,8 @@
       "userId": "4e4f089c-8c40-4304-be6e-2463d74c2dbf",
       "role": "CLIENT",
       "email": "roster.client.001@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the client user"
     },
     {
       "step": 2,
@@ -102,7 +104,8 @@
       },
       "headers": {
         "Authorization": "Bearer {{authToken}}"
-      }
+      },
+      "layman": "Client searches for venues matching the substring 'galaxy'"
     }
   ],
   "assertions": {

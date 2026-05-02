@@ -1,6 +1,6 @@
 {
   "testId": "MOD-BOOKING-008",
-  "artifactStatus": "DRAFT_SPEC",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scenarioName": "Cancel Already-Cancelled Booking - Idempotent Success (200)",
   "flowType": "edge",
   "linkedRequirement": "booking-and-allocation/cancel-idempotency",

@@ -1,5 +1,6 @@
 {
   "testId": "MOD-COMPANION-PROFILE-006",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "companion-profile",
   "priority": "P1",
@@ -54,7 +55,8 @@
       "userId": "user-companion",
       "role": "COMPANION",
       "email": "companion@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the companion user"
     },
     {
       "step": 2,
@@ -67,7 +69,8 @@
       },
       "payload": {
         "languages": ["ENGLISH", "SPANISH"]
-      }
+      },
+      "layman": "Companion attempts to update languages with an invalid language code"
     },
     {
       "step": 3,
@@ -77,7 +80,8 @@
       "where": {
         "field": "user_id",
         "value": "user-companion"
-      }
+      },
+      "layman": "Verify the languages field was not changed in the database"
     }
   ],
   "assertions": {

@@ -1,13 +1,13 @@
 {
   "testId": "MOD-BOOKING-012",
   "artifactStatus": "FINALIZED_EXECUTABLE",
-  "scenarioName": "Get Booking Details - CANCELLED/COMPLETED Status (Companions Hidden)",
+  "scenarioName": "Get Booking Details - CANCELLED/COMPLETED Status (Companions Always Visible)",
   "flowType": "edge",
-  "linkedRequirement": "booking-and-allocation/get-booking-details-timed-reveal",
+  "linkedRequirement": "booking-and-allocation/get-booking-details-terminal-states",
   "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-012-get-booking-details-cancelled-completed-null-companions.json",
   "executionMode": "api+db+auth",
-  "objective": "Validate that companion information is hidden (companions: null) when booking status is CANCELLED or COMPLETED, regardless of timing",
-  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.2.0",
+  "objective": "Validate that companion public information is present even for CANCELLED or COMPLETED bookings (as of v2.0.0, companions always visible)",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v2.0.0",
   "testVariants": [
     {
       "variantId": "A",

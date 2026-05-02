@@ -1,5 +1,6 @@
 {
   "testId": "MOD-COMPANION-PROFILE-002",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "companion-profile",
   "priority": "P1",
@@ -42,7 +43,8 @@
       "userId": "user-client",
       "role": "CLIENT",
       "email": "client@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for a CLIENT role user"
     },
     {
       "step": 2,
@@ -52,7 +54,8 @@
       "endpoint": "/companion-profiles/me",
       "headers": {
         "Authorization": "Bearer {{authToken}}"
-      }
+      },
+      "layman": "Client user attempts to access companion-only endpoint"
     }
   ],
   "assertions": {

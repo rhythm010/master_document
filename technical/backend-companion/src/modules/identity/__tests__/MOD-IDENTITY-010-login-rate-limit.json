@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-010",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P2",
@@ -46,7 +47,8 @@
         "password": "WrongPassword1!"
       },
       "repeat": 5,
-      "description": "Attempt 5 failed logins"
+      "description": "Attempt 5 failed logins",
+      "layman": "User attempts login 5 times with wrong password to trigger rate limit"
     },
     {
       "step": 2,
@@ -58,7 +60,8 @@
         "email": "ratelimit@test.com",
         "password": "CorrectPassword123!"
       },
-      "description": "6th attempt with correct password should be rate limited"
+      "description": "6th attempt with correct password should be rate limited",
+      "layman": "User attempts 6th login with correct password but gets blocked by rate limit"
     }
   ],
   "assertions": {

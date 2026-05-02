@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-007",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P1",
@@ -45,7 +46,8 @@
         "email": "verified@test.com",
         "password": "Test123!@#"
       },
-      "storeResponseFields": ["accessToken", "user.id"]
+      "storeResponseFields": ["accessToken", "user.id"],
+      "layman": "User logs in with email and password credentials"
     },
     {
       "step": 2,
@@ -56,7 +58,8 @@
         "sub": "user-verified",
         "role": "CLIENT",
         "email": "verified@test.com"
-      }
+      },
+      "layman": "Verify the returned JWT token contains correct user claims and is valid"
     }
   ],
   "assertions": {

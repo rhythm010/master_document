@@ -1,5 +1,6 @@
 {
   "testId": "MOD-ROSTER-004",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "roster",
   "priority": "P1",
@@ -161,7 +162,8 @@
         "endAt": "2026-04-26T12:00:00.000Z",
         "bookingId": "7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5"
       },
-      "storeResponseFields": ["captainSlotId", "viceCaptainSlotId"]
+      "storeResponseFields": ["captainSlotId", "viceCaptainSlotId"],
+      "layman": "System reserves one captain and one vice captain roster slot for the booking"
     },
     {
       "step": 2,
@@ -172,7 +174,8 @@
         "field": "id",
         "value": "f62a597b-da60-42a2-847e-be33ab24f5da"
       },
-      "description": "Verify CAPTAIN roster_slot row booked + booking_id set (query by seeded CAPTAIN roster_slot id)"
+      "description": "Verify CAPTAIN roster_slot row booked + booking_id set (query by seeded CAPTAIN roster_slot id)",
+      "layman": "Verify captain roster slot is now marked BOOKED with booking ID"
     },
     {
       "step": 3,
@@ -183,7 +186,8 @@
         "field": "id",
         "value": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb"
       },
-      "description": "Verify VICE_CAPTAIN roster_slot row booked + booking_id set (query by seeded VICE_CAPTAIN roster_slot id)"
+      "description": "Verify VICE_CAPTAIN roster_slot row booked + booking_id set (query by seeded VICE_CAPTAIN roster_slot id)",
+      "layman": "Verify vice captain roster slot is now marked BOOKED with booking ID"
     },
     {
       "step": 4,
@@ -196,7 +200,8 @@
       },
       "payload": {
         "bookingId": "7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5"
-      }
+      },
+      "layman": "System releases all roster slots associated with the booking"
     },
     {
       "step": 5,
@@ -207,7 +212,8 @@
         "field": "id",
         "value": "f62a597b-da60-42a2-847e-be33ab24f5da"
       },
-      "description": "Verify CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded CAPTAIN roster_slot id)"
+      "description": "Verify CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded CAPTAIN roster_slot id)",
+      "layman": "Verify captain roster slot is now AVAILABLE with no booking ID"
     },
     {
       "step": 6,
@@ -218,7 +224,8 @@
         "field": "id",
         "value": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb"
       },
-      "description": "Verify VICE_CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded VICE_CAPTAIN roster_slot id)"
+      "description": "Verify VICE_CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded VICE_CAPTAIN roster_slot id)",
+      "layman": "Verify vice captain roster slot is now AVAILABLE with no booking ID"
     }
   ],
   "assertions": {

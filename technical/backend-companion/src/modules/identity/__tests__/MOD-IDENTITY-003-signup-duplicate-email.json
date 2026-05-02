@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-003",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P1",
@@ -46,7 +47,8 @@
         "nickname": "duplicate",
         "email": "existing@test.com",
         "password": "Test123!@#"
-      }
+      },
+      "layman": "Attempt to sign up with an email address that already exists in the system"
     },
     {
       "step": 2,
@@ -56,7 +58,8 @@
       "where": {
         "field": "email",
         "value": "existing@test.com"
-      }
+      },
+      "layman": "Verify that no new user was created and only the original user exists"
     }
   ],
   "assertions": {

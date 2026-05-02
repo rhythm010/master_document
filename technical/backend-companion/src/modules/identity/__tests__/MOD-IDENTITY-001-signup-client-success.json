@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-001",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P1",
@@ -41,7 +42,8 @@
         "password": "Test123!@#",
         "biometricAuthEnabled": false
       },
-      "storeResponseFields": ["id"]
+      "storeResponseFields": ["id"],
+      "layman": "Client signs up with role CLIENT, providing name, nickname, email, and password"
     },
     {
       "step": 2,
@@ -51,7 +53,8 @@
       "where": {
         "idFromStep": 1,
         "field": "id"
-      }
+      },
+      "layman": "Verify the user record was created in the database with correct fields"
     },
     {
       "step": 3,
@@ -59,7 +62,8 @@
       "actionType": "externalCheck",
       "description": "Check verification email sent to Mailpit",
       "endpoint": "http://localhost:8025/api/v1/messages",
-      "validateEmailTo": "client@test.com"
+      "validateEmailTo": "client@test.com",
+      "layman": "Verify that a verification email was sent to the client's email address"
     }
   ],
   "assertions": {

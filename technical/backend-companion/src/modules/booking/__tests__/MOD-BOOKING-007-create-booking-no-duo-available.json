@@ -1,6 +1,6 @@
 {
   "testId": "MOD-BOOKING-007",
-  "artifactStatus": "DRAFT_SPEC",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scenarioName": "Create Booking - No Duo Available (409)",
   "flowType": "edge",
   "linkedRequirement": "booking-and-allocation/no-duo-available",

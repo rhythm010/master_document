@@ -1,5 +1,6 @@
 {
   "testId": "MOD-COMPANION-PROFILE-004",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "companion-profile",
   "priority": "P1",
@@ -54,7 +55,8 @@
       "userId": "user-companion",
       "role": "COMPANION",
       "email": "companion@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the companion user"
     },
     {
       "step": 2,
@@ -67,7 +69,8 @@
       },
       "payload": {
         "languages": ["ENGLISH", "ENGLISH", "ARABIC"]
-      }
+      },
+      "layman": "Companion updates their spoken languages list"
     },
     {
       "step": 3,
@@ -77,7 +80,8 @@
       "where": {
         "field": "user_id",
         "value": "user-companion"
-      }
+      },
+      "layman": "Verify languages were updated and deduplicated in database"
     }
   ],
   "assertions": {

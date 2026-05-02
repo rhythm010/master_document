@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-011",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P1",
@@ -57,7 +58,8 @@
       "userId": "user-companion",
       "role": "COMPANION",
       "email": "companion@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the companion user"
     },
     {
       "step": 2,
@@ -67,7 +69,8 @@
       "endpoint": "/users/me",
       "headers": {
         "Authorization": "Bearer {{authToken}}"
-      }
+      },
+      "layman": "User requests their own profile information"
     }
   ],
   "assertions": {

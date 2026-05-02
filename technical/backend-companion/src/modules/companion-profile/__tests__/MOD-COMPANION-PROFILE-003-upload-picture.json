@@ -1,5 +1,6 @@
 {
   "testId": "MOD-COMPANION-PROFILE-003",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "companion-profile",
   "priority": "P2",
@@ -51,7 +52,8 @@
       "userId": "user-companion",
       "role": "COMPANION",
       "email": "companion@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the companion user"
     },
     {
       "step": 2,
@@ -66,14 +68,16 @@
       "files": {
         "picture": "test-fixtures/sample-image.jpg"
       },
-      "storeResponseFields": ["profilePictureUrl"]
+      "storeResponseFields": ["profilePictureUrl"],
+      "layman": "Companion uploads a profile picture file"
     },
     {
       "step": 3,
       "actor": "TestExecutor",
       "actionType": "filesystemCheck",
       "description": "Verify file exists on disk",
-      "path": "{{profilePictureUrl}}"
+      "path": "{{profilePictureUrl}}",
+      "layman": "Verify the uploaded image file exists in storage"
     }
   ],
   "assertions": {

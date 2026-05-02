@@ -1,13 +1,13 @@
 {
   "testId": "MOD-BOOKING-011",
   "artifactStatus": "FINALIZED_EXECUTABLE",
-  "scenarioName": "Get Booking Details - Before T-5h Reveal Window (Companions Hidden)",
-  "flowType": "edge",
-  "linkedRequirement": "booking-and-allocation/get-booking-details-timed-reveal",
+  "scenarioName": "Get Booking Details - Companions Always Visible (No Timed Reveal)",
+  "flowType": "happy",
+  "linkedRequirement": "booking-and-allocation/get-booking-details-always-reveal",
   "filePath": "technical/backend-companion/src/modules/booking/__tests__/MOD-BOOKING-011-get-booking-details-before-reveal-window.json",
   "executionMode": "api+db+auth",
-  "objective": "Validate that companion information is hidden (companions: null) when current time is before the T-5h reveal window",
-  "featureSdsVersion": "booking-and-allocation.feature-sds.md v1.2.0",
+  "objective": "Validate that companion public information is ALWAYS present in booking details response, regardless of timing (no reveal window as of v2.0.0)",
+  "featureSdsVersion": "booking-and-allocation.feature-sds.md v2.0.0",
   "seedData": [
     {
       "entity": "user",

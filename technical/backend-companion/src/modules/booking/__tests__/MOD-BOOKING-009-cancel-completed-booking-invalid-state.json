@@ -1,6 +1,6 @@
 {
   "testId": "MOD-BOOKING-009",
-  "artifactStatus": "DRAFT_SPEC",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scenarioName": "Cancel Completed Booking - Invalid State Transition (400)",
   "flowType": "edge",
   "linkedRequirement": "booking-and-allocation/cancel-invalid-state",

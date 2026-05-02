@@ -1,6 +1,6 @@
 {
   "testId": "MOD-BOOKING-001",
-  "artifactStatus": "DRAFT_SPEC",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scenarioName": "Create Booking - Happy Path",
   "flowType": "happy",
   "linkedRequirement": "booking-and-allocation/create-booking",

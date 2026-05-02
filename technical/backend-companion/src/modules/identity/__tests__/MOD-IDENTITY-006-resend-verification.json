@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-006",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P2",
@@ -43,7 +44,8 @@
       "endpoint": "/auth/resend-verification",
       "payload": {
         "email": "unverified@test.com"
-      }
+      },
+      "layman": "User requests to resend verification email for their unverified account"
     },
     {
       "step": 2,
@@ -51,7 +53,8 @@
       "actionType": "externalCheck",
       "description": "Check verification email sent to Mailpit",
       "endpoint": "http://localhost:8025/api/v1/messages",
-      "validateEmailTo": "unverified@test.com"
+      "validateEmailTo": "unverified@test.com",
+      "layman": "Verify that a new verification email was sent to the user's email address"
     }
   ],
   "assertions": {

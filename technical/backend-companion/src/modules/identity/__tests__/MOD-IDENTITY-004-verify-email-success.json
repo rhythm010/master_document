@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-004",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P1",
@@ -41,7 +42,8 @@
       "tokenType": "EMAIL_VERIFY",
       "userId": "user-unverified",
       "email": "unverified@test.com",
-      "storeAs": "verificationToken"
+      "storeAs": "verificationToken",
+      "layman": "Generate a valid email verification token for the user"
     },
     {
       "step": 2,
@@ -51,7 +53,8 @@
       "endpoint": "/auth/verify-email",
       "queryParams": {
         "token": "{{verificationToken}}"
-      }
+      },
+      "layman": "User clicks verification link with valid token to verify their email"
     },
     {
       "step": 3,
@@ -61,7 +64,8 @@
       "where": {
         "field": "id",
         "value": "user-unverified"
-      }
+      },
+      "layman": "Verify the user's emailVerified flag was updated to true in database"
     }
   ],
   "assertions": {

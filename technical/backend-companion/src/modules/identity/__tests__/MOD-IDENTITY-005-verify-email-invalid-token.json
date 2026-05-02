@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-005",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P2",
@@ -42,7 +43,8 @@
       "endpoint": "/auth/verify-email",
       "queryParams": {
         "token": "invalid.jwt.token"
-      }
+      },
+      "layman": "User attempts to verify email with an invalid or expired token"
     },
     {
       "step": 2,
@@ -52,7 +54,8 @@
       "where": {
         "field": "id",
         "value": "user-unverified"
-      }
+      },
+      "layman": "Verify the user's emailVerified flag remains false in database"
     }
   ],
   "assertions": {
