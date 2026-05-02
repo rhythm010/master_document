@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    "**/results": false,
+    "**/__tests__/results": false
+  },
+  "search.exclude": {
+    "**/results": false,
+    "**/__tests__/results": false
+  }
+}
