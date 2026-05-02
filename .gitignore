@@ -1,7 +1,16 @@
+# Dependencies (never commit)
 node_modules/
+
+# Build output (never commit)
 dist/
-.DS_Store
-*.log
+
+# Environment files
 .env
 .env.local
 .env.*.local
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
