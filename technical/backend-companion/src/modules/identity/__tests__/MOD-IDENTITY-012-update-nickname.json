@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-012",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P2",
@@ -44,7 +45,8 @@
       "userId": "user-client",
       "role": "CLIENT",
       "email": "client@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the client user"
     },
     {
       "step": 2,
@@ -57,7 +59,8 @@
       },
       "payload": {
         "nickname": "newnickname"
-      }
+      },
+      "layman": "User updates their nickname to a new value"
     },
     {
       "step": 3,
@@ -67,7 +70,8 @@
       "where": {
         "field": "id",
         "value": "user-client"
-      }
+      },
+      "layman": "Verify the nickname was updated in the database"
     }
   ],
   "assertions": {

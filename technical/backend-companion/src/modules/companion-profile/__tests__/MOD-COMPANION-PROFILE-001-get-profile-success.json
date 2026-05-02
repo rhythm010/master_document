@@ -1,5 +1,6 @@
 {
   "testId": "MOD-COMPANION-PROFILE-001",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "companion-profile",
   "priority": "P1",
@@ -57,7 +58,8 @@
       "userId": "3b7a9e2a-7c8c-4b6b-9c1f-8d0f0bfb3f9a",
       "role": "COMPANION",
       "email": "companion@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the companion user"
     },
     {
       "step": 2,
@@ -67,7 +69,8 @@
       "endpoint": "/companion-profiles/me",
       "headers": {
         "Authorization": "Bearer {{authToken}}"
-      }
+      },
+      "layman": "Companion requests their own profile information"
     }
   ],
   "assertions": {

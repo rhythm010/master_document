@@ -1,5 +1,6 @@
 {
   "testId": "MOD-ROSTER-003",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "roster",
   "priority": "P1",
@@ -98,7 +99,8 @@
       },
       "storeResponseFields": [
         "slotsCreated"
-      ]
+      ],
+      "layman": "System creates venue assignments and roster slots for a companion at multiple venues"
     },
     {
       "step": 2,
@@ -109,7 +111,8 @@
         "field": "companion_id",
         "value": "a54a9731-9ea6-48fc-8243-26e6245fcd68"
       },
-      "description": "Verify companion_venue_assignments rows created"
+      "description": "Verify companion_venue_assignments rows created",
+      "layman": "Verify companion was assigned to the specified venues in database"
     },
     {
       "step": 3,
@@ -120,7 +123,8 @@
         "field": "companion_id",
         "value": "a54a9731-9ea6-48fc-8243-26e6245fcd68"
       },
-      "description": "Verify roster_slots rows created"
+      "description": "Verify roster_slots rows created",
+      "layman": "Verify roster slots were created for the companion at those venues"
     }
   ],
   "assertions": {

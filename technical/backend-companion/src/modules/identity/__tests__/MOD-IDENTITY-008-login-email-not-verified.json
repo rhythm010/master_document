@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-008",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P1",
@@ -44,7 +45,8 @@
       "payload": {
         "email": "unverified@test.com",
         "password": "Test123!@#"
-      }
+      },
+      "layman": "Attempt to login with correct credentials but unverified email address"
     }
   ],
   "assertions": {

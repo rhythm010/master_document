@@ -1,0 +1,127 @@
+{
+  "testId": "MOD-COMPANION-PROFILE-009",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "type": "module",
+  "moduleOwner": "companion-profile",
+  "priority": "P1",
+  "scenarioName": "Get Companion Profile By ID (Public Non-PII)",
+  "flowType": "happy",
+  "linkedRequirement": "companion-profile/get-by-id-public",
+  "filePath": "src/modules/companion-profile/__tests__/MOD-COMPANION-PROFILE-009-get-profile-by-id-public.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false
+  },
+  "objective": "Validate GET /companion-profiles/{companionId} returns public non-PII companion profile for any authenticated user",
+  "preconditions": [
+    "Companion user exists with profile",
+    "Any authenticated user (CLIENT or COMPANION) can call this endpoint"
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "companion-target",
+        "role": "COMPANION",
+        "name": "Target Companion Full Name",
+        "nickname": "targetcomp",
+        "email": "target@test.com",
+        "passwordHash": "hashed",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "companion_profile",
+      "values": {
+        "id": "profile-target",
+        "userId": "companion-target",
+        "designation": "CAPTAIN",
+        "isActive": true,
+        "languages": ["ENGLISH", "ARABIC"],
+        "profilePictureUrl": "https://example.com/target.jpg",
+        "averageRating": 4.75
+      }
+    },
+    {
+      "entity": "user",
+      "values": {
+        "id": "client-viewer",
+        "role": "CLIENT",
+        "name": "Client Viewer",
+        "nickname": "clientviewer",
+        "email": "viewer@test.com",
+        "passwordHash": "hashed",
+        "emailVerified": true
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "client-viewer",
+      "role": "CLIENT",
+      "email": "viewer@test.com",
+      "storeAs": "authToken",
+      "layman": "Generate auth token for a CLIENT user who will view the companion profile"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/companion-profiles/companion-target",
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      },
+      "layman": "Client requests public profile of a companion by their companion ID"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "bodyFields": {
+          "id": "profile-target",
+          "displayName": "targetcomp",
+          "designation": "CAPTAIN",
+          "languages": ["ENGLISH", "ARABIC"],
+          "profilePictureUrl": "https://example.com/target.jpg",
+          "averageRating": 4.75
+        },
+        "requiredKeys": ["id", "displayName", "designation", "languages", "profilePictureUrl", "averageRating"]
+      }
+    ],
+    "mustNotOccur": [
+      "email in response",
+      "name (full name) in response",
+      "passwordHash in response",
+      "userId in response",
+      "any PII fields"
+    ]
+  },
+  "cleanup": [
+    "Delete companion_profile row",
+    "Delete companion user",
+    "Delete client user"
+  ],
+  "passCriteria": [
+    "API returns 200",
+    "Public non-PII fields returned",
+    "displayName is nickname from users table",
+    "No PII fields exposed (email, full name, etc.)",
+    "averageRating is numeric to 2 decimal places"
+  ]
+}

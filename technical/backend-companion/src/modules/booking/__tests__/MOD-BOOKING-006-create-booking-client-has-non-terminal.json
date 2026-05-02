@@ -1,6 +1,6 @@
 {
   "testId": "MOD-BOOKING-006",
-  "artifactStatus": "DRAFT_SPEC",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "scenarioName": "Create Booking - Client Already Has Non-Terminal Booking (409)",
   "flowType": "edge",
   "linkedRequirement": "booking-and-allocation/one-non-terminal-booking-rule",

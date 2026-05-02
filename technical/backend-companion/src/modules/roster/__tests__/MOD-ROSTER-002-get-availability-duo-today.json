@@ -1,5 +1,6 @@
 {
   "testId": "MOD-ROSTER-002",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "roster",
   "priority": "P1",
@@ -127,7 +128,8 @@
       "userId": "45b632cb-ad71-4da6-a6ae-ca70c9ba1d77",
       "role": "CLIENT",
       "email": "roster.client.002@test.com",
-      "storeAs": "authToken"
+      "storeAs": "authToken",
+      "layman": "Generate authentication token for the client user"
     },
     {
       "step": 2,
@@ -141,7 +143,8 @@
       },
       "headers": {
         "Authorization": "Bearer {{authToken}}"
-      }
+      },
+      "layman": "Client requests available booking times for the venue on a specific date"
     },
     {
       "step": 3,
@@ -152,7 +155,8 @@
         "field": "venue_id",
         "value": "86f3716d-bde5-49c0-8617-7c611b0c95aa"
       },
-      "description": "Verify backfill created roster_slots for venue/date (at least some rows exist)"
+      "description": "Verify backfill created roster_slots for venue/date (at least some rows exist)",
+      "layman": "Verify roster slots were auto-generated for the venue and date"
     }
   ],
   "assertions": {

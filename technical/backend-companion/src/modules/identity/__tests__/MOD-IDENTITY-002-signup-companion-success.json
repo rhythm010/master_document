@@ -1,5 +1,6 @@
 {
   "testId": "MOD-IDENTITY-002",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
   "type": "module",
   "moduleOwner": "identity",
   "priority": "P1",
@@ -52,7 +53,8 @@
         "password": "Test123!@#",
         "biometricAuthEnabled": true
       },
-      "storeResponseFields": ["id"]
+      "storeResponseFields": ["id"],
+      "layman": "Companion signs up with role COMPANION, providing name, nickname, email, and password"
     },
     {
       "step": 2,
@@ -62,7 +64,8 @@
       "where": {
         "idFromStep": 1,
         "field": "id"
-      }
+      },
+      "layman": "Verify the user record was created in the database with COMPANION role"
     },
     {
       "step": 3,
@@ -72,7 +75,8 @@
       "where": {
         "idFromStep": 1,
         "field": "user_id"
-      }
+      },
+      "layman": "Verify companion profile was created with assigned designation and default values"
     },
     {
       "step": 4,
@@ -82,7 +86,8 @@
       "where": {
         "idFromStep": 1,
         "field": "companion_id"
-      }
+      },
+      "layman": "Verify roster slots were automatically populated for the companion"
     },
     {
       "step": 5,
@@ -90,7 +95,8 @@
       "actionType": "externalCheck",
       "description": "Check verification email sent to Mailpit",
       "endpoint": "http://localhost:8025/api/v1/messages",
-      "validateEmailTo": "companion@test.com"
+      "validateEmailTo": "companion@test.com",
+      "layman": "Verify that a verification email was sent to the companion's email address"
     }
   ],
   "assertions": {

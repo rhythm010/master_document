@@ -1,0 +1,263 @@
+{
+  "summary": {
+    "totalTests": 12,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "errors": 1,
+    "executedAt": "2026-05-02T08:51:58.799Z",
+    "totalDurationMs": 14
+  },
+  "results": [
+    {
+      "testId": "MOD-BOOKING-001",
+      "scenarioName": "Create Booking - Happy Path",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.796Z",
+      "durationMs": 1,
+      "assertions": {
+        "total": 12,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-002",
+      "scenarioName": "Cancel Booking - Happy Path (Pre-Session)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.797Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 8,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-003",
+      "scenarioName": "Get Booking Details - Happy Path (Companions Revealed)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.797Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 17,
+        "passed": 6,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-004",
+      "scenarioName": "Internal Edit - Change Venue and Time (Happy Path)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 12,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-005",
+      "scenarioName": "Internal Edit - Manual Duo Reassignment (Happy Path)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 12,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-006",
+      "scenarioName": "Create Booking - Client Already Has Non-Terminal Booking (409)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 9,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-007",
+      "scenarioName": "Create Booking - No Duo Available (409)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 10,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-008",
+      "scenarioName": "Cancel Already-Cancelled Booking - Idempotent Success (200)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 9,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-009",
+      "scenarioName": "Cancel Completed Booking - Invalid State Transition (400)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 8,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-010",
+      "scenarioName": "Internal Edit - Invalid State/Extended/Progressed (400)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 13,
+        "passed": 7,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-011",
+      "scenarioName": "Get Booking Details - Companions Always Visible (No Timed Reveal)",
+      "status": "ERROR",
+      "executedAt": "2026-05-02T08:51:58.798Z",
+      "durationMs": 1,
+      "assertions": {
+        "total": 7,
+        "passed": 6,
+        "failed": 0
+      },
+      "errors": [
+        "Test objective claims \"companions ALWAYS visible\" but implementation still has timed reveal logic"
+      ],
+      "warnings": [
+        "Test references v2.0.0 (companions always visible) but implementation enforces timed/status-based reveal",
+        "Implementation shows: companions hidden before T-5h AND when status is CANCELLED/COMPLETED"
+      ],
+      "details": {}
+    },
+    {
+      "testId": "MOD-BOOKING-012",
+      "scenarioName": "Get Booking Details - CANCELLED/COMPLETED Status (Companions Always Visible)",
+      "status": "PASS",
+      "executedAt": "2026-05-02T08:51:58.799Z",
+      "durationMs": 0,
+      "assertions": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Test references v2.0.0 (companions always visible) but implementation enforces timed/status-based reveal",
+        "Implementation shows: companions hidden before T-5h AND when status is CANCELLED/COMPLETED",
+        "Test objective claims \"companions always visible\" but test expects companions: null for terminal statuses"
+      ],
+      "details": {}
+    }
+  ],
+  "coverage": {
+    "endpoints": [
+      "GET /bookings/:id/details",
+      "PATCH /bookings/:id",
+      "POST /bookings",
+      "POST /bookings/:id/cancel"
+    ],
+    "businessRules": [
+      "All safety constraints enforced before any mutations",
+      "Allocation failure is deterministic (no partial booking)",
+      "Artifacts remain stable across reassignment",
+      "Artifacts stability preserved across edits",
+      "CANCELLED and COMPLETED bookings do not block new bookings",
+      "COMPLETED bookings cannot transition to CANCELLED",
+      "Cancellation from CONFIRMED is allowed",
+      "Cannot edit bookings that have started (now >= start_at)",
+      "Cannot edit bookings with progressed match/presence statuses",
+      "Cannot edit extended bookings (extended_at != NULL)",
+      "Client has no other non-terminal bookings",
+      "Companion array ordered: CAPTAIN first, VICE_CAPTAIN second",
+      "Companions hidden when current time < (startAt - 5 hours)",
+      "Companions hidden when status is CANCELLED",
+      "Companions hidden when status is COMPLETED",
+      "Companions must be distinct",
+      "Companions must have correct designations (CAPTAIN, VICE_CAPTAIN)",
+      "Companions revealed when current time >= (startAt - 5 hours) AND status IN (CONFIRMED, ACTIVE)",
+      "Duo allocation requires both CAPTAIN and VICE_CAPTAIN",
+      "Duo integrity: one CAPTAIN + one VICE_CAPTAIN",
+      "Duo remains the same when no reassignment requested",
+      "Edit is atomic (all or nothing)",
+      "Global state machine enforced: COMPLETED is a terminal state",
+      "Idempotent cancellation succeeds",
+      "Manual reassignment requires BOTH companion IDs",
+      "Non-terminal statuses are CONFIRMED and ACTIVE",
+      "One non-terminal booking per client rule enforced",
+      "Only INTERNAL token can authorize",
+      "Only booking owner can cancel",
+      "PATCH /bookings/{id} only allowed on CONFIRMED bookings",
+      "Per SDS v1.2.0 section 4.D: companions null when status is CANCELLED or COMPLETED",
+      "Privacy protection: companions not revealed too early",
+      "Repeated cancellation requests are safe",
+      "Roster slots become available for new bookings",
+      "Roster slots reserved for exact 2-hour window",
+      "Status blocks reveal regardless of timing",
+      "System does not create booking without successful duo allocation",
+      "System does not fail on already-cancelled bookings",
+      "Target duo must be available at booking window",
+      "Timed reveal enforced per SDS v1.2.0 section 4.D",
+      "Transaction rolled back on constraint violation",
+      "Valid cancellation sources are CONFIRMED and ACTIVE only",
+      "averageRating is from companion_profiles.average_rating",
+      "displayName is from users.nickname (no full name, email, phone)",
+      "languages is an array from companion_profiles.languages",
+      "profilePictureUrl is from companion_profiles.profile_picture_url"
+    ]
+  },
+  "recommendations": [
+    "⚠️  Critical: Fix test design errors before execution",
+    "📋 SDS Alignment Issue: MOD-BOOKING-011 and MOD-BOOKING-012 reference v2.0.0 claiming \"companions always visible\", but implementation still enforces timed reveal (T-5h) and status-based blocking (CANCELLED/COMPLETED)",
+    "🔧 Action Required: Either (1) Update test designs to match current implementation behavior, OR (2) Update implementation to match v2.0.0 SDS specification"
+  ]
+}

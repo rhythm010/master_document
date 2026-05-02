@@ -1,0 +1,120 @@
+{
+  "testId": "MOD-ROSTER-005",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "type": "module",
+  "moduleOwner": "roster",
+  "priority": "P1",
+  "scenarioName": "GET /venues/{venueId} returns single venue by ID",
+  "flowType": "happy",
+  "linkedRequirement": "roster/get-venue-by-id",
+  "filePath": "src/modules/roster/__tests__/MOD-ROSTER-005-get-venue-by-id.json",
+  "executionMode": "api+db",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": false
+  },
+  "objective": "Validate authenticated caller can fetch a single venue by ID and receive same fields as venue list item",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Seed runner inserts seedData into DB before steps",
+    "Caller has a valid Bearer token"
+  ],
+  "seedData": [
+    {
+      "entity": "user",
+      "values": {
+        "id": "user-roster-005",
+        "role": "CLIENT",
+        "name": "Roster Client",
+        "nickname": "rosterclient",
+        "email": "roster.client.005@test.com",
+        "passwordHash": "seeded_hash",
+        "emailVerified": true,
+        "biometricAuthEnabled": false
+      }
+    },
+    {
+      "entity": "venue",
+      "values": {
+        "id": "venue-unique-005",
+        "name": "Marina Grand Mall",
+        "address": "123 Marina Boulevard, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.0801,
+        "longitude": 55.1396,
+        "operatingHoursStart": "10:00:00",
+        "operatingHoursEnd": "22:00:00"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 5,
+    "pollEveryMs": 500,
+    "retryCount": 10
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "tokenType": "AUTH",
+      "userId": "user-roster-005",
+      "role": "CLIENT",
+      "email": "roster.client.005@test.com",
+      "storeAs": "authToken",
+      "layman": "Generate auth token for authenticated client"
+    },
+    {
+      "step": 2,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/venues/venue-unique-005",
+      "headers": {
+        "Authorization": "Bearer {{authToken}}"
+      },
+      "layman": "Fetch a single venue by its ID"
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 2,
+        "statusCode": 200,
+        "bodyFields": {
+          "id": "venue-unique-005",
+          "name": "Marina Grand Mall",
+          "address": "123 Marina Boulevard, Dubai",
+          "venueType": "MALL",
+          "latitude": 25.0801,
+          "longitude": 55.1396,
+          "operatingHoursStart": "10:00",
+          "operatingHoursEnd": "22:00"
+        },
+        "requiredKeys": [
+          "id",
+          "name",
+          "address",
+          "venueType",
+          "latitude",
+          "longitude",
+          "operatingHoursStart",
+          "operatingHoursEnd"
+        ]
+      }
+    ],
+    "mustNotOccur": []
+  },
+  "cleanup": [
+    "Delete venue venue-unique-005",
+    "Delete user user-roster-005"
+  ],
+  "passCriteria": [
+    "API returns 200",
+    "Response contains correct venue with all required fields",
+    "Fields match venue list item structure from GET /venues"
+  ]
+}
