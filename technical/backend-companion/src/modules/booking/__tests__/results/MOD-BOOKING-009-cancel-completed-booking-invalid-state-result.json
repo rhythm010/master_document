@@ -1,0 +1,264 @@
+{
+  "runId": "RUN-20260430030805273-MOD-BOOKING-009",
+  "testId": "MOD-BOOKING-009",
+  "status": "PASS",
+  "startedAt": "2026-04-30T03:08:05.273Z",
+  "endedAt": "2026-04-30T03:08:05.292Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/8c3d0466-174e-4ef5-969e-46ed58141f5e/cancel",
+      "startedAt": "2026-04-30T03:08:05.289Z",
+      "endedAt": "2026-04-30T03:08:05.291Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 2,
+      "target": "authorization (noop)",
+      "startedAt": "2026-04-30T03:08:05.291Z",
+      "endedAt": "2026-04-30T03:08:05.291Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "validation (noop)",
+      "startedAt": "2026-04-30T03:08:05.291Z",
+      "endedAt": "2026-04-30T03:08:05.291Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "API response validation",
+      "startedAt": "2026-04-30T03:08:05.291Z",
+      "endedAt": "2026-04-30T03:08:05.291Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 5,
+      "target": "DB verify bookings",
+      "startedAt": "2026-04-30T03:08:05.291Z",
+      "endedAt": "2026-04-30T03:08:05.292Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-04-30T03:08:05.292Z",
+      "endedAt": "2026-04-30T03:08:05.292Z",
+      "durationMs": 0,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "INVALID_STATE_TRANSITION",
+        "message": "Invalid state transition"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client attempts to cancel a booking that has already completed",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/8c3d0466-174e-4ef5-969e-46ed58141f5e/cancel",
+        "startedAt": "2026-04-30T03:08:05.289Z",
+        "endedAt": "2026-04-30T03:08:05.291Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Verify booking exists",
+          "Verify caller owns the booking"
+        ]
+      },
+      "actor": "System",
+      "actionType": "authorization",
+      "layman": "System verifies the client owns this booking",
+      "serviceHit": {
+        "step": 2,
+        "target": "authorization (noop)",
+        "startedAt": "2026-04-30T03:08:05.291Z",
+        "endedAt": "2026-04-30T03:08:05.291Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Check booking.status is COMPLETED",
+          "Reject cancellation (invalid state transition)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System detects the booking is completed and cannot be cancelled",
+      "serviceHit": {
+        "step": 3,
+        "target": "validation (noop)",
+        "startedAt": "2026-04-30T03:08:05.291Z",
+        "endedAt": "2026-04-30T03:08:05.291Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "INVALID_STATE_TRANSITION",
+          "message": "Invalid state transition"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 400,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects the cancellation with an invalid state transition error",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 4,
+        "target": "API response validation",
+        "startedAt": "2026-04-30T03:08:05.291Z",
+        "endedAt": "2026-04-30T03:08:05.291Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "8c3d0466-174e-4ef5-969e-46ed58141f5e"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "8c3d0466-174e-4ef5-969e-46ed58141f5e",
+            "client_id": "1e7bec42-cc07-4c21-9450-605d0a3dd7e6",
+            "venue_id": "e5d5a45a-2cec-48cc-9a81-ba678ed7864e",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "COMPLETED",
+            "qr_code": "qr_8c3d0466-174e-4ef5-969e-46ed58141f5e",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_8c3d0466-174e-4ef5-969e-46ed58141f5e",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-04-30T03:08:05.284Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "8c3d0466-174e-4ef5-969e-46ed58141f5e",
+            "actual": "8c3d0466-174e-4ef5-969e-46ed58141f5e",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "COMPLETED",
+            "actual": "COMPLETED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify booking status remains COMPLETED (no change)",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB verify bookings",
+        "startedAt": "2026-04-30T03:08:05.291Z",
+        "endedAt": "2026-04-30T03:08:05.292Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE companion_id IN ($1, $2) AND start_at=$3 LIMIT 50;",
+        "params": [
+          "5363c11c-bfa1-4adc-ba2a-d72ca4697fa8",
+          "86efb74b-42ac-4792-8af9-1534eb38541d",
+          "2026-05-01T10:00:00.000Z"
+        ],
+        "rowCount": 0,
+        "rows": [],
+        "checks": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify roster slots remain unchanged",
+      "serviceHit": {
+        "step": 6,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-04-30T03:08:05.292Z",
+        "endedAt": "2026-04-30T03:08:05.292Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

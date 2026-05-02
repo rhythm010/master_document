@@ -1,0 +1,278 @@
+{
+  "runId": "RUN-20260430030805256-MOD-BOOKING-008",
+  "testId": "MOD-BOOKING-008",
+  "status": "PASS",
+  "startedAt": "2026-04-30T03:08:05.256Z",
+  "endedAt": "2026-04-30T03:08:05.272Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/1cd0aab8-1b84-4160-a38d-778fa72949ef/cancel",
+      "startedAt": "2026-04-30T03:08:05.269Z",
+      "endedAt": "2026-04-30T03:08:05.271Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 2,
+      "target": "authorization (noop)",
+      "startedAt": "2026-04-30T03:08:05.271Z",
+      "endedAt": "2026-04-30T03:08:05.271Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "validation (noop)",
+      "startedAt": "2026-04-30T03:08:05.271Z",
+      "endedAt": "2026-04-30T03:08:05.271Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "API response validation",
+      "startedAt": "2026-04-30T03:08:05.271Z",
+      "endedAt": "2026-04-30T03:08:05.271Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "DB verify bookings",
+      "startedAt": "2026-04-30T03:08:05.271Z",
+      "endedAt": "2026-04-30T03:08:05.272Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-04-30T03:08:05.272Z",
+      "endedAt": "2026-04-30T03:08:05.272Z",
+      "durationMs": 0,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "1cd0aab8-1b84-4160-a38d-778fa72949ef",
+        "status": "CANCELLED"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client attempts to cancel a booking that is already cancelled",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/1cd0aab8-1b84-4160-a38d-778fa72949ef/cancel",
+        "startedAt": "2026-04-30T03:08:05.269Z",
+        "endedAt": "2026-04-30T03:08:05.271Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Verify booking exists",
+          "Verify caller owns the booking"
+        ]
+      },
+      "actor": "System",
+      "actionType": "authorization",
+      "layman": "System verifies the client owns this booking",
+      "serviceHit": {
+        "step": 2,
+        "target": "authorization (noop)",
+        "startedAt": "2026-04-30T03:08:05.271Z",
+        "endedAt": "2026-04-30T03:08:05.271Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Check booking.status is CANCELLED",
+          "Recognize idempotent cancellation (already cancelled)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System detects the booking is already cancelled",
+      "serviceHit": {
+        "step": 3,
+        "target": "validation (noop)",
+        "startedAt": "2026-04-30T03:08:05.271Z",
+        "endedAt": "2026-04-30T03:08:05.271Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "id": "1cd0aab8-1b84-4160-a38d-778fa72949ef",
+          "status": "CANCELLED"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "id",
+            "expected": "1cd0aab8-1b84-4160-a38d-778fa72949ef",
+            "actual": "1cd0aab8-1b84-4160-a38d-778fa72949ef",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "status",
+            "expected": "CANCELLED",
+            "actual": "CANCELLED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns idempotent success (200) with current status",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "API response validation",
+        "startedAt": "2026-04-30T03:08:05.271Z",
+        "endedAt": "2026-04-30T03:08:05.271Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "1cd0aab8-1b84-4160-a38d-778fa72949ef"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "1cd0aab8-1b84-4160-a38d-778fa72949ef",
+            "client_id": "bdbe0301-ef7a-4f90-ad2d-0b6f30617b50",
+            "venue_id": "f072aac2-74cd-4454-a1bd-8dc3f9606f94",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "CANCELLED",
+            "qr_code": "qr_1cd0aab8-1b84-4160-a38d-778fa72949ef",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_1cd0aab8-1b84-4160-a38d-778fa72949ef",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-04-30T03:08:05.264Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "1cd0aab8-1b84-4160-a38d-778fa72949ef",
+            "actual": "1cd0aab8-1b84-4160-a38d-778fa72949ef",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "CANCELLED",
+            "actual": "CANCELLED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify booking status remains CANCELLED (no change)",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB verify bookings",
+        "startedAt": "2026-04-30T03:08:05.271Z",
+        "endedAt": "2026-04-30T03:08:05.272Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE companion_id IN ($1, $2) AND start_at=$3 LIMIT 50;",
+        "params": [
+          "45d658c1-53bf-4c97-bb77-852d28cf0809",
+          "8a56f820-478d-4b9e-9674-3e0f01defa58",
+          "2026-05-01T10:00:00.000Z"
+        ],
+        "rowCount": 0,
+        "rows": [],
+        "checks": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify roster slots remain AVAILABLE (already released, no double-release)",
+      "serviceHit": {
+        "step": 6,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-04-30T03:08:05.272Z",
+        "endedAt": "2026-04-30T03:08:05.272Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
