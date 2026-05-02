@@ -1,0 +1,388 @@
+{
+  "runId": "RUN-20260502105338709-JRN-004",
+  "testId": "JRN-004",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T10:53:38.709Z",
+  "endedAt": "2026-05-02T11:09:20.986Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-02T10:53:38.721Z",
+      "endedAt": "2026-05-02T10:53:38.730Z",
+      "durationMs": 9,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-02T10:53:38.730Z",
+      "endedAt": "2026-05-02T10:54:08.793Z",
+      "durationMs": 30063,
+      "result": "FAIL"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-05-02T10:54:08.793Z",
+      "endedAt": "2026-05-02T10:54:08.812Z",
+      "durationMs": 19,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-02T10:54:08.813Z",
+      "endedAt": "2026-05-02T10:54:08.820Z",
+      "durationMs": 7,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 5,
+      "target": "DB users query",
+      "startedAt": "2026-05-02T10:54:08.820Z",
+      "endedAt": "2026-05-02T10:54:08.840Z",
+      "durationMs": 20,
+      "result": "FAIL"
+    },
+    {
+      "step": 6,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-02T10:54:08.840Z",
+      "endedAt": "2026-05-02T10:54:08.842Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 7,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-02T10:54:08.842Z",
+      "endedAt": "2026-05-02T11:09:20.721Z",
+      "durationMs": 911879,
+      "result": "FAIL"
+    },
+    {
+      "step": 8,
+      "target": "GET /auth/verify-email",
+      "startedAt": "2026-05-02T11:09:20.721Z",
+      "endedAt": "2026-05-02T11:09:20.904Z",
+      "durationMs": 183,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 9,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-02T11:09:20.904Z",
+      "endedAt": "2026-05-02T11:09:20.929Z",
+      "durationMs": 25,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 10,
+      "target": "DB users query",
+      "startedAt": "2026-05-02T11:09:20.929Z",
+      "endedAt": "2026-05-02T11:09:20.978Z",
+      "durationMs": 49,
+      "result": "FAIL"
+    },
+    {
+      "step": 11,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-05-02T11:09:20.978Z",
+      "endedAt": "2026-05-02T11:09:20.985Z",
+      "durationMs": 7,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT signs up",
+      "layman": "Create a brand new client account so we can verify email and log in.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-02T10:53:38.721Z",
+        "endedAt": "2026-05-02T10:53:38.730Z",
+        "durationMs": 9,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 2,
+      "result": "FAIL",
+      "observed": {
+        "emailFound": false
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve CLIENT verification email from Mailpit and extract token",
+      "layman": "Confirm the client verification email was sent and extract the verify-email token from it.",
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-02T10:53:38.730Z",
+        "endedAt": "2026-05-02T10:54:08.793Z",
+        "durationMs": 30063,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT verifies email",
+      "layman": "Mark the client email as verified so login can succeed.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-05-02T10:54:08.793Z",
+        "endedAt": "2026-05-02T10:54:08.812Z",
+        "durationMs": 19,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT logs in",
+      "layman": "Log the client in and store the access token for potential authenticated calls.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-02T10:54:08.813Z",
+        "endedAt": "2026-05-02T10:54:08.820Z",
+        "durationMs": 7,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 5,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: CLIENT user row exists",
+      "layman": "Confirm the client user exists in the database after signup + verification.",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB users query",
+        "startedAt": "2026-05-02T10:54:08.820Z",
+        "endedAt": "2026-05-02T10:54:08.840Z",
+        "durationMs": 20,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION signs up",
+      "layman": "Create a brand new companion account so we can verify email and log in.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 6,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-02T10:54:08.840Z",
+        "endedAt": "2026-05-02T10:54:08.842Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 7,
+      "result": "FAIL",
+      "observed": {
+        "emailFound": false
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Retrieve COMPANION verification email from Mailpit and extract token",
+      "layman": "Confirm the companion verification email was sent and extract the verify-email token from it.",
+      "serviceHit": {
+        "step": 7,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-02T10:54:08.842Z",
+        "endedAt": "2026-05-02T11:09:20.721Z",
+        "durationMs": 911879,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION verifies email",
+      "layman": "Mark the companion email as verified so login can succeed.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 8,
+        "target": "GET /auth/verify-email",
+        "startedAt": "2026-05-02T11:09:20.721Z",
+        "endedAt": "2026-05-02T11:09:20.904Z",
+        "durationMs": 183,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 9,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION logs in",
+      "layman": "Log the companion in and store the access token.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 9,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-02T11:09:20.904Z",
+        "endedAt": "2026-05-02T11:09:20.929Z",
+        "durationMs": 25,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 10,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: COMPANION user row exists",
+      "layman": "Confirm the companion user exists in the database after signup + verification.",
+      "serviceHit": {
+        "step": 10,
+        "target": "DB users query",
+        "startedAt": "2026-05-02T11:09:20.929Z",
+        "endedAt": "2026-05-02T11:09:20.978Z",
+        "durationMs": 49,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 11,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "DB verification: COMPANION has a companion_profile row",
+      "layman": "Confirm the system provisioned a companion profile for the companion account.",
+      "serviceHit": {
+        "step": 11,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-05-02T11:09:20.978Z",
+        "endedAt": "2026-05-02T11:09:20.985Z",
+        "durationMs": 7,
+        "result": "FAIL"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL",
+    "db": "FAIL",
+    "external": "FAIL",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 2,
+      "reason": "Step failed",
+      "evidence": {
+        "emailFound": false
+      }
+    },
+    {
+      "step": 5,
+      "reason": "Step execution failed",
+      "evidence": "error: invalid input syntax for type uuid: \"{{clientUserId}}\""
+    },
+    {
+      "step": 5,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 7,
+      "reason": "Step failed",
+      "evidence": {
+        "emailFound": false
+      }
+    },
+    {
+      "step": 10,
+      "reason": "Step execution failed",
+      "evidence": "error: invalid input syntax for type uuid: \"{{companionUserId}}\""
+    },
+    {
+      "step": 10,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 11,
+      "reason": "Step execution failed",
+      "evidence": "error: invalid input syntax for type uuid: \"{{companionUserId}}\""
+    },
+    {
+      "step": 11,
+      "reason": "Step failed",
+      "evidence": {}
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

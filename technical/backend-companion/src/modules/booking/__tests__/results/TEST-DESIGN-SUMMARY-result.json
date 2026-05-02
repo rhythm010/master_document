@@ -1,0 +1,31 @@
+{
+  "runId": "RUN-20260502113421522-undefined",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.522Z",
+  "endedAt": "2026-05-02T11:34:21.526Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [],
+  "stepResults": [],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": null,
+      "reason": "Unexpected error",
+      "evidence": "TypeError: testDef.steps is not iterable"
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

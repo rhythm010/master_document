@@ -1,0 +1,2769 @@
+{
+  "runId": "RUN-20260502141526186-MOD-ROSTER-003",
+  "testId": "MOD-ROSTER-003",
+  "status": "PASS",
+  "startedAt": "2026-05-02T14:15:26.187Z",
+  "endedAt": "2026-05-02T14:15:26.362Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-05-02T14:15:26.237Z",
+      "endedAt": "2026-05-02T14:15:26.358Z",
+      "durationMs": 121,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 2,
+      "target": "DB companion_venue_assignments query",
+      "startedAt": "2026-05-02T14:15:26.358Z",
+      "endedAt": "2026-05-02T14:15:26.359Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-05-02T14:15:26.359Z",
+      "endedAt": "2026-05-02T14:15:26.362Z",
+      "durationMs": 3,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "companionId": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+        "slotsCreated": 294
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-05-02T14:15:26.237Z",
+        "endedAt": "2026-05-02T14:15:26.358Z",
+        "durationMs": 121,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "assigned_at": "2026-05-02T14:15:26.293Z"
+          },
+          {
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "assigned_at": "2026-05-02T14:15:26.293Z"
+          }
+        ],
+        "rowCount": 2
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Verify companion_venue_assignments rows created",
+      "serviceHit": {
+        "step": 2,
+        "target": "DB companion_venue_assignments query",
+        "startedAt": "2026-05-02T14:15:26.358Z",
+        "endedAt": "2026-05-02T14:15:26.359Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "0622857d-362f-434b-a80b-3aba56ca7346",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T05:00:00.000Z",
+            "end_at": "2026-05-02T07:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1d568169-3eaf-4de9-b4a4-b7432a17d3d6",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T05:30:00.000Z",
+            "end_at": "2026-05-02T07:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "39dd4f65-cce4-4112-8ac9-125391c233cf",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T06:00:00.000Z",
+            "end_at": "2026-05-02T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7c8044cb-21cf-4750-b23f-68f61d99453a",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T06:00:00.000Z",
+            "end_at": "2026-05-02T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ea8eb16b-5828-49e1-a6e0-55c552325419",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T06:30:00.000Z",
+            "end_at": "2026-05-02T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ed1bad45-bb8b-454b-b506-fd8d80482f99",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T06:30:00.000Z",
+            "end_at": "2026-05-02T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b9676a43-4e7f-4fd8-a6ee-79a050610714",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T07:00:00.000Z",
+            "end_at": "2026-05-02T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3b9e65f6-d56f-4cc2-9004-3f1d9a74b99c",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T07:00:00.000Z",
+            "end_at": "2026-05-02T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f408d5eb-d6b8-4f97-b6f3-ce0a62902d0a",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T07:30:00.000Z",
+            "end_at": "2026-05-02T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "9c8794f3-fa04-43c7-8c0a-4871d72d3219",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T07:30:00.000Z",
+            "end_at": "2026-05-02T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "9b1628f8-ef48-479d-8140-93e8e7c8b023",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T08:00:00.000Z",
+            "end_at": "2026-05-02T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ea8fc84c-4851-44eb-b50a-6fa6b06f49b0",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T08:00:00.000Z",
+            "end_at": "2026-05-02T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0ff7ee5f-6d41-490b-bf52-52e6cb42bcf1",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T08:30:00.000Z",
+            "end_at": "2026-05-02T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a9049f14-784d-4327-ba4f-fd11ebccfeb2",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T08:30:00.000Z",
+            "end_at": "2026-05-02T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "84fcb75d-3083-4b4d-9b36-36b5a9139bf3",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T09:00:00.000Z",
+            "end_at": "2026-05-02T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a926c9a5-3d3b-4ab3-85c7-fd00cf58ddda",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T09:00:00.000Z",
+            "end_at": "2026-05-02T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c445ee12-c9f3-477c-8856-0259ed8ccb76",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T09:30:00.000Z",
+            "end_at": "2026-05-02T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ef3ec4bd-82b3-46c2-9aca-0e0831bddd8d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T09:30:00.000Z",
+            "end_at": "2026-05-02T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3fd17d2c-9a83-493c-bef2-c7956b86a751",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T10:00:00.000Z",
+            "end_at": "2026-05-02T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "465014ba-d489-4560-a3bf-9cb19bede2d0",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T10:00:00.000Z",
+            "end_at": "2026-05-02T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a9198bb0-f4ca-4e16-bf10-5dfd3d2f4f9a",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T10:30:00.000Z",
+            "end_at": "2026-05-02T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e6e26bfd-9606-4c7a-9d64-52dfefd45c7f",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T10:30:00.000Z",
+            "end_at": "2026-05-02T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a236b47e-26ff-4990-9917-3e29c727eb4d",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T11:00:00.000Z",
+            "end_at": "2026-05-02T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b88e2aa3-c92d-4b58-ba9f-4ef163f9ad9b",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T11:00:00.000Z",
+            "end_at": "2026-05-02T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f1fee10b-b2ab-4b9a-bb48-b363a29806c9",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T11:30:00.000Z",
+            "end_at": "2026-05-02T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4215c119-acbf-43da-801f-053d07ad1dfc",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T11:30:00.000Z",
+            "end_at": "2026-05-02T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8ef6ac7f-2377-422d-b4c0-b7d0a08aaf1e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T12:00:00.000Z",
+            "end_at": "2026-05-02T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0342b6d2-1926-479f-a0d5-d89434a3e9b5",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T12:00:00.000Z",
+            "end_at": "2026-05-02T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "442f7e35-91bf-45b0-8e48-a6cc218830a2",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T12:30:00.000Z",
+            "end_at": "2026-05-02T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "23b442ee-aa85-4c9f-b218-c229761878a5",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T12:30:00.000Z",
+            "end_at": "2026-05-02T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "65fccace-e504-45e3-9dac-c12721a43396",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T13:00:00.000Z",
+            "end_at": "2026-05-02T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0a9f5803-c9c2-4b19-a586-bcc2d38361fb",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T13:00:00.000Z",
+            "end_at": "2026-05-02T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a9bfbb95-f2cc-4e09-b0be-dc7b8d5eaf76",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T13:30:00.000Z",
+            "end_at": "2026-05-02T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c88cd44c-8b7c-4450-b072-7c9f3f42eb30",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T13:30:00.000Z",
+            "end_at": "2026-05-02T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7f20ed6e-1666-46eb-908d-fc624db382a9",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T14:00:00.000Z",
+            "end_at": "2026-05-02T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "901c05dc-f76f-4c4d-bd0e-40736171e497",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T14:00:00.000Z",
+            "end_at": "2026-05-02T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b9efe8e3-74e5-4cb5-91d1-f250536d6087",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T14:30:00.000Z",
+            "end_at": "2026-05-02T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "85902fb0-6804-401a-9519-a53350ae16fc",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T14:30:00.000Z",
+            "end_at": "2026-05-02T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "d440c3dc-3339-40f7-ab58-9f0932aa304b",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T15:00:00.000Z",
+            "end_at": "2026-05-02T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "348a82fc-53cd-4f28-bc19-800445dd443c",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T15:00:00.000Z",
+            "end_at": "2026-05-02T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "97a43dd2-c451-4ee9-96ac-f690dcb51d70",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T15:30:00.000Z",
+            "end_at": "2026-05-02T17:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "64bcc8ad-b384-4e88-a871-83d85ddb3164",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-02T16:00:00.000Z",
+            "end_at": "2026-05-02T18:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8284302b-d814-49ee-b807-efeb07951910",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T05:00:00.000Z",
+            "end_at": "2026-05-03T07:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "203ba087-88eb-4d55-8d36-bbca6ce41ccb",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T05:30:00.000Z",
+            "end_at": "2026-05-03T07:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "29e4f235-221c-4ac1-adf2-abf1864594de",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T06:00:00.000Z",
+            "end_at": "2026-05-03T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0ba4a722-42cb-4744-a0db-201346a6c3d0",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T06:00:00.000Z",
+            "end_at": "2026-05-03T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "fe2d0818-df30-4068-9eb1-f5a040946cac",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T06:30:00.000Z",
+            "end_at": "2026-05-03T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "78007cdf-c3f7-4169-8d1f-1ebe3963d171",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T06:30:00.000Z",
+            "end_at": "2026-05-03T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "48f4c94f-30cb-4b7e-8dd9-5e01da967268",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T07:00:00.000Z",
+            "end_at": "2026-05-03T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b4368779-8773-4bf3-a111-da4fdd0ddf40",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T07:00:00.000Z",
+            "end_at": "2026-05-03T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a95e7a83-0745-4a05-ad68-bb9858783cd6",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T07:30:00.000Z",
+            "end_at": "2026-05-03T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4089b600-733e-4c47-8f41-8bb7192b71f6",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T07:30:00.000Z",
+            "end_at": "2026-05-03T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b6398873-aefc-4eeb-871d-c59363546110",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T08:00:00.000Z",
+            "end_at": "2026-05-03T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5b187e39-d2da-4aab-a8ba-3400dcd6ab6e",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T08:00:00.000Z",
+            "end_at": "2026-05-03T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4f5cb056-75cf-4c66-8b69-1669d0bf5677",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T08:30:00.000Z",
+            "end_at": "2026-05-03T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1cc4c1ad-d2a9-4abf-b5a7-f70dfc4e6c04",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T08:30:00.000Z",
+            "end_at": "2026-05-03T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5bcca81f-8f49-4dec-8fae-381863f06b5e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T09:00:00.000Z",
+            "end_at": "2026-05-03T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7ad5b3ba-e8a7-4f30-b4b7-f037fb9b36da",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T09:00:00.000Z",
+            "end_at": "2026-05-03T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8afff227-945a-4606-87e6-7b8efc300d37",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T09:30:00.000Z",
+            "end_at": "2026-05-03T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "fe0a241a-1b01-42a2-b11f-3d061f5d2373",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T09:30:00.000Z",
+            "end_at": "2026-05-03T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f15d9eb9-fa21-4630-b123-3c9ed0b41c1b",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "645a46a3-133e-4849-bf26-d5103ff54a7f",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3fcabb14-1d20-431f-884b-54bbd7b36810",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T10:30:00.000Z",
+            "end_at": "2026-05-03T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "2b726cc0-017f-4e2a-8dda-e1363253c319",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T10:30:00.000Z",
+            "end_at": "2026-05-03T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b210f83e-cc6e-4271-ab63-643d03b4df80",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T11:00:00.000Z",
+            "end_at": "2026-05-03T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "80022c0a-41bd-445e-b07f-cc091ea75d4a",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T11:00:00.000Z",
+            "end_at": "2026-05-03T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "31731009-cb99-4115-a76a-aaf203a7bfad",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T11:30:00.000Z",
+            "end_at": "2026-05-03T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b6df7318-84df-4489-8b03-124edcc7b1cc",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T11:30:00.000Z",
+            "end_at": "2026-05-03T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "89d32d42-8e18-43c1-9457-aca3eba64a06",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T12:00:00.000Z",
+            "end_at": "2026-05-03T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "72e74c62-9b6c-4224-a425-41b04e56f7d6",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T12:00:00.000Z",
+            "end_at": "2026-05-03T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1dd0503a-1f21-4037-8f76-cf2c93fcef28",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T12:30:00.000Z",
+            "end_at": "2026-05-03T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b51687da-48f8-43cb-8bd2-2305c4850ca2",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T12:30:00.000Z",
+            "end_at": "2026-05-03T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b627c3d0-6928-4c84-b6fe-ca1138a70ab4",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T13:00:00.000Z",
+            "end_at": "2026-05-03T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "6f2afa94-9150-4a9d-b0ce-0ff2c08f0dce",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T13:00:00.000Z",
+            "end_at": "2026-05-03T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a173920e-171a-4bda-893b-69b52ae8c031",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T13:30:00.000Z",
+            "end_at": "2026-05-03T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "cc9004ff-14fd-4a9c-ac8b-05d6166557b0",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T13:30:00.000Z",
+            "end_at": "2026-05-03T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7347cb9a-87d9-4840-94b6-4f48d21f856e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T14:00:00.000Z",
+            "end_at": "2026-05-03T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0024ffc6-f4c2-43ec-b37b-7ab7277e6d88",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T14:00:00.000Z",
+            "end_at": "2026-05-03T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "02875284-52d1-419b-a25b-23a7c73e3b09",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T14:30:00.000Z",
+            "end_at": "2026-05-03T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "33550657-36d6-492a-bce6-c19ebd0d3900",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T14:30:00.000Z",
+            "end_at": "2026-05-03T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f0b39f6e-f190-4e05-bfe5-ea68260d4deb",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T15:00:00.000Z",
+            "end_at": "2026-05-03T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "50f07bbd-c157-4e3a-a852-a94ab310a6e7",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T15:00:00.000Z",
+            "end_at": "2026-05-03T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "980d8d5e-b5ac-4720-9c91-e8ec6c7776e1",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T15:30:00.000Z",
+            "end_at": "2026-05-03T17:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e7b9e4f4-eb33-4cd1-a14e-0fd0ab5cdac4",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-03T16:00:00.000Z",
+            "end_at": "2026-05-03T18:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "40e5a328-4019-4862-8c7c-0b58e619c69d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T05:00:00.000Z",
+            "end_at": "2026-05-04T07:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1a54e28b-c5d3-4867-b986-1b777c87d8ea",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T05:30:00.000Z",
+            "end_at": "2026-05-04T07:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a51201b1-02f1-425d-9146-c7c9eeda64c3",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T06:00:00.000Z",
+            "end_at": "2026-05-04T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b1f9e4ed-9a65-47bf-94f2-7069afb15fa0",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T06:00:00.000Z",
+            "end_at": "2026-05-04T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "13e46036-7e90-4834-94d6-470c5fafe54a",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T06:30:00.000Z",
+            "end_at": "2026-05-04T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ac5c9e11-ac8e-4bd7-9290-c195d84b39dc",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T06:30:00.000Z",
+            "end_at": "2026-05-04T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5d5551cf-ee16-486c-8daf-34466abb81f6",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T07:00:00.000Z",
+            "end_at": "2026-05-04T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "dcc59de8-c5b1-4514-b5bc-3204384381f3",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T07:00:00.000Z",
+            "end_at": "2026-05-04T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1d5d60e3-2937-4763-965f-f970f10a8e79",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T07:30:00.000Z",
+            "end_at": "2026-05-04T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "bd0db5bc-a3b5-4252-9e42-8c292c43d5f7",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T07:30:00.000Z",
+            "end_at": "2026-05-04T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c8994c00-fea7-4280-aa92-2f4a69168af5",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T08:00:00.000Z",
+            "end_at": "2026-05-04T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "014b9fa7-f2df-4cf9-a03c-740a54ab1801",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T08:00:00.000Z",
+            "end_at": "2026-05-04T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "2525e6b6-00d0-4230-ae6e-75401916fe05",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T08:30:00.000Z",
+            "end_at": "2026-05-04T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "46b62ec1-f8e5-413f-b5a0-196d02e8c11d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T08:30:00.000Z",
+            "end_at": "2026-05-04T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c8363f3d-c3c8-4af1-b721-ee14af70387c",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T09:00:00.000Z",
+            "end_at": "2026-05-04T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "946b0028-c580-4050-b751-8a5725b60aee",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T09:00:00.000Z",
+            "end_at": "2026-05-04T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "d07f2f58-07a2-442a-b764-d4dbc74c7e04",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T09:30:00.000Z",
+            "end_at": "2026-05-04T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f0ed87b2-0da0-4594-a897-051d5f98f4a5",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T09:30:00.000Z",
+            "end_at": "2026-05-04T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "d83d288d-4b4a-4a84-83a3-830c3e84a25d",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T10:00:00.000Z",
+            "end_at": "2026-05-04T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "97fefd3a-a191-4516-88c3-f681d2b00a34",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T10:00:00.000Z",
+            "end_at": "2026-05-04T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8a9ecccf-01cb-4cbb-8a39-ea10b4f878f5",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T10:30:00.000Z",
+            "end_at": "2026-05-04T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "415e0cfc-1833-41a9-adfa-c09e24c78eee",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T10:30:00.000Z",
+            "end_at": "2026-05-04T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e5483a0a-c1d2-4e99-8214-5830d15be3ae",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T11:00:00.000Z",
+            "end_at": "2026-05-04T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e0bc8e17-5cbe-4dad-aaf8-54c7f0009f97",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T11:00:00.000Z",
+            "end_at": "2026-05-04T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "60fa5149-0269-4070-a2ae-009436f95be0",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T11:30:00.000Z",
+            "end_at": "2026-05-04T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0215fb3c-9c76-4a6f-985a-c30d8b17b4ea",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T11:30:00.000Z",
+            "end_at": "2026-05-04T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "74ff7c91-492b-4725-91ff-30620983cb57",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T12:00:00.000Z",
+            "end_at": "2026-05-04T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8534690f-3843-4688-85a2-caa58861c471",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T12:00:00.000Z",
+            "end_at": "2026-05-04T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0bf34571-cf5b-4802-b4bb-477b614a9750",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T12:30:00.000Z",
+            "end_at": "2026-05-04T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a810fbbe-9fdc-4d31-b984-4f72db6b4823",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T12:30:00.000Z",
+            "end_at": "2026-05-04T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "2f3b5f44-4689-4944-bc67-802ea77b0a4b",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T13:00:00.000Z",
+            "end_at": "2026-05-04T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "9b1ce124-9f97-49d2-88b7-2662942fb17c",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T13:00:00.000Z",
+            "end_at": "2026-05-04T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "58ec667f-0e06-461b-88e5-e829ed39f031",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T13:30:00.000Z",
+            "end_at": "2026-05-04T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0b9ef119-2818-4cc3-b7d8-185190007738",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T13:30:00.000Z",
+            "end_at": "2026-05-04T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c06c953d-cf19-4493-8b1b-682fa5b81ed2",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T14:00:00.000Z",
+            "end_at": "2026-05-04T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e7e014f1-3f37-454f-9849-b2199c0bccb7",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T14:00:00.000Z",
+            "end_at": "2026-05-04T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "12f99ae6-c9f2-42a2-bee1-340d3a812dad",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T14:30:00.000Z",
+            "end_at": "2026-05-04T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3519efe5-c44c-47b6-9296-6231ad8c0b36",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T14:30:00.000Z",
+            "end_at": "2026-05-04T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4fa1b65a-c04d-48b1-b068-b1963035f1d8",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T15:00:00.000Z",
+            "end_at": "2026-05-04T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1112dbeb-62ab-4ad6-b40e-53b3b5e9d00d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T15:00:00.000Z",
+            "end_at": "2026-05-04T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "589235c4-0d4c-4927-9b9e-bee5d60084db",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T15:30:00.000Z",
+            "end_at": "2026-05-04T17:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "985b9b81-0778-4432-a77d-fb7c6bca2eea",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-04T16:00:00.000Z",
+            "end_at": "2026-05-04T18:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a9080843-7c91-43a2-957c-c572453f7549",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T05:00:00.000Z",
+            "end_at": "2026-05-05T07:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "bcd5ab2f-a821-4593-865a-f60b3c32bd9f",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T05:30:00.000Z",
+            "end_at": "2026-05-05T07:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "85fe24c9-9aec-4b10-b693-b93db654bef1",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T06:00:00.000Z",
+            "end_at": "2026-05-05T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "93702e6d-b7e1-41db-8a47-0660d329642f",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T06:00:00.000Z",
+            "end_at": "2026-05-05T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8e1c82e1-bccd-4955-b878-7fe8d0db3fb6",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T06:30:00.000Z",
+            "end_at": "2026-05-05T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a9b116cb-95f4-4776-b384-288a85425488",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T06:30:00.000Z",
+            "end_at": "2026-05-05T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "9ad66a46-a769-4172-9bc9-b4aaa12139b3",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T07:00:00.000Z",
+            "end_at": "2026-05-05T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1109682a-1017-4618-8ae4-51f06c3b846d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T07:00:00.000Z",
+            "end_at": "2026-05-05T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "479f9c03-e8dd-4fa9-aae3-bbdd60fbbf97",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T07:30:00.000Z",
+            "end_at": "2026-05-05T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1b2d7b55-ffea-4c1d-bc48-e81de8c334f8",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T07:30:00.000Z",
+            "end_at": "2026-05-05T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "764cd2dd-14d6-4812-8b5a-b2a015f8f84a",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T08:00:00.000Z",
+            "end_at": "2026-05-05T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3d8d3264-91c9-4cf9-8e57-d9760e426d8b",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T08:00:00.000Z",
+            "end_at": "2026-05-05T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e1da357d-219a-4c9b-a184-e2818c729b62",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T08:30:00.000Z",
+            "end_at": "2026-05-05T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ed9ff5e4-24ab-4487-8538-b040a54f92e0",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T08:30:00.000Z",
+            "end_at": "2026-05-05T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5fa530dc-a702-4352-8b93-e96aa74742c4",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T09:00:00.000Z",
+            "end_at": "2026-05-05T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c789c648-5c97-4409-a0df-66f246b2b4b4",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T09:00:00.000Z",
+            "end_at": "2026-05-05T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8d91e1f1-b3e3-420d-b976-b1c89cdac68e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T09:30:00.000Z",
+            "end_at": "2026-05-05T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "18487cb0-045c-48a6-8358-deb10abb8f40",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T09:30:00.000Z",
+            "end_at": "2026-05-05T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ee5bd4c3-c6b3-4c20-99cb-1946691f5ace",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T10:00:00.000Z",
+            "end_at": "2026-05-05T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ae112976-7450-44eb-9f03-d5ad968df7ab",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T10:00:00.000Z",
+            "end_at": "2026-05-05T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "cdf11ffe-1668-43c0-893a-b80a3ca61407",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T10:30:00.000Z",
+            "end_at": "2026-05-05T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f6e867cc-4a01-4ae3-b0c0-35b5da4943ff",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T10:30:00.000Z",
+            "end_at": "2026-05-05T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1158c6a3-189a-4045-934f-56daf6450bbf",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T11:00:00.000Z",
+            "end_at": "2026-05-05T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "689412bc-c51a-461f-9b0b-7101ac3d7aa7",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T11:00:00.000Z",
+            "end_at": "2026-05-05T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7ecdbf1f-e4ae-40df-8710-372d43c189d1",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T11:30:00.000Z",
+            "end_at": "2026-05-05T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3c1a4ea2-3a6b-4ab1-946e-b21cbde3278e",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T11:30:00.000Z",
+            "end_at": "2026-05-05T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c1b45588-e220-432e-b789-2ed600ecd788",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T12:00:00.000Z",
+            "end_at": "2026-05-05T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "633c94bf-44e4-469b-bb1b-a6bba80f2716",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T12:00:00.000Z",
+            "end_at": "2026-05-05T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "9db96881-2dd2-4dc8-a4e1-cb22bf22df92",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T12:30:00.000Z",
+            "end_at": "2026-05-05T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "02e25644-17c7-4a86-a48f-5ebb8681d1e7",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T12:30:00.000Z",
+            "end_at": "2026-05-05T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "9a92aaee-efe4-4b82-a50d-e32299ccd467",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T13:00:00.000Z",
+            "end_at": "2026-05-05T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0749f655-0f18-407d-8132-e3e025e7ac0d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T13:00:00.000Z",
+            "end_at": "2026-05-05T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "d927adc3-4834-499b-a0f7-e2f25b9c156d",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T13:30:00.000Z",
+            "end_at": "2026-05-05T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c83a595c-1fe9-4260-9a42-d0074118edb8",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T13:30:00.000Z",
+            "end_at": "2026-05-05T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "92b77376-d1db-4272-9e2c-cf10e82a59a0",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T14:00:00.000Z",
+            "end_at": "2026-05-05T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "cf3c25b8-9f6e-4704-984d-56b5b1ff65e3",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T14:00:00.000Z",
+            "end_at": "2026-05-05T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "74754d58-0760-4831-b32b-cc6e71a68631",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T14:30:00.000Z",
+            "end_at": "2026-05-05T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "935969cc-ffbd-45c9-bb0a-0cf47354a018",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T14:30:00.000Z",
+            "end_at": "2026-05-05T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1b7509d0-61a3-4d4f-9120-b64910b846ff",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T15:00:00.000Z",
+            "end_at": "2026-05-05T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c7633f46-4a21-4397-9b7d-98ca8d23b4ce",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T15:00:00.000Z",
+            "end_at": "2026-05-05T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0cea5fed-7d4a-4a13-b69f-b6fbbd296e9c",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T15:30:00.000Z",
+            "end_at": "2026-05-05T17:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c397185b-b295-4214-b17f-140b493c8362",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-05T16:00:00.000Z",
+            "end_at": "2026-05-05T18:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "34462abd-e9d3-4a62-be0c-27bd381ac772",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T05:00:00.000Z",
+            "end_at": "2026-05-06T07:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ee61e011-28f1-46f4-85c3-07d43bffe316",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T05:30:00.000Z",
+            "end_at": "2026-05-06T07:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4cdbd3de-6865-4c1d-b149-1b63a2a72161",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T06:00:00.000Z",
+            "end_at": "2026-05-06T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8174c3da-cb44-44fc-bb90-8254c9ed89d4",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T06:00:00.000Z",
+            "end_at": "2026-05-06T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ca02468f-e0a7-4127-9b31-168fdf7f5a54",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T06:30:00.000Z",
+            "end_at": "2026-05-06T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8c65b70b-b953-4863-983b-3d12770475ea",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T06:30:00.000Z",
+            "end_at": "2026-05-06T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c003c44f-c879-4225-92f1-935e9451fb3e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T07:00:00.000Z",
+            "end_at": "2026-05-06T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5baffe02-9cbe-4c89-a3ca-88b495b7811e",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T07:00:00.000Z",
+            "end_at": "2026-05-06T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c3694a0b-b51a-4f74-a714-9e3a0acae885",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T07:30:00.000Z",
+            "end_at": "2026-05-06T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4dd1cf6e-e852-4d1a-82ed-c34dd1b81957",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T07:30:00.000Z",
+            "end_at": "2026-05-06T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "6ab72e20-a698-4186-80c5-303a0902af55",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T08:00:00.000Z",
+            "end_at": "2026-05-06T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b9c5472d-a674-4b8d-b747-e8ebde80143b",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T08:00:00.000Z",
+            "end_at": "2026-05-06T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "874f254c-505c-4287-bfe6-3d5c1fd951fc",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T08:30:00.000Z",
+            "end_at": "2026-05-06T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "73c2ae01-ab97-4a01-ab68-b2639cfb1a04",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T08:30:00.000Z",
+            "end_at": "2026-05-06T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a26f9be0-c33e-4d94-9a41-52cc28a3e694",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T09:00:00.000Z",
+            "end_at": "2026-05-06T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "78496a7c-a613-47f2-a533-3ffe623b8ad2",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T09:00:00.000Z",
+            "end_at": "2026-05-06T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c952bef2-ec2e-4358-9539-963386b81081",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T09:30:00.000Z",
+            "end_at": "2026-05-06T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "98384372-828f-4776-968d-15f106334ab2",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T09:30:00.000Z",
+            "end_at": "2026-05-06T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "03898c98-45de-4c2a-bfaf-271a699bbb62",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T10:00:00.000Z",
+            "end_at": "2026-05-06T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c397034f-7154-4907-9126-f8a3d4a0926d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T10:00:00.000Z",
+            "end_at": "2026-05-06T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c7520c71-389c-484b-94c5-df19dc79868e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T10:30:00.000Z",
+            "end_at": "2026-05-06T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5061bc0f-3ab1-4343-9886-296c2124a248",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T10:30:00.000Z",
+            "end_at": "2026-05-06T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "6d4bccbe-db57-4470-84cd-40c45a8eca1c",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T11:00:00.000Z",
+            "end_at": "2026-05-06T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "49e8c4c3-3e64-4d9a-91b4-ce6385e4f227",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T11:00:00.000Z",
+            "end_at": "2026-05-06T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "97ea20ff-339f-432a-a3a8-be3c71cd6d6d",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T11:30:00.000Z",
+            "end_at": "2026-05-06T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4edc6095-e5c6-4c88-a7ad-22e6df6e1733",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T11:30:00.000Z",
+            "end_at": "2026-05-06T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "002f76b3-25aa-42f2-8e75-ea348f278a03",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T12:00:00.000Z",
+            "end_at": "2026-05-06T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "530fa8a0-e9dc-480d-80a6-ad0c76c7fc66",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T12:00:00.000Z",
+            "end_at": "2026-05-06T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7c3ee069-4409-4106-b80f-6d33e1bc4eee",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T12:30:00.000Z",
+            "end_at": "2026-05-06T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0b46bf03-9464-426f-9fab-d1f46f67f65a",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T12:30:00.000Z",
+            "end_at": "2026-05-06T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a1bc90e6-8bc9-4465-874b-a6754279a867",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T13:00:00.000Z",
+            "end_at": "2026-05-06T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "195b6b44-71ca-4b17-a1f2-aecb6cc6179d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T13:00:00.000Z",
+            "end_at": "2026-05-06T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "15442838-7bcb-4cba-871c-9e301590dd67",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T13:30:00.000Z",
+            "end_at": "2026-05-06T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "33604913-4849-4b7f-9b70-de87e5eb8b05",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T13:30:00.000Z",
+            "end_at": "2026-05-06T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0f544d68-44eb-4c9e-9680-0dfbfffc5baf",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T14:00:00.000Z",
+            "end_at": "2026-05-06T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0b636b8b-437b-42d0-b69e-d1f3b404bfbc",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T14:00:00.000Z",
+            "end_at": "2026-05-06T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "87efe369-2722-4341-b7af-5a054f22a064",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T14:30:00.000Z",
+            "end_at": "2026-05-06T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7dc6f094-d25b-4ad1-b903-68902432384f",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T14:30:00.000Z",
+            "end_at": "2026-05-06T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "14e1aa6c-311b-4d39-b03f-adc47ee6b8ef",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T15:00:00.000Z",
+            "end_at": "2026-05-06T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "35031992-ebac-4b41-b28c-8b74032fd0dd",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T15:00:00.000Z",
+            "end_at": "2026-05-06T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4bec72e4-e603-4936-bbf7-dceeedb31d5d",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T15:30:00.000Z",
+            "end_at": "2026-05-06T17:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "523a8817-6a07-4ce0-83b2-1fa889a2fa36",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-06T16:00:00.000Z",
+            "end_at": "2026-05-06T18:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "176c0839-0866-4066-b506-0b9f3a56a217",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T05:00:00.000Z",
+            "end_at": "2026-05-07T07:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "40429418-84b6-4d6f-9ed5-73f88004906e",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T05:30:00.000Z",
+            "end_at": "2026-05-07T07:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3d6c434e-2b49-47c9-b1ae-d5a18fac1cf8",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T06:00:00.000Z",
+            "end_at": "2026-05-07T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "751b7f3c-c1cd-4a6e-950b-362f09a56025",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T06:00:00.000Z",
+            "end_at": "2026-05-07T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4740b019-0e5c-4553-a1ba-f30fc179e945",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T06:30:00.000Z",
+            "end_at": "2026-05-07T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b9a36c82-4c93-4be1-a42f-80db6917161d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T06:30:00.000Z",
+            "end_at": "2026-05-07T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4b95fc1a-c7b9-478e-91f9-ad5ef95c73da",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T07:00:00.000Z",
+            "end_at": "2026-05-07T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "79b77a8f-68da-4a1b-a0c3-bad573e18c04",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T07:00:00.000Z",
+            "end_at": "2026-05-07T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e65061df-5025-4bd2-a343-6fd330a9578e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T07:30:00.000Z",
+            "end_at": "2026-05-07T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "56c0c923-e160-4897-8289-d70dbfc53522",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T07:30:00.000Z",
+            "end_at": "2026-05-07T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "dfb0dc5a-f985-4a51-bed2-d8b8bcd7e1f6",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T08:00:00.000Z",
+            "end_at": "2026-05-07T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a8135d9a-271b-4dd8-bb19-4a123e4cb3e9",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T08:00:00.000Z",
+            "end_at": "2026-05-07T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1c39a155-d65c-41d6-9d23-9d3a341a12bd",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T08:30:00.000Z",
+            "end_at": "2026-05-07T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "162deb64-ec71-4595-938b-16cb2c867ba8",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T08:30:00.000Z",
+            "end_at": "2026-05-07T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a5977d9b-2409-456a-b17a-e5ac46b78e1f",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T09:00:00.000Z",
+            "end_at": "2026-05-07T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "270e4c68-c060-479e-9382-92397abb7aab",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T09:00:00.000Z",
+            "end_at": "2026-05-07T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c9b380af-389d-422e-b371-10d6a0be00da",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T09:30:00.000Z",
+            "end_at": "2026-05-07T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ca002394-b1d8-4e35-86d8-84d21e1cf556",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T09:30:00.000Z",
+            "end_at": "2026-05-07T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "590f6aaf-5b75-4979-8c33-8c8e791b5618",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T10:00:00.000Z",
+            "end_at": "2026-05-07T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1298c3e5-ad99-415c-952e-64c1bbc36217",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T10:00:00.000Z",
+            "end_at": "2026-05-07T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "db338c7a-fe7c-4cfc-988f-95cebb1a44c9",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T10:30:00.000Z",
+            "end_at": "2026-05-07T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "6655821e-bc98-4102-8742-3339e5ba9c90",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T10:30:00.000Z",
+            "end_at": "2026-05-07T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a5f6160e-3c95-409d-99d1-e0e86958c0c9",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T11:00:00.000Z",
+            "end_at": "2026-05-07T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "15730dad-00ba-406d-acaa-fa2fea28812d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T11:00:00.000Z",
+            "end_at": "2026-05-07T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "ab10714b-b391-405e-bc37-f016849ee774",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T11:30:00.000Z",
+            "end_at": "2026-05-07T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "da76637c-3765-4322-8bc1-55645ba4d2f4",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T11:30:00.000Z",
+            "end_at": "2026-05-07T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "57890e94-62de-4858-a95b-3e066aae8830",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T12:00:00.000Z",
+            "end_at": "2026-05-07T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "fcaa3f2c-2463-4686-8778-991e6d30f568",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T12:00:00.000Z",
+            "end_at": "2026-05-07T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "14d3c9d9-71eb-44d2-b22c-9a45170b7b5c",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T12:30:00.000Z",
+            "end_at": "2026-05-07T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0e1fa439-d91a-49f3-910d-724b79b2067a",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T12:30:00.000Z",
+            "end_at": "2026-05-07T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "396ea06d-8d8f-4593-a49a-74be9afc7723",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T13:00:00.000Z",
+            "end_at": "2026-05-07T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b73bb044-642a-484c-ba8c-5628a43c246d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T13:00:00.000Z",
+            "end_at": "2026-05-07T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "59ac5121-ae73-4f06-bcf4-28adc79b63d8",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T13:30:00.000Z",
+            "end_at": "2026-05-07T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "81c3cc92-c67c-4a6f-b665-2b20145fa8c8",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T13:30:00.000Z",
+            "end_at": "2026-05-07T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "266ef2ce-b47e-4c7a-a094-89682893d967",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T14:00:00.000Z",
+            "end_at": "2026-05-07T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "7ee47359-b6ef-4674-80fa-5ef634883c99",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T14:00:00.000Z",
+            "end_at": "2026-05-07T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f9c07b32-462c-4804-ab74-91bc075fdb6a",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T14:30:00.000Z",
+            "end_at": "2026-05-07T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "61618e56-7a90-49d4-8e7e-87bdadb454d8",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T14:30:00.000Z",
+            "end_at": "2026-05-07T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a2b2c944-d0bf-4f35-b1d0-0893f4f57987",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T15:00:00.000Z",
+            "end_at": "2026-05-07T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "755d124f-8400-41f6-a303-60d9941cabb3",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T15:00:00.000Z",
+            "end_at": "2026-05-07T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1386a20a-c384-4fd8-abfa-2df03f9b91cd",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T15:30:00.000Z",
+            "end_at": "2026-05-07T17:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "dce94144-705e-454f-bd51-0db227ecfffc",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-07T16:00:00.000Z",
+            "end_at": "2026-05-07T18:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8d546b84-52b0-40e5-81e9-b2597cdd7f22",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T05:00:00.000Z",
+            "end_at": "2026-05-08T07:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1dbdbc7a-04a6-4061-852e-5d05588b78ae",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T05:30:00.000Z",
+            "end_at": "2026-05-08T07:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "2dbc1fda-252c-4898-a400-73c2003866f7",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T06:00:00.000Z",
+            "end_at": "2026-05-08T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "6b37342c-1458-4d44-971c-90c243ea2822",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T06:00:00.000Z",
+            "end_at": "2026-05-08T08:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "efeb2286-9280-4e45-a804-b70b74e12911",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T06:30:00.000Z",
+            "end_at": "2026-05-08T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "f4be2304-dbfc-4bf4-bb60-fab9e4fe7a70",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T06:30:00.000Z",
+            "end_at": "2026-05-08T08:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "224b3d4d-6c81-4bdc-892b-2ba126c101dc",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T07:00:00.000Z",
+            "end_at": "2026-05-08T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "35494102-1eb9-49d4-92d5-7aa030c6b35d",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T07:00:00.000Z",
+            "end_at": "2026-05-08T09:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "237e1348-d8a0-4d79-9c9d-94fdbef1abc9",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T07:30:00.000Z",
+            "end_at": "2026-05-08T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8c772382-bb8e-4e6e-bd61-3c8fd9784280",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T07:30:00.000Z",
+            "end_at": "2026-05-08T09:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5ff0f669-e2e9-4983-b858-6bc0ae634350",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T08:00:00.000Z",
+            "end_at": "2026-05-08T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4ae3d74a-129c-409b-9373-8ae749c4280e",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T08:00:00.000Z",
+            "end_at": "2026-05-08T10:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "af2953e2-4045-4a0d-92b2-a9956157d94f",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T08:30:00.000Z",
+            "end_at": "2026-05-08T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "086047fd-d912-4b92-8577-ae5a5c06d8dd",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T08:30:00.000Z",
+            "end_at": "2026-05-08T10:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "39628f8d-2b70-40ac-9107-5ad61a746a21",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T09:00:00.000Z",
+            "end_at": "2026-05-08T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "805cde00-8b27-4c3a-8f5a-f24bb707533e",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T09:00:00.000Z",
+            "end_at": "2026-05-08T11:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b49ff5e4-2dc6-4bac-be2b-17ad9683301e",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T09:30:00.000Z",
+            "end_at": "2026-05-08T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4cf4773d-fc69-47f3-8d26-dedbb622946b",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T09:30:00.000Z",
+            "end_at": "2026-05-08T11:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "dfd98ab2-09e1-4e52-91dc-951cd807967c",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T10:00:00.000Z",
+            "end_at": "2026-05-08T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "e53e90d1-2a71-4d0a-87e8-eb37a0aa7359",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T10:00:00.000Z",
+            "end_at": "2026-05-08T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8caeb517-07f2-4a70-a38c-60b83d536f81",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T10:30:00.000Z",
+            "end_at": "2026-05-08T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "00ce3a8c-a8d9-46bb-93e2-98fa32bd62de",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T10:30:00.000Z",
+            "end_at": "2026-05-08T12:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "dfa282d9-f150-4d28-a9f9-2cfa67d479da",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T11:00:00.000Z",
+            "end_at": "2026-05-08T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "2afcf359-6b51-46c8-aac2-a68d00c84da3",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T11:00:00.000Z",
+            "end_at": "2026-05-08T13:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c5008289-68c7-4acd-b09f-c30f27cfef79",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T11:30:00.000Z",
+            "end_at": "2026-05-08T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "1f073814-b404-4b78-8857-be3898a76a01",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T11:30:00.000Z",
+            "end_at": "2026-05-08T13:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "4c2e397b-ff4d-4a09-9256-3de6ba3762d7",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T12:00:00.000Z",
+            "end_at": "2026-05-08T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5e74b897-97f3-4dd8-aeb0-d562916f9ec3",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T12:00:00.000Z",
+            "end_at": "2026-05-08T14:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "5c7b8614-bc82-49f9-8782-bf9733f41c93",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T12:30:00.000Z",
+            "end_at": "2026-05-08T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "45ac08c0-32ba-44c3-957f-33e679676559",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T12:30:00.000Z",
+            "end_at": "2026-05-08T14:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b9bce537-3291-4ff7-900c-16a749c8d810",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T13:00:00.000Z",
+            "end_at": "2026-05-08T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "44da06ee-9282-42b6-962c-7aa03bf8c080",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T13:00:00.000Z",
+            "end_at": "2026-05-08T15:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a3ecff1c-f9d6-4b1a-be49-eec8ac0b9999",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T13:30:00.000Z",
+            "end_at": "2026-05-08T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "8da1e0e3-61fe-4572-957b-2e06e8d2f72b",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T13:30:00.000Z",
+            "end_at": "2026-05-08T15:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "761133b0-1f0a-426c-a6be-76ac886755ff",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T14:00:00.000Z",
+            "end_at": "2026-05-08T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "b340d173-6a42-4726-8023-664834b29da9",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T14:00:00.000Z",
+            "end_at": "2026-05-08T16:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "a8ceff45-5db5-4471-a3ff-93c7f829c7ec",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T14:30:00.000Z",
+            "end_at": "2026-05-08T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "c0de7f67-7907-4242-8181-570070970c44",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T14:30:00.000Z",
+            "end_at": "2026-05-08T16:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "30cc91fe-565e-4f62-9d64-9f66215a808a",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T15:00:00.000Z",
+            "end_at": "2026-05-08T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "bbfe4910-d498-4319-a15d-47538fd2bf67",
+            "venue_id": "79447dd5-8081-4e60-be76-8a579635370d",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T15:00:00.000Z",
+            "end_at": "2026-05-08T17:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "873cc831-1a7e-4e43-89fa-cc07f4148c8a",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T15:30:00.000Z",
+            "end_at": "2026-05-08T17:30:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "3c80399f-6f91-4555-b5e0-6e9a9a53db5b",
+            "venue_id": "e2da706c-a87a-41c3-9671-f0457bcad402",
+            "companion_id": "a54a9731-9ea6-48fc-8243-26e6245fcd68",
+            "booking_id": null,
+            "start_at": "2026-05-08T16:00:00.000Z",
+            "end_at": "2026-05-08T18:00:00.000Z",
+            "status": "AVAILABLE"
+          }
+        ],
+        "rowCount": 294
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Verify roster_slots rows created",
+      "serviceHit": {
+        "step": 3,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-05-02T14:15:26.359Z",
+        "endedAt": "2026-05-02T14:15:26.362Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

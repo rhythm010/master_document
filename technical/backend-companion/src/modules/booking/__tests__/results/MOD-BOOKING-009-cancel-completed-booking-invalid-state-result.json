@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "runId": "RUN-20260430030805273-MOD-BOOKING-009",
   "testId": "MOD-BOOKING-009",
   "status": "PASS",
@@ -8,56 +9,106 @@
     "apiServer": "OK",
     "mailpit": "OK",
     "database": "OK"
+=======
+  "runId": "RUN-20260502113421446-MOD-BOOKING-009",
+  "testId": "MOD-BOOKING-009",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.446Z",
+  "endedAt": "2026-05-02T11:34:21.514Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+>>>>>>> agents/lead-agent-background-features-move
   },
   "serviceHitLog": [
     {
       "step": 1,
+<<<<<<< HEAD
       "target": "POST /bookings/8c3d0466-174e-4ef5-969e-46ed58141f5e/cancel",
       "startedAt": "2026-04-30T03:08:05.289Z",
       "endedAt": "2026-04-30T03:08:05.291Z",
       "durationMs": 2,
       "result": "PASS",
       "statusCode": 400
+=======
+      "target": "POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel",
+      "startedAt": "2026-05-02T11:34:21.509Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 404
+>>>>>>> agents/lead-agent-background-features-move
     },
     {
       "step": 2,
       "target": "authorization (noop)",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.291Z",
       "endedAt": "2026-04-30T03:08:05.291Z",
+=======
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+>>>>>>> agents/lead-agent-background-features-move
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 3,
       "target": "validation (noop)",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.291Z",
       "endedAt": "2026-04-30T03:08:05.291Z",
+=======
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+>>>>>>> agents/lead-agent-background-features-move
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 4,
       "target": "API response validation",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.291Z",
       "endedAt": "2026-04-30T03:08:05.291Z",
       "durationMs": 0,
       "result": "PASS",
       "statusCode": 400
+=======
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 0,
+      "result": "FAIL",
+      "statusCode": 404
+>>>>>>> agents/lead-agent-background-features-move
     },
     {
       "step": 5,
       "target": "DB verify bookings",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.291Z",
       "endedAt": "2026-04-30T03:08:05.292Z",
       "durationMs": 1,
+=======
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 0,
+>>>>>>> agents/lead-agent-background-features-move
       "result": "PASS"
     },
     {
       "step": 6,
       "target": "DB verify roster_slots",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.292Z",
       "endedAt": "2026-04-30T03:08:05.292Z",
       "durationMs": 0,
+=======
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.514Z",
+      "durationMs": 3,
+>>>>>>> agents/lead-agent-background-features-move
       "result": "PASS"
     }
   ],
@@ -66,12 +117,17 @@
       "step": 1,
       "result": "PASS",
       "observed": {
+<<<<<<< HEAD
         "code": "INVALID_STATE_TRANSITION",
         "message": "Invalid state transition"
+=======
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel</pre>\n</body>\n</html>\n"
+>>>>>>> agents/lead-agent-background-features-move
       },
       "actor": "Client",
       "actionType": "apiRequest",
       "layman": "Client attempts to cancel a booking that has already completed",
+<<<<<<< HEAD
       "statusCode": 400,
       "serviceHit": {
         "step": 1,
@@ -81,6 +137,17 @@
         "durationMs": 2,
         "result": "PASS",
         "statusCode": 400
+=======
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel",
+        "startedAt": "2026-05-02T11:34:21.509Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 404
+>>>>>>> agents/lead-agent-background-features-move
       }
     },
     {
@@ -99,8 +166,13 @@
       "serviceHit": {
         "step": 2,
         "target": "authorization (noop)",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.291Z",
         "endedAt": "2026-04-30T03:08:05.291Z",
+=======
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+>>>>>>> agents/lead-agent-background-features-move
         "durationMs": 0,
         "result": "PASS"
       }
@@ -121,33 +193,52 @@
       "serviceHit": {
         "step": 3,
         "target": "validation (noop)",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.291Z",
         "endedAt": "2026-04-30T03:08:05.291Z",
+=======
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+>>>>>>> agents/lead-agent-background-features-move
         "durationMs": 0,
         "result": "PASS"
       }
     },
     {
       "step": 4,
+<<<<<<< HEAD
       "result": "PASS",
       "observed": {
         "lastApiRequestStep": 1,
         "response": {
           "code": "INVALID_STATE_TRANSITION",
           "message": "Invalid state transition"
+=======
+      "result": "FAIL",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel</pre>\n</body>\n</html>\n"
+>>>>>>> agents/lead-agent-background-features-move
         },
         "checks": [
           {
             "type": "statusCode",
             "expected": 400,
+<<<<<<< HEAD
             "actual": 400,
             "pass": true
+=======
+            "actual": 404,
+            "pass": false
+>>>>>>> agents/lead-agent-background-features-move
           }
         ]
       },
       "actor": "System",
       "actionType": "apiResponse",
       "layman": "System rejects the cancellation with an invalid state transition error",
+<<<<<<< HEAD
       "statusCode": 400,
       "serviceHit": {
         "step": 4,
@@ -157,6 +248,17 @@
         "durationMs": 0,
         "result": "PASS",
         "statusCode": 400
+=======
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 4,
+        "target": "API response validation",
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 0,
+        "result": "FAIL",
+        "statusCode": 404
+>>>>>>> agents/lead-agent-background-features-move
       }
     },
     {
@@ -165,11 +267,16 @@
       "observed": {
         "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
         "params": [
+<<<<<<< HEAD
           "8c3d0466-174e-4ef5-969e-46ed58141f5e"
+=======
+          "fb49deca-e4f1-4264-b656-28e489df620e"
+>>>>>>> agents/lead-agent-background-features-move
         ],
         "rowCount": 1,
         "rows": [
           {
+<<<<<<< HEAD
             "id": "8c3d0466-174e-4ef5-969e-46ed58141f5e",
             "client_id": "1e7bec42-cc07-4c21-9450-605d0a3dd7e6",
             "venue_id": "e5d5a45a-2cec-48cc-9a81-ba678ed7864e",
@@ -183,6 +290,21 @@
             "com_match_pin_code": "222222",
             "extended_at": null,
             "created_at": "2026-04-30T03:08:05.284Z"
+=======
+            "id": "fb49deca-e4f1-4264-b656-28e489df620e",
+            "client_id": "e6b66789-b039-4c7e-857b-cc94b8c60139",
+            "venue_id": "da99d63c-8fe8-47f6-9bb0-5839c8a37024",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "COMPLETED",
+            "qr_code": "qr_fb49deca-e4f1-4264-b656-28e489df620e",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_fb49deca-e4f1-4264-b656-28e489df620e",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.483Z"
+>>>>>>> agents/lead-agent-background-features-move
           }
         ],
         "checks": [
@@ -196,8 +318,13 @@
             "type": "equals",
             "row": 0,
             "field": "id",
+<<<<<<< HEAD
             "expected": "8c3d0466-174e-4ef5-969e-46ed58141f5e",
             "actual": "8c3d0466-174e-4ef5-969e-46ed58141f5e",
+=======
+            "expected": "fb49deca-e4f1-4264-b656-28e489df620e",
+            "actual": "fb49deca-e4f1-4264-b656-28e489df620e",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": true
           },
           {
@@ -216,9 +343,15 @@
       "serviceHit": {
         "step": 5,
         "target": "DB verify bookings",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.291Z",
         "endedAt": "2026-04-30T03:08:05.292Z",
         "durationMs": 1,
+=======
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 0,
+>>>>>>> agents/lead-agent-background-features-move
         "result": "PASS"
       }
     },
@@ -228,9 +361,15 @@
       "observed": {
         "sql": "SELECT * FROM \"roster_slots\" WHERE companion_id IN ($1, $2) AND start_at=$3 LIMIT 50;",
         "params": [
+<<<<<<< HEAD
           "5363c11c-bfa1-4adc-ba2a-d72ca4697fa8",
           "86efb74b-42ac-4792-8af9-1534eb38541d",
           "2026-05-01T10:00:00.000Z"
+=======
+          "d35f0520-2c5e-47bb-ae3b-641368bdd2de",
+          "72c67b93-e690-4c9a-8e64-00b80a375893",
+          "2026-05-03T10:00:00.000Z"
+>>>>>>> agents/lead-agent-background-features-move
         ],
         "rowCount": 0,
         "rows": [],
@@ -242,9 +381,15 @@
       "serviceHit": {
         "step": 6,
         "target": "DB verify roster_slots",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.292Z",
         "endedAt": "2026-04-30T03:08:05.292Z",
         "durationMs": 0,
+=======
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.514Z",
+        "durationMs": 3,
+>>>>>>> agents/lead-agent-background-features-move
         "result": "PASS"
       }
     }
@@ -255,7 +400,30 @@
     "external": "PASS",
     "mustNotOccur": "PASS"
   },
+<<<<<<< HEAD
   "failures": [],
+=======
+  "failures": [
+    {
+      "step": 4,
+      "reason": "Step failed",
+      "evidence": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 404,
+            "pass": false
+          }
+        ]
+      }
+    }
+  ],
+>>>>>>> agents/lead-agent-background-features-move
   "cleanup": {
     "status": "SKIPPED",
     "reason": "Default behavior - cleanup not requested",

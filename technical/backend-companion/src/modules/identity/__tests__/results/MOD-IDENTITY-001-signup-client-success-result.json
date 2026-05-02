@@ -1,0 +1,124 @@
+{
+  "runId": "RUN-20260502113421539-MOD-IDENTITY-001",
+  "testId": "MOD-IDENTITY-001",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.539Z",
+  "endedAt": "2026-05-02T11:34:25.392Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-02T11:34:21.543Z",
+      "endedAt": "2026-05-02T11:34:21.548Z",
+      "durationMs": 5,
+      "result": "PASS",
+      "statusCode": 409
+    },
+    {
+      "step": 2,
+      "target": "DB users query",
+      "startedAt": "2026-05-02T11:34:21.548Z",
+      "endedAt": "2026-05-02T11:34:21.555Z",
+      "durationMs": 7,
+      "result": "FAIL"
+    },
+    {
+      "step": 3,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-02T11:34:21.555Z",
+      "endedAt": "2026-05-02T11:34:25.391Z",
+      "durationMs": 3836,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "EMAIL_ALREADY_EXISTS",
+        "message": "Email already exists"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "statusCode": 409,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-02T11:34:21.543Z",
+        "endedAt": "2026-05-02T11:34:21.548Z",
+        "durationMs": 5,
+        "result": "PASS",
+        "statusCode": 409
+      }
+    },
+    {
+      "step": 2,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "serviceHit": {
+        "step": 2,
+        "target": "DB users query",
+        "startedAt": "2026-05-02T11:34:21.548Z",
+        "endedAt": "2026-05-02T11:34:21.555Z",
+        "durationMs": 7,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 3,
+      "result": "FAIL",
+      "observed": {
+        "emailFound": false
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Check verification email sent to Mailpit",
+      "serviceHit": {
+        "step": 3,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-02T11:34:21.555Z",
+        "endedAt": "2026-05-02T11:34:25.391Z",
+        "durationMs": 3836,
+        "result": "FAIL"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL",
+    "db": "FAIL",
+    "external": "FAIL",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 2,
+      "reason": "Step execution failed",
+      "evidence": "error: invalid input syntax for type uuid: \"undefined\""
+    },
+    {
+      "step": 2,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 3,
+      "reason": "Step failed",
+      "evidence": {
+        "emailFound": false
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "runId": "RUN-20260430030805293-MOD-BOOKING-010",
   "testId": "MOD-BOOKING-010",
   "status": "FAIL",
@@ -8,46 +9,85 @@
     "apiServer": "OK",
     "mailpit": "OK",
     "database": "OK"
+=======
+  "runId": "RUN-20260502113421446-MOD-BOOKING-010",
+  "testId": "MOD-BOOKING-010",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.446Z",
+  "endedAt": "2026-05-02T11:34:21.506Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+>>>>>>> agents/lead-agent-background-features-move
   },
   "serviceHitLog": [
     {
       "step": 1,
+<<<<<<< HEAD
       "target": "PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
       "startedAt": "2026-04-30T03:08:05.306Z",
       "endedAt": "2026-04-30T03:08:05.307Z",
       "durationMs": 1,
+=======
+      "target": "PATCH /bookings/4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+      "startedAt": "2026-05-02T11:34:21.494Z",
+      "endedAt": "2026-05-02T11:34:21.498Z",
+      "durationMs": 4,
+>>>>>>> agents/lead-agent-background-features-move
       "result": "PASS",
       "statusCode": 404
     },
     {
       "step": 2,
       "target": "internalAuth (noop)",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.307Z",
       "endedAt": "2026-04-30T03:08:05.307Z",
+=======
+      "startedAt": "2026-05-02T11:34:21.498Z",
+      "endedAt": "2026-05-02T11:34:21.498Z",
+>>>>>>> agents/lead-agent-background-features-move
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 3,
       "target": "validation (noop)",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.307Z",
       "endedAt": "2026-04-30T03:08:05.307Z",
+=======
+      "startedAt": "2026-05-02T11:34:21.498Z",
+      "endedAt": "2026-05-02T11:34:21.498Z",
+>>>>>>> agents/lead-agent-background-features-move
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 4,
       "target": "dbTransaction (noop)",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.307Z",
       "endedAt": "2026-04-30T03:08:05.307Z",
       "durationMs": 0,
+=======
+      "startedAt": "2026-05-02T11:34:21.498Z",
+      "endedAt": "2026-05-02T11:34:21.499Z",
+      "durationMs": 1,
+>>>>>>> agents/lead-agent-background-features-move
       "result": "PASS"
     },
     {
       "step": 5,
       "target": "API response validation",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.307Z",
       "endedAt": "2026-04-30T03:08:05.307Z",
+=======
+      "startedAt": "2026-05-02T11:34:21.499Z",
+      "endedAt": "2026-05-02T11:34:21.499Z",
+>>>>>>> agents/lead-agent-background-features-move
       "durationMs": 0,
       "result": "FAIL",
       "statusCode": 404
@@ -55,24 +95,41 @@
     {
       "step": 6,
       "target": "DB verify bookings",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.307Z",
       "endedAt": "2026-04-30T03:08:05.308Z",
       "durationMs": 1,
+=======
+      "startedAt": "2026-05-02T11:34:21.499Z",
+      "endedAt": "2026-05-02T11:34:21.502Z",
+      "durationMs": 3,
+>>>>>>> agents/lead-agent-background-features-move
       "result": "FAIL"
     },
     {
       "step": 7,
       "target": "DB verify roster_slots",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.308Z",
       "endedAt": "2026-04-30T03:08:05.308Z",
       "durationMs": 0,
+=======
+      "startedAt": "2026-05-02T11:34:21.502Z",
+      "endedAt": "2026-05-02T11:34:21.505Z",
+      "durationMs": 3,
+>>>>>>> agents/lead-agent-background-features-move
       "result": "PASS"
     },
     {
       "step": 8,
       "target": "DB verify booking_companion_assignments",
+<<<<<<< HEAD
       "startedAt": "2026-04-30T03:08:05.308Z",
       "endedAt": "2026-04-30T03:08:05.309Z",
+=======
+      "startedAt": "2026-05-02T11:34:21.505Z",
+      "endedAt": "2026-05-02T11:34:21.506Z",
+>>>>>>> agents/lead-agent-background-features-move
       "durationMs": 1,
       "result": "FAIL"
     }
@@ -82,7 +139,11 @@
       "step": 1,
       "result": "PASS",
       "observed": {
+<<<<<<< HEAD
         "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e</pre>\n</body>\n</html>\n"
+=======
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/4dd7e2dc-326f-48dd-80f9-df49a813efc6</pre>\n</body>\n</html>\n"
+>>>>>>> agents/lead-agent-background-features-move
       },
       "actor": "InternalService",
       "actionType": "apiRequest",
@@ -90,10 +151,17 @@
       "statusCode": 404,
       "serviceHit": {
         "step": 1,
+<<<<<<< HEAD
         "target": "PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
         "startedAt": "2026-04-30T03:08:05.306Z",
         "endedAt": "2026-04-30T03:08:05.307Z",
         "durationMs": 1,
+=======
+        "target": "PATCH /bookings/4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+        "startedAt": "2026-05-02T11:34:21.494Z",
+        "endedAt": "2026-05-02T11:34:21.498Z",
+        "durationMs": 4,
+>>>>>>> agents/lead-agent-background-features-move
         "result": "PASS",
         "statusCode": 404
       }
@@ -113,8 +181,13 @@
       "serviceHit": {
         "step": 2,
         "target": "internalAuth (noop)",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.307Z",
         "endedAt": "2026-04-30T03:08:05.307Z",
+=======
+        "startedAt": "2026-05-02T11:34:21.498Z",
+        "endedAt": "2026-05-02T11:34:21.498Z",
+>>>>>>> agents/lead-agent-background-features-move
         "durationMs": 0,
         "result": "PASS"
       }
@@ -140,8 +213,13 @@
       "serviceHit": {
         "step": 3,
         "target": "validation (noop)",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.307Z",
         "endedAt": "2026-04-30T03:08:05.307Z",
+=======
+        "startedAt": "2026-05-02T11:34:21.498Z",
+        "endedAt": "2026-05-02T11:34:21.498Z",
+>>>>>>> agents/lead-agent-background-features-move
         "durationMs": 0,
         "result": "PASS"
       }
@@ -158,9 +236,15 @@
       "serviceHit": {
         "step": 4,
         "target": "dbTransaction (noop)",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.307Z",
         "endedAt": "2026-04-30T03:08:05.307Z",
         "durationMs": 0,
+=======
+        "startedAt": "2026-05-02T11:34:21.498Z",
+        "endedAt": "2026-05-02T11:34:21.499Z",
+        "durationMs": 1,
+>>>>>>> agents/lead-agent-background-features-move
         "result": "PASS"
       }
     },
@@ -170,7 +254,11 @@
       "observed": {
         "lastApiRequestStep": 1,
         "response": {
+<<<<<<< HEAD
           "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e</pre>\n</body>\n</html>\n"
+=======
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/4dd7e2dc-326f-48dd-80f9-df49a813efc6</pre>\n</body>\n</html>\n"
+>>>>>>> agents/lead-agent-background-features-move
         },
         "checks": [
           {
@@ -188,8 +276,13 @@
       "serviceHit": {
         "step": 5,
         "target": "API response validation",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.307Z",
         "endedAt": "2026-04-30T03:08:05.307Z",
+=======
+        "startedAt": "2026-05-02T11:34:21.499Z",
+        "endedAt": "2026-05-02T11:34:21.499Z",
+>>>>>>> agents/lead-agent-background-features-move
         "durationMs": 0,
         "result": "FAIL",
         "statusCode": 404
@@ -201,11 +294,16 @@
       "observed": {
         "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
         "params": [
+<<<<<<< HEAD
           "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+=======
+          "4dd7e2dc-326f-48dd-80f9-df49a813efc6"
+>>>>>>> agents/lead-agent-background-features-move
         ],
         "rowCount": 1,
         "rows": [
           {
+<<<<<<< HEAD
             "id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "client_id": "ea51050f-2062-4afd-a2d9-f1fbd10a0815",
             "venue_id": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
@@ -219,6 +317,21 @@
             "com_match_pin_code": "222222",
             "extended_at": null,
             "created_at": "2026-04-30T03:08:05.303Z"
+=======
+            "id": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "client_id": "560b2892-0bfe-4629-a3f5-36195fdadf25",
+            "venue_id": "b5f2b175-3bda-40cd-83bb-897084b1a0fa",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.483Z"
+>>>>>>> agents/lead-agent-background-features-move
           }
         ],
         "checks": [
@@ -232,8 +345,13 @@
             "type": "equals",
             "row": 0,
             "field": "id",
+<<<<<<< HEAD
             "expected": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "actual": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+=======
+            "expected": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "actual": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": true
           },
           {
@@ -248,24 +366,39 @@
             "type": "equals",
             "row": 0,
             "field": "venue_id",
+<<<<<<< HEAD
             "expected": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
             "actual": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+=======
+            "expected": "b5f2b175-3bda-40cd-83bb-897084b1a0fa",
+            "actual": "b5f2b175-3bda-40cd-83bb-897084b1a0fa",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": true
           },
           {
             "type": "equals",
             "row": 0,
             "field": "start_at",
+<<<<<<< HEAD
             "expected": "2026-05-01T10:00:00.000Z",
             "actual": "2026-05-01T10:00:00.000Z",
+=======
+            "expected": "2026-05-03T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
             "type": "equals",
             "row": 0,
             "field": "end_at",
+<<<<<<< HEAD
             "expected": "2026-05-01T12:00:00.000Z",
             "actual": "2026-05-01T12:00:00.000Z",
+=======
+            "expected": "2026-05-03T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
@@ -284,9 +417,15 @@
       "serviceHit": {
         "step": 6,
         "target": "DB verify bookings",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.307Z",
         "endedAt": "2026-04-30T03:08:05.308Z",
         "durationMs": 1,
+=======
+        "startedAt": "2026-05-02T11:34:21.499Z",
+        "endedAt": "2026-05-02T11:34:21.502Z",
+        "durationMs": 3,
+>>>>>>> agents/lead-agent-background-features-move
         "result": "FAIL"
       }
     },
@@ -296,7 +435,11 @@
       "observed": {
         "sql": "SELECT * FROM \"roster_slots\" WHERE booking_id=$1 LIMIT 50;",
         "params": [
+<<<<<<< HEAD
           "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+=======
+          "4dd7e2dc-326f-48dd-80f9-df49a813efc6"
+>>>>>>> agents/lead-agent-background-features-move
         ],
         "rowCount": 0,
         "rows": [],
@@ -308,9 +451,15 @@
       "serviceHit": {
         "step": 7,
         "target": "DB verify roster_slots",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.308Z",
         "endedAt": "2026-04-30T03:08:05.308Z",
         "durationMs": 0,
+=======
+        "startedAt": "2026-05-02T11:34:21.502Z",
+        "endedAt": "2026-05-02T11:34:21.505Z",
+        "durationMs": 3,
+>>>>>>> agents/lead-agent-background-features-move
         "result": "PASS"
       }
     },
@@ -320,23 +469,39 @@
       "observed": {
         "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id=$1 LIMIT 50;",
         "params": [
+<<<<<<< HEAD
           "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+=======
+          "4dd7e2dc-326f-48dd-80f9-df49a813efc6"
+>>>>>>> agents/lead-agent-background-features-move
         ],
         "rowCount": 2,
         "rows": [
           {
+<<<<<<< HEAD
             "id": "9cca29e8-e9a3-4ea9-96c2-2052913d9c4d",
             "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "companion_id": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+=======
+            "id": "79ebdfa5-337b-4a13-bfc4-64e92342d9c5",
+            "booking_id": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "companion_id": "d77de0e4-414e-4ede-b589-98fb555ce69e",
+>>>>>>> agents/lead-agent-background-features-move
             "designation": "CAPTAIN",
             "presence_status": "ASSIGNED",
             "self_match_status": "NOT_MATCHED",
             "client_match_status": "WAITING_FOR_CLIENT"
           },
           {
+<<<<<<< HEAD
             "id": "a2fb388b-b551-410a-98cb-0fd81de44768",
             "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "companion_id": "61be6071-a4d9-430e-bfea-5c4424900a96",
+=======
+            "id": "af1242b4-0148-49f0-86de-b762896be06c",
+            "booking_id": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "companion_id": "d871d515-538b-487b-8cd0-45369de8e317",
+>>>>>>> agents/lead-agent-background-features-move
             "designation": "VICE_CAPTAIN",
             "presence_status": "ASSIGNED",
             "self_match_status": "NOT_MATCHED",
@@ -355,7 +520,11 @@
             "row": 0,
             "field": "companion_id",
             "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+<<<<<<< HEAD
             "actual": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+=======
+            "actual": "d77de0e4-414e-4ede-b589-98fb555ce69e",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
@@ -363,7 +532,11 @@
             "row": 1,
             "field": "companion_id",
             "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+<<<<<<< HEAD
             "actual": "61be6071-a4d9-430e-bfea-5c4424900a96",
+=======
+            "actual": "d871d515-538b-487b-8cd0-45369de8e317",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
@@ -422,8 +595,13 @@
       "serviceHit": {
         "step": 8,
         "target": "DB verify booking_companion_assignments",
+<<<<<<< HEAD
         "startedAt": "2026-04-30T03:08:05.308Z",
         "endedAt": "2026-04-30T03:08:05.309Z",
+=======
+        "startedAt": "2026-05-02T11:34:21.505Z",
+        "endedAt": "2026-05-02T11:34:21.506Z",
+>>>>>>> agents/lead-agent-background-features-move
         "durationMs": 1,
         "result": "FAIL"
       }
@@ -442,7 +620,11 @@
       "evidence": {
         "lastApiRequestStep": 1,
         "response": {
+<<<<<<< HEAD
           "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e</pre>\n</body>\n</html>\n"
+=======
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/4dd7e2dc-326f-48dd-80f9-df49a813efc6</pre>\n</body>\n</html>\n"
+>>>>>>> agents/lead-agent-background-features-move
         },
         "checks": [
           {
@@ -460,11 +642,16 @@
       "evidence": {
         "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
         "params": [
+<<<<<<< HEAD
           "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+=======
+          "4dd7e2dc-326f-48dd-80f9-df49a813efc6"
+>>>>>>> agents/lead-agent-background-features-move
         ],
         "rowCount": 1,
         "rows": [
           {
+<<<<<<< HEAD
             "id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "client_id": "ea51050f-2062-4afd-a2d9-f1fbd10a0815",
             "venue_id": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
@@ -478,6 +665,21 @@
             "com_match_pin_code": "222222",
             "extended_at": null,
             "created_at": "2026-04-30T03:08:05.303Z"
+=======
+            "id": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "client_id": "560b2892-0bfe-4629-a3f5-36195fdadf25",
+            "venue_id": "b5f2b175-3bda-40cd-83bb-897084b1a0fa",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.483Z"
+>>>>>>> agents/lead-agent-background-features-move
           }
         ],
         "checks": [
@@ -491,8 +693,13 @@
             "type": "equals",
             "row": 0,
             "field": "id",
+<<<<<<< HEAD
             "expected": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "actual": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+=======
+            "expected": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "actual": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": true
           },
           {
@@ -507,24 +714,39 @@
             "type": "equals",
             "row": 0,
             "field": "venue_id",
+<<<<<<< HEAD
             "expected": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
             "actual": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+=======
+            "expected": "b5f2b175-3bda-40cd-83bb-897084b1a0fa",
+            "actual": "b5f2b175-3bda-40cd-83bb-897084b1a0fa",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": true
           },
           {
             "type": "equals",
             "row": 0,
             "field": "start_at",
+<<<<<<< HEAD
             "expected": "2026-05-01T10:00:00.000Z",
             "actual": "2026-05-01T10:00:00.000Z",
+=======
+            "expected": "2026-05-03T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
             "type": "equals",
             "row": 0,
             "field": "end_at",
+<<<<<<< HEAD
             "expected": "2026-05-01T12:00:00.000Z",
             "actual": "2026-05-01T12:00:00.000Z",
+=======
+            "expected": "2026-05-03T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
@@ -544,23 +766,39 @@
       "evidence": {
         "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id=$1 LIMIT 50;",
         "params": [
+<<<<<<< HEAD
           "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+=======
+          "4dd7e2dc-326f-48dd-80f9-df49a813efc6"
+>>>>>>> agents/lead-agent-background-features-move
         ],
         "rowCount": 2,
         "rows": [
           {
+<<<<<<< HEAD
             "id": "9cca29e8-e9a3-4ea9-96c2-2052913d9c4d",
             "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "companion_id": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+=======
+            "id": "79ebdfa5-337b-4a13-bfc4-64e92342d9c5",
+            "booking_id": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "companion_id": "d77de0e4-414e-4ede-b589-98fb555ce69e",
+>>>>>>> agents/lead-agent-background-features-move
             "designation": "CAPTAIN",
             "presence_status": "ASSIGNED",
             "self_match_status": "NOT_MATCHED",
             "client_match_status": "WAITING_FOR_CLIENT"
           },
           {
+<<<<<<< HEAD
             "id": "a2fb388b-b551-410a-98cb-0fd81de44768",
             "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
             "companion_id": "61be6071-a4d9-430e-bfea-5c4424900a96",
+=======
+            "id": "af1242b4-0148-49f0-86de-b762896be06c",
+            "booking_id": "4dd7e2dc-326f-48dd-80f9-df49a813efc6",
+            "companion_id": "d871d515-538b-487b-8cd0-45369de8e317",
+>>>>>>> agents/lead-agent-background-features-move
             "designation": "VICE_CAPTAIN",
             "presence_status": "ASSIGNED",
             "self_match_status": "NOT_MATCHED",
@@ -579,7 +817,11 @@
             "row": 0,
             "field": "companion_id",
             "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+<<<<<<< HEAD
             "actual": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+=======
+            "actual": "d77de0e4-414e-4ede-b589-98fb555ce69e",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
@@ -587,7 +829,11 @@
             "row": 1,
             "field": "companion_id",
             "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+<<<<<<< HEAD
             "actual": "61be6071-a4d9-430e-bfea-5c4424900a96",
+=======
+            "actual": "d871d515-538b-487b-8cd0-45369de8e317",
+>>>>>>> agents/lead-agent-background-features-move
             "pass": false
           },
           {
