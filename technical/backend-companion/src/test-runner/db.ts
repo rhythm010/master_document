@@ -608,8 +608,16 @@ export async function executeDbQuery(
   step: DbQueryStep,
   context: RunContext
 ): Promise<{ rows: Array<Record<string, unknown>>; rowCount: number }>{
+  // If step has a custom query, use it directly
+  if (step.query) {
+    const queryText = substitute(step.query, context);
+    const result = await pool.query(queryText);
+    return { rows: result.rows as Array<Record<string, unknown>>, rowCount: result.rowCount || 0 };
+  }
+
+  // Otherwise construct simple SELECT from target and where
   if (typeof step.target !== "string" || step.target.trim().length === 0) {
-    throw new Error("dbQuery step requires a non-empty target");
+    throw new Error("dbQuery step requires either a query field or a non-empty target");
   }
 
   const targetRaw = substitute(step.target, context);

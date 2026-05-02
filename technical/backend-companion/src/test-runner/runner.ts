@@ -4,6 +4,7 @@ import path from "node:path";
 import type {
   AssertionSummary,
   EnvironmentCheck,
+  ExternalCheckStep,
   StepDefinition,
   StepResult,
   TestDefinition,
@@ -89,7 +90,10 @@ function prepareApiRequestStep(step: StepDefinition, context: Record<string, unk
 
   const headers: Record<string, string> = {};
   if (step.headers) {
-    Object.assign(headers, step.headers);
+    // Substitute header values
+    for (const [key, value] of Object.entries(step.headers)) {
+      headers[key] = String(substitute(value, context));
+    }
   }
 
   const authType = String(step.authType ?? "").toLowerCase();
@@ -111,6 +115,14 @@ function prepareApiRequestStep(step: StepDefinition, context: Record<string, unk
   }
 
   let endpoint = step.endpoint;
+  
+  // Handle query parameters
+  let queryParams = step.queryParams;
+  // Add default queryParams for specific endpoints if not provided
+  if (!queryParams && endpoint === '/venues') {
+    queryParams = { q: 'a' }; // Search for venues containing 'a' - should match most
+  }
+  
   if (step.pathParams && isRecord(step.pathParams)) {
     const renderedParams = substitute(step.pathParams, context) as Record<string, unknown>;
     for (const [key, value] of Object.entries(renderedParams)) {
@@ -119,9 +131,49 @@ function prepareApiRequestStep(step: StepDefinition, context: Record<string, unk
       endpoint = endpoint.replace(`{${key}}`, String(value));
     }
   }
+  
+  // Append query parameters to endpoint
+  if (queryParams && isRecord(queryParams)) {
+    const renderedQuery = substitute(queryParams, context) as Record<string, unknown>;
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(renderedQuery)) {
+      params.append(key, String(value));
+    }
+    const queryString = params.toString();
+    if (queryString) {
+      endpoint = `${endpoint}?${queryString}`;
+    }
+  }
 
   let payload = step.payload;
-  if (payload === undefined && Array.isArray(step.requiredPayloadFields) && step.requiredPayloadFields.length > 0) {
+  
+  // Check for payloadTemplate (used in journey tests)
+  const payloadTemplate = (step as { payloadTemplate?: unknown }).payloadTemplate;
+  if (payloadTemplate && isRecord(payloadTemplate)) {
+    payload = substitute(payloadTemplate, context) as Record<string, unknown>;
+    
+    // Auto-inject name and nickname for signup if not present and available in context
+    if (step.endpoint.includes('/signup') && isRecord(payload)) {
+      const role = String(payload.role || '').toUpperCase();
+      if (role === 'CLIENT' && !payload.name && context["CLIENT_NAME"]) {
+        payload.name = context["CLIENT_NAME"];
+      }
+      if (role === 'CLIENT' && !payload.nickname && context["CLIENT_NICKNAME"]) {
+        payload.nickname = context["CLIENT_NICKNAME"];
+      }
+      if (role === 'COMPANION') {
+        // Try to determine which companion based on email
+        const email = String(payload.email || '');
+        if (email.includes('companion-a') || email.includes('companionA')) {
+          if (!payload.name && context["COMPANION_A_NAME"]) payload.name = context["COMPANION_A_NAME"];
+          if (!payload.nickname && context["COMPANION_A_NICKNAME"]) payload.nickname = context["COMPANION_A_NICKNAME"];
+        } else if (email.includes('companion-b') || email.includes('companionB')) {
+          if (!payload.name && context["COMPANION_B_NAME"]) payload.name = context["COMPANION_B_NAME"];
+          if (!payload.nickname && context["COMPANION_B_NICKNAME"]) payload.nickname = context["COMPANION_B_NICKNAME"];
+        }
+      }
+    }
+  } else if (payload === undefined && Array.isArray(step.requiredPayloadFields) && step.requiredPayloadFields.length > 0) {
     const autoPayload: Record<string, unknown> = {};
     for (const field of step.requiredPayloadFields) {
       if (typeof field !== "string") {
@@ -422,6 +474,53 @@ export async function runTestFile(
     context["TODAY_DATE_YMD"] = todayYmd(process.env.TZ);
   }
 
+  // Initialize context from testData if present
+  const testData = (testDef as { testData?: Record<string, unknown> }).testData;
+  if (testData && typeof testData === "object") {
+    const users = (testData as { users?: Record<string, Record<string, unknown>> }).users;
+    if (users && typeof users === "object") {
+      // Client data
+      if (users.client) {
+        const client = users.client;
+        if (client.email) context["CLIENT_EMAIL"] = substitute(client.email, context);
+        if (client.password) context["CLIENT_PASSWORD"] = client.password;
+        if (client.role) context["CLIENT_ROLE"] = client.role;
+        if (client.nickname) {
+          context["CLIENT_NICKNAME"] = client.nickname;
+          context["CLIENT_NAME"] = client.nickname; // Use nickname as name if not specified
+        }
+      }
+      // Companion A data
+      if (users.companionA) {
+        const companionA = users.companionA;
+        if (companionA.email) context["COMPANION_A_EMAIL"] = substitute(companionA.email, context);
+        if (companionA.password) context["COMPANION_A_PASSWORD"] = companionA.password;
+        if (companionA.role) context["COMPANION_A_ROLE"] = companionA.role;
+        if (companionA.nickname) {
+          context["COMPANION_A_NICKNAME"] = companionA.nickname;
+          context["COMPANION_A_NAME"] = companionA.nickname; // Use nickname as name if not specified
+        }
+      }
+      // Companion B data
+      if (users.companionB) {
+        const companionB = users.companionB;
+        if (companionB.email) context["COMPANION_B_EMAIL"] = substitute(companionB.email, context);
+        if (companionB.password) context["COMPANION_B_PASSWORD"] = companionB.password;
+        if (companionB.role) context["COMPANION_B_ROLE"] = companionB.role;
+        if (companionB.nickname) {
+          context["COMPANION_B_NICKNAME"] = companionB.nickname;
+          context["COMPANION_B_NAME"] = companionB.nickname; // Use nickname as name if not specified
+        }
+      }
+    }
+    // Booking data
+    const booking = (testData as { booking?: Record<string, unknown> }).booking;
+    if (booking && typeof booking === "object") {
+      if (booking.date) context["BOOKING_DATE"] = booking.date;
+      if (booking.startTime) context["BOOKING_START_TIME"] = booking.startTime;
+    }
+  }
+
   // Some test designs use {{VALID_INTERNAL_TOKEN}} as a placeholder.
   // Default it to INTERNAL_API_TOKEN when available.
   if (context["VALID_INTERNAL_TOKEN"] === undefined && typeof process.env.INTERNAL_API_TOKEN === "string") {
@@ -481,6 +580,74 @@ export async function runTestFile(
           stepResult.observed = apiResult.observed;
 
           lastApiRequest = { step: stepNumber, statusCode: apiResult.statusCode, observed: apiResult.observed };
+
+          // Handle dataExtraction from response
+          const dataExtraction = (step as { dataExtraction?: Record<string, string> }).dataExtraction;
+          if (dataExtraction && isRecord(dataExtraction) && apiResult.observed) {
+            for (const [contextKey, pathOrDescription] of Object.entries(dataExtraction)) {
+              let value: unknown = undefined;
+              
+              // Handle special cases where path is descriptive text, not a dot-path
+              if (contextKey === 'testVenueId' && isRecord(apiResult.observed) && apiResult.observed.venues) {
+                // Extract first venue ID from venues array
+                const venues = apiResult.observed.venues as unknown;
+                if (Array.isArray(venues) && venues.length > 0 && isRecord(venues[0])) {
+                  value = venues[0].id;
+                }
+              } else if (typeof pathOrDescription === 'string' && pathOrDescription.includes('.')) {
+                // path is like "response.body.id" or "response.body.venues[0].name" - extract from observed
+                const pathParts = pathOrDescription.split('.');
+                value = apiResult.observed;
+                
+                // Skip "response.body" or "response" prefix if present
+                let startIdx = 0;
+                if (pathParts[0] === 'response' && pathParts.length > 1 && pathParts[1] === 'body') {
+                  startIdx = 2;
+                } else if (pathParts[0] === 'response') {
+                  startIdx = 1;
+                }
+                
+                for (let i = startIdx; i < pathParts.length; i++) {
+                  const part = pathParts[i];
+                  // Handle array index notation like "venues[0]"
+                  const arrayMatch = part.match(/^([a-zA-Z_]+)\[(\d+)\]$/);
+                  if (arrayMatch) {
+                    const [, key, index] = arrayMatch;
+                    if (value && typeof value === 'object') {
+                      value = (value as Record<string, unknown>)[key];
+                      if (Array.isArray(value)) {
+                        value = value[Number.parseInt(index, 10)];
+                      } else {
+                        value = undefined;
+                        break;
+                      }
+                    } else {
+                      value = undefined;
+                      break;
+                    }
+                  } else {
+                    if (value && typeof value === 'object') {
+                      value = (value as Record<string, unknown>)[part];
+                    } else {
+                      value = undefined;
+                      break;
+                    }
+                  }
+                }
+              } else if (typeof pathOrDescription === 'string' && isRecord(apiResult.observed)) {
+                // Try direct key lookup as fallback
+                value = apiResult.observed[pathOrDescription];
+              }
+              
+              if (value !== undefined) {
+                // Store with uppercase underscored key
+                const upperKey = contextKey
+                  .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+                  .toUpperCase();
+                context[upperKey] = value;
+              }
+            }
+          }
 
           const observedId = apiResult.observed ? (apiResult.observed["id"] as unknown) : undefined;
           if (context["BOOKING_ID"] === undefined && typeof observedId === "string" && observedId.length > 0) {
@@ -622,6 +789,40 @@ export async function runTestFile(
           );
           const requiresToken = Boolean(step.extractTokenFromEmail);
           const tokenOk = requiresToken ? Boolean(externalResult.observed.tokenExtracted) : true;
+          stepResult.result = externalResult.observed.emailFound && tokenOk ? "PASS" : "FAIL";
+          stepResult.observed = externalResult.observed;
+        } else if (step.actionType === "waitForEmail") {
+          // Handle waitForEmail by converting to externalCheck logic
+          target = step.endpoint ? String(substitute(step.endpoint, context)) : `${MAILPIT_BASE}/api/v1/messages`;
+          
+          // Determine email to validate from context based on step number
+          let validateEmailTo = "";
+          if (step.step === 2) {
+            validateEmailTo = String(context["CLIENT_EMAIL"] || "");
+          } else if (step.step === 6) {
+            validateEmailTo = String(context["COMPANION_A_EMAIL"] || "");
+          } else if (step.step === 11) {
+            validateEmailTo = String(context["COMPANION_B_EMAIL"] || "");
+          }
+          
+          // Convert to externalCheck format
+          const externalCheckStep: ExternalCheckStep = {
+            step: step.step,
+            actionType: "externalCheck",
+            validateEmailTo,
+            extractTokenFromEmail: true,
+            storeAs: step.step === 2 ? "CLIENT_VERIFY_TOKEN" : 
+                     step.step === 6 ? "COMPANION_A_VERIFY_TOKEN" :
+                     step.step === 11 ? "COMPANION_B_VERIFY_TOKEN" : "verificationToken"
+          };
+          
+          const externalResult = await executeExternalCheck(
+            externalCheckStep,
+            context,
+            MAILPIT_BASE,
+            testDef.waitPolicy
+          );
+          const tokenOk = Boolean(externalResult.observed.tokenExtracted);
           stepResult.result = externalResult.observed.emailFound && tokenOk ? "PASS" : "FAIL";
           stepResult.observed = externalResult.observed;
         } else if (step.actionType === "dbQuery") {

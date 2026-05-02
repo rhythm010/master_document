@@ -88,6 +88,7 @@ export type DbQueryStep = {
   actor?: string;
   actionType: "dbQuery";
   target?: string;
+  query?: string;
   where?: {
     field: string;
     value: string;
@@ -96,6 +97,22 @@ export type DbQueryStep = {
   notes?: unknown;
   description?: string;
   layman?: string;
+  validations?: string[];
+  phase?: string;
+};
+
+export type WaitForEmailStep = {
+  step: number;
+  actor?: string;
+  actionType: "waitForEmail";
+  endpoint?: string;
+  validations?: string[];
+  dataExtraction?: Record<string, string>;
+  expectedBehavior?: unknown;
+  notes?: unknown;
+  description?: string;
+  layman?: string;
+  phase?: string;
 };
 
 export type StepDefinition =
@@ -104,7 +121,8 @@ export type StepDefinition =
   | DbVerificationStep
   | InformationalStep
   | ExternalCheckStep
-  | DbQueryStep;
+  | DbQueryStep
+  | WaitForEmailStep;
 
 export type SeedVenue = {
   entity: "venue";
