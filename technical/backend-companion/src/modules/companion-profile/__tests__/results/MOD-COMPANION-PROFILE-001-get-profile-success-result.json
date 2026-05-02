@@ -1,0 +1,91 @@
+{
+  "runId": "RUN-20260502113421523-MOD-COMPANION-PROFILE-001",
+  "testId": "MOD-COMPANION-PROFILE-001",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.523Z",
+  "endedAt": "2026-05-02T11:34:21.533Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "",
+      "startedAt": "2026-05-02T11:34:21.532Z",
+      "endedAt": "2026-05-02T11:34:21.532Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    },
+    {
+      "step": 2,
+      "target": "GET /companion-profiles/me",
+      "startedAt": "2026-05-02T11:34:21.532Z",
+      "endedAt": "2026-05-02T11:34:21.532Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 401
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "generateToken",
+      "serviceHit": {
+        "step": 1,
+        "target": "",
+        "startedAt": "2026-05-02T11:34:21.532Z",
+        "endedAt": "2026-05-02T11:34:21.532Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 2,
+        "target": "GET /companion-profiles/me",
+        "startedAt": "2026-05-02T11:34:21.532Z",
+        "endedAt": "2026-05-02T11:34:21.532Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "FAIL",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 1,
+      "reason": "Unsupported actionType",
+      "evidence": "generateToken"
+    },
+    {
+      "step": 1,
+      "reason": "Step failed",
+      "evidence": {}
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

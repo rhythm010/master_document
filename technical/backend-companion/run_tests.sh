@@ -7,6 +7,18 @@ set -e
 
 cd "$(dirname "$0")"
 
+# Load test environment if .env.test exists
+if [ -f ".env.test" ]; then
+    echo "✓ Loading test environment from .env.test"
+    set -a  # automatically export all variables
+    source .env.test
+    set +a
+else
+    echo "⚠ .env.test not found, using default environment"
+    echo "  To fix: Copy .env.test.example to .env.test and update tokens"
+fi
+echo ""
+
 echo "========================================"
 echo "Companion Test Runner"
 echo "========================================"
@@ -58,8 +70,8 @@ echo "Running tests..."
 echo "========================================"
 echo ""
 
-# Run the Python test validator with all arguments passed through
-python3 test_runner.py "$@"
+# Run the TypeScript test runner with all arguments passed through
+npx tsx src/test-runner/index.ts "$@"
 
 echo ""
 echo "========================================"

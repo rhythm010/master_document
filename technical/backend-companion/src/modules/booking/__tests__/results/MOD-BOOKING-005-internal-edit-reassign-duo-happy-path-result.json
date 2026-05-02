@@ -1,0 +1,931 @@
+{
+  "runId": "RUN-20260502113421445-MOD-BOOKING-005",
+  "testId": "MOD-BOOKING-005",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.445Z",
+  "endedAt": "2026-05-02T11:34:21.520Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "PATCH /bookings/9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 2,
+      "target": "internalAuth (noop)",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "validation (noop)",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "dbTransaction (noop)",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "target": "slotRelease (noop)",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "slotReservation (noop)",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "dbUpdate (noop)",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 8,
+      "target": "dbTransaction (noop)",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 9,
+      "target": "API response validation",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "FAIL",
+      "statusCode": 404
+    },
+    {
+      "step": 10,
+      "target": "DB verify bookings",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 11,
+      "target": "",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    },
+    {
+      "step": 12,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.520Z",
+      "durationMs": 1,
+      "result": "FAIL"
+    },
+    {
+      "step": 13,
+      "target": "DB verify booking_companion_assignments",
+      "startedAt": "2026-05-02T11:34:21.520Z",
+      "endedAt": "2026-05-02T11:34:21.520Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d</pre>\n</body>\n</html>\n"
+      },
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "layman": "Internal service requests to manually reassign a different duo to the booking",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 1,
+        "target": "PATCH /bookings/9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Validate X-Internal-Token"
+        ]
+      },
+      "actor": "System",
+      "actionType": "internalAuth",
+      "layman": "System verifies internal authorization",
+      "serviceHit": {
+        "step": 2,
+        "target": "internalAuth (noop)",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Booking exists and status is CONFIRMED",
+          "extended_at is NULL",
+          "Server time < start_at",
+          "Both captainCompanionId and viceCaptainCompanionId provided",
+          "Companions are distinct (not the same ID)",
+          "captainCompanionId has designation=CAPTAIN",
+          "viceCaptainCompanionId has designation=VICE_CAPTAIN"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System validates the booking can be edited and the target duo is valid",
+      "serviceHit": {
+        "step": 3,
+        "target": "validation (noop)",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Lock booking FOR UPDATE",
+          "Load and lock assignment rows FOR UPDATE",
+          "Verify assignments at default statuses"
+        ]
+      },
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "layman": "System locks the booking and verifies no progression",
+      "serviceHit": {
+        "step": 4,
+        "target": "dbTransaction (noop)",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Release current roster slots for original duo",
+          "Verify exactly 2 rows affected"
+        ]
+      },
+      "actor": "System",
+      "actionType": "slotRelease",
+      "layman": "System releases the original duo's roster slots",
+      "serviceHit": {
+        "step": 5,
+        "target": "slotRelease (noop)",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Lock target duo's roster slots using FOR UPDATE SKIP LOCKED",
+          "Verify exactly 2 rows locked (target duo available)",
+          "Reserve slots for target duo",
+          "Verify exactly 2 rows affected"
+        ]
+      },
+      "actor": "System",
+      "actionType": "slotReservation",
+      "layman": "System reserves roster slots for the new duo",
+      "serviceHit": {
+        "step": 6,
+        "target": "slotReservation (noop)",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Update CAPTAIN assignment: SET companion_id={{TARGET_CAPTAIN_ID}}, reset to defaults (presence_status='ASSIGNED', etc.)",
+          "Update VICE_CAPTAIN assignment: SET companion_id={{TARGET_VICE_CAPTAIN_ID}}, reset to defaults",
+          "Do NOT change booking artifacts (qrCode, pinCode, etc.)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "dbUpdate",
+      "layman": "System updates the companion assignments to the new duo and resets match statuses",
+      "serviceHit": {
+        "step": 7,
+        "target": "dbUpdate (noop)",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS)."
+      },
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "layman": "System commits all changes atomically",
+      "serviceHit": {
+        "step": 8,
+        "target": "dbTransaction (noop)",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 9,
+      "result": "FAIL",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 404,
+            "pass": false
+          },
+          {
+            "type": "present",
+            "field": "id",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "status",
+            "expected": "CONFIRMED",
+            "pass": false
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns success with updated booking",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 9,
+        "target": "API response validation",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "FAIL",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "client_id": "b9174275-89e7-4ac3-ae14-4ba138aa0587",
+            "venue_id": "a3eea62b-5251-4bce-abab-c8a752ba589d",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.492Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "actual": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "CONFIRMED",
+            "actual": "CONFIRMED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "qr_code",
+            "expected": "qr_9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "actual": "qr_9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "pin_code",
+            "expected": "111111",
+            "actual": "111111",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "com_match_qr_code",
+            "expected": "com_qr_9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "actual": "com_qr_9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "com_match_pin_code",
+            "expected": "222222",
+            "actual": "222222",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "booking_color",
+            "expected": "BLUE",
+            "actual": "BLUE",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify booking artifacts remain unchanged despite duo change",
+      "serviceHit": {
+        "step": 10,
+        "target": "DB verify bookings",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 11,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify original duo's slots are released",
+      "serviceHit": {
+        "step": 11,
+        "target": "",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 12,
+      "result": "FAIL",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "ac8badff-a6ea-4f3d-93fe-d4079bad586a",
+            "venue_id": "a3eea62b-5251-4bce-abab-c8a752ba589d",
+            "companion_id": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "9e691ab4-49cb-4e73-8d86-9ca764773a0c",
+            "venue_id": "a3eea62b-5251-4bce-abab-c8a752ba589d",
+            "companion_id": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "oneOf",
+            "row": 0,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "pass": false
+          },
+          {
+            "type": "oneOf",
+            "row": 1,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify new duo's slots are reserved for this booking",
+      "serviceHit": {
+        "step": 12,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.520Z",
+        "durationMs": 1,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 13,
+      "result": "FAIL",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "c355b134-01ee-4bbb-ab8e-fa8179926418",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "companion_id": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "908363d8-a009-448e-9695-3a481c8c0aef",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "companion_id": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "designationSet",
+            "expected": [
+              "CAPTAIN",
+              "VICE_CAPTAIN"
+            ],
+            "actual": [
+              "CAPTAIN",
+              "VICE_CAPTAIN"
+            ],
+            "pass": true
+          },
+          {
+            "type": "oneOf",
+            "row": 0,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "pass": false
+          },
+          {
+            "type": "oneOf",
+            "row": 1,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "presence_status",
+            "expected": "ASSIGNED",
+            "actual": "ASSIGNED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "presence_status",
+            "expected": "ASSIGNED",
+            "actual": "ASSIGNED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "self_match_status",
+            "expected": "NOT_MATCHED",
+            "actual": "NOT_MATCHED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "self_match_status",
+            "expected": "NOT_MATCHED",
+            "actual": "NOT_MATCHED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "client_match_status",
+            "expected": "WAITING_FOR_CLIENT",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "client_match_status",
+            "expected": "WAITING_FOR_CLIENT",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify assignments updated to new duo with statuses reset to defaults",
+      "serviceHit": {
+        "step": 13,
+        "target": "DB verify booking_companion_assignments",
+        "startedAt": "2026-05-02T11:34:21.520Z",
+        "endedAt": "2026-05-02T11:34:21.520Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 9,
+      "reason": "Step failed",
+      "evidence": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 404,
+            "pass": false
+          },
+          {
+            "type": "present",
+            "field": "id",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "status",
+            "expected": "CONFIRMED",
+            "pass": false
+          }
+        ]
+      }
+    },
+    {
+      "step": 11,
+      "reason": "Step execution failed",
+      "evidence": "Error: dbVerification.query placeholder {{ORIGINAL_CAPTAIN_ID}} was not found in context"
+    },
+    {
+      "step": 11,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 12,
+      "reason": "Step failed",
+      "evidence": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "ac8badff-a6ea-4f3d-93fe-d4079bad586a",
+            "venue_id": "a3eea62b-5251-4bce-abab-c8a752ba589d",
+            "companion_id": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "9e691ab4-49cb-4e73-8d86-9ca764773a0c",
+            "venue_id": "a3eea62b-5251-4bce-abab-c8a752ba589d",
+            "companion_id": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "oneOf",
+            "row": 0,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "pass": false
+          },
+          {
+            "type": "oneOf",
+            "row": 1,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          }
+        ]
+      }
+    },
+    {
+      "step": 13,
+      "reason": "Step failed",
+      "evidence": {
+        "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "c355b134-01ee-4bbb-ab8e-fa8179926418",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "companion_id": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "908363d8-a009-448e-9695-3a481c8c0aef",
+            "booking_id": "9a7ee0d7-a9d5-419d-8bdc-5cbdef79d21d",
+            "companion_id": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "designationSet",
+            "expected": [
+              "CAPTAIN",
+              "VICE_CAPTAIN"
+            ],
+            "actual": [
+              "CAPTAIN",
+              "VICE_CAPTAIN"
+            ],
+            "pass": true
+          },
+          {
+            "type": "oneOf",
+            "row": 0,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "737e9685-69c5-4779-ab31-31b12b6e0173",
+            "pass": false
+          },
+          {
+            "type": "oneOf",
+            "row": 1,
+            "field": "companion_id",
+            "allowed": [
+              "{{TARGET_CAPTAIN_ID}}",
+              "{{TARGET_VICE_CAPTAIN_ID}}"
+            ],
+            "actual": "c2d694bf-14da-48f6-87b1-5ae897c63fe5",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "presence_status",
+            "expected": "ASSIGNED",
+            "actual": "ASSIGNED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "presence_status",
+            "expected": "ASSIGNED",
+            "actual": "ASSIGNED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "self_match_status",
+            "expected": "NOT_MATCHED",
+            "actual": "NOT_MATCHED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "self_match_status",
+            "expected": "NOT_MATCHED",
+            "actual": "NOT_MATCHED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "client_match_status",
+            "expected": "WAITING_FOR_CLIENT",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "client_match_status",
+            "expected": "WAITING_FOR_CLIENT",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": true
+          }
+        ]
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

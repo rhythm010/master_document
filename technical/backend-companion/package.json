@@ -12,7 +12,6 @@
     "test:validator": "./run_tests.sh",
     "test:validator:node": "tsx src/test-runner/index.ts",
     "test:journey": "./run_tests.sh qa/JRN-*.json",
-    "test:identity": "python3 test_runner.py src/modules/identity/__tests__/*.json",
     "lint": "eslint src/ --cache",
     "lint:fix": "eslint src/ --cache --fix",
     "format": "prettier --write src/",

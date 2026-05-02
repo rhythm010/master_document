@@ -1,0 +1,1172 @@
+{
+  "runId": "RUN-20260502113421445-MOD-BOOKING-004",
+  "testId": "MOD-BOOKING-004",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.445Z",
+  "endedAt": "2026-05-02T11:34:21.521Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "PATCH /bookings/ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+      "startedAt": "2026-05-02T11:34:21.517Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 2,
+      "target": "internalAuth (noop)",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "validation (noop)",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "dbTransaction (noop)",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "target": "slotRelease (noop)",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "slotReservation (noop)",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "dbUpdate (noop)",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 8,
+      "target": "dbTransaction (noop)",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 9,
+      "target": "API response validation",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.518Z",
+      "durationMs": 0,
+      "result": "FAIL",
+      "statusCode": 404
+    },
+    {
+      "step": 10,
+      "target": "DB verify bookings",
+      "startedAt": "2026-05-02T11:34:21.518Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 1,
+      "result": "FAIL"
+    },
+    {
+      "step": 11,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.519Z",
+      "durationMs": 0,
+      "result": "FAIL"
+    },
+    {
+      "step": 12,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-05-02T11:34:21.519Z",
+      "endedAt": "2026-05-02T11:34:21.520Z",
+      "durationMs": 1,
+      "result": "FAIL"
+    },
+    {
+      "step": 13,
+      "target": "DB verify booking_companion_assignments",
+      "startedAt": "2026-05-02T11:34:21.520Z",
+      "endedAt": "2026-05-02T11:34:21.521Z",
+      "durationMs": 1,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c</pre>\n</body>\n</html>\n"
+      },
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "layman": "Internal service requests to change the booking's venue and start time",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 1,
+        "target": "PATCH /bookings/ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+        "startedAt": "2026-05-02T11:34:21.517Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Validate X-Internal-Token header is present and valid",
+          "Reject if Bearer token is provided instead (INTERNAL ONLY endpoint)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "internalAuth",
+      "layman": "System verifies the request comes from an authorized internal service",
+      "serviceHit": {
+        "step": 2,
+        "target": "internalAuth (noop)",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Booking exists",
+          "Booking status is CONFIRMED",
+          "extended_at is NULL",
+          "Current server time < booking.start_at",
+          "Current server time < target startAt",
+          "Target venue exists"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System validates the booking can be edited (not extended, not started, not progressed)",
+      "serviceHit": {
+        "step": 3,
+        "target": "validation (noop)",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Lock booking FOR UPDATE",
+          "Load and lock both assignment rows FOR UPDATE",
+          "Verify assignments are at default statuses (ASSIGNED, NOT_MATCHED, WAITING_FOR_CLIENT)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "layman": "System locks the booking and verifies no matching/presence has progressed",
+      "serviceHit": {
+        "step": 4,
+        "target": "dbTransaction (noop)",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Calculate targetEndAt = targetStartAt + 2 hours",
+          "Release current roster slots: UPDATE roster_slots SET status='AVAILABLE', booking_id=NULL WHERE booking_id={{BOOKING_ID}}",
+          "Verify exactly 2 rows affected (data integrity check)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "slotRelease",
+      "layman": "System releases the currently reserved roster slots for this booking",
+      "serviceHit": {
+        "step": 5,
+        "target": "slotRelease (noop)",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Lock target slots: SELECT ... WHERE venue_id=targetVenueId AND start_at=targetStartAt AND end_at=targetEndAt AND status='AVAILABLE' AND companion_id IN (captainId, viceCaptainId) FOR UPDATE SKIP LOCKED",
+          "Verify exactly 2 rows locked (duo available)",
+          "Reserve slots: UPDATE roster_slots SET status='BOOKED', booking_id={{BOOKING_ID}}",
+          "Verify exactly 2 rows affected (row-count guard)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "slotReservation",
+      "layman": "System reserves the new roster slots for the same duo at the target venue/time",
+      "serviceHit": {
+        "step": 6,
+        "target": "slotReservation (noop)",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Update booking: SET venue_id=targetVenueId, start_at=targetStartAt, end_at=targetEndAt WHERE id={{BOOKING_ID}}",
+          "Do NOT change: qr_code, pin_code, com_match_qr_code, com_match_pin_code, booking_color",
+          "Verify exactly 1 row affected"
+        ]
+      },
+      "actor": "System",
+      "actionType": "dbUpdate",
+      "layman": "System updates the booking's venue and time while preserving all booking artifacts",
+      "serviceHit": {
+        "step": 7,
+        "target": "dbUpdate (noop)",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS)."
+      },
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "layman": "System commits all changes atomically",
+      "serviceHit": {
+        "step": 8,
+        "target": "dbTransaction (noop)",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 9,
+      "result": "FAIL",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 404,
+            "pass": false
+          },
+          {
+            "type": "present",
+            "field": "id",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "status",
+            "expected": "CONFIRMED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "venueId",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "startAt",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "endAt",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "pass": false
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns the updated booking with new venue and time",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 9,
+        "target": "API response validation",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.518Z",
+        "durationMs": 0,
+        "result": "FAIL",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 10,
+      "result": "FAIL",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "client_id": "b7f0c568-9183-4283-9c14-a50afe44fd19",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.483Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "actual": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "CONFIRMED",
+            "actual": "CONFIRMED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "venue_id",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "actual": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "start_at",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "end_at",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "qr_code",
+            "expected": "qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "actual": "qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "pin_code",
+            "expected": "111111",
+            "actual": "111111",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "com_match_qr_code",
+            "expected": "com_qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "actual": "com_qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "com_match_pin_code",
+            "expected": "222222",
+            "actual": "222222",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "booking_color",
+            "expected": "BLUE",
+            "actual": "BLUE",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "extended_at",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify booking was updated with new venue/time but artifacts remain unchanged",
+      "serviceHit": {
+        "step": 10,
+        "target": "DB verify bookings",
+        "startedAt": "2026-05-02T11:34:21.518Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 1,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 11,
+      "result": "FAIL",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE venue_id=$1 AND start_at=$2 LIMIT 50;",
+        "params": [
+          "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+          "2026-05-03T10:00:00.000Z"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "a26cdf7e-2b40-4f91-be9c-a04216294fdb",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "69878e8c-04c8-47a6-a64e-c14989d80d4e",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "a7562ddb-7df7-470f-b69a-8a3774770930",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "checks": [
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "AVAILABLE",
+            "actual": "BOOKED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "status",
+            "expected": "AVAILABLE",
+            "actual": "BOOKED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "booking_id",
+            "expected": null,
+            "actual": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "booking_id",
+            "expected": null,
+            "actual": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": false
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify original roster slots are now available",
+      "serviceHit": {
+        "step": 11,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.519Z",
+        "durationMs": 0,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 12,
+      "result": "FAIL",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "a26cdf7e-2b40-4f91-be9c-a04216294fdb",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "69878e8c-04c8-47a6-a64e-c14989d80d4e",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "a7562ddb-7df7-470f-b69a-8a3774770930",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "venue_id",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "actual": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "venue_id",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "actual": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "start_at",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "start_at",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "end_at",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "end_at",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify new roster slots are reserved for this booking",
+      "serviceHit": {
+        "step": 12,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-05-02T11:34:21.519Z",
+        "endedAt": "2026-05-02T11:34:21.520Z",
+        "durationMs": 1,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 13,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "6a782e04-25af-4514-b3de-8a4b4e687a9f",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "companion_id": "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "ef5e0e2e-2439-4584-9c0d-76c5c0156aeb",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "companion_id": "a7562ddb-7df7-470f-b69a-8a3774770930",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "designationSet",
+            "expected": [
+              "CAPTAIN",
+              "VICE_CAPTAIN"
+            ],
+            "actual": [
+              "CAPTAIN",
+              "VICE_CAPTAIN"
+            ],
+            "pass": true
+          },
+          {
+            "type": "oneOf",
+            "row": 0,
+            "field": "companion_id",
+            "allowed": [
+              "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+              "a7562ddb-7df7-470f-b69a-8a3774770930"
+            ],
+            "actual": "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+            "pass": true
+          },
+          {
+            "type": "oneOf",
+            "row": 1,
+            "field": "companion_id",
+            "allowed": [
+              "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+              "a7562ddb-7df7-470f-b69a-8a3774770930"
+            ],
+            "actual": "a7562ddb-7df7-470f-b69a-8a3774770930",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "presence_status",
+            "expected": "ASSIGNED",
+            "actual": "ASSIGNED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "presence_status",
+            "expected": "ASSIGNED",
+            "actual": "ASSIGNED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "self_match_status",
+            "expected": "NOT_MATCHED",
+            "actual": "NOT_MATCHED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "self_match_status",
+            "expected": "NOT_MATCHED",
+            "actual": "NOT_MATCHED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "client_match_status",
+            "expected": "WAITING_FOR_CLIENT",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "client_match_status",
+            "expected": "WAITING_FOR_CLIENT",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify duo assignments remain unchanged (no reassignment requested)",
+      "serviceHit": {
+        "step": 13,
+        "target": "DB verify booking_companion_assignments",
+        "startedAt": "2026-05-02T11:34:21.520Z",
+        "endedAt": "2026-05-02T11:34:21.521Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 9,
+      "reason": "Step failed",
+      "evidence": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 404,
+            "pass": false
+          },
+          {
+            "type": "present",
+            "field": "id",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "status",
+            "expected": "CONFIRMED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "venueId",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "startAt",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "field": "endAt",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "pass": false
+          }
+        ]
+      }
+    },
+    {
+      "step": 10,
+      "reason": "Step failed",
+      "evidence": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "client_id": "b7f0c568-9183-4283-9c14-a50afe44fd19",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.483Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "actual": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "CONFIRMED",
+            "actual": "CONFIRMED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "venue_id",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "actual": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "start_at",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "end_at",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "qr_code",
+            "expected": "qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "actual": "qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "pin_code",
+            "expected": "111111",
+            "actual": "111111",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "com_match_qr_code",
+            "expected": "com_qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "actual": "com_qr_ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "com_match_pin_code",
+            "expected": "222222",
+            "actual": "222222",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "booking_color",
+            "expected": "BLUE",
+            "actual": "BLUE",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "extended_at",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          }
+        ]
+      }
+    },
+    {
+      "step": 11,
+      "reason": "Step failed",
+      "evidence": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE venue_id=$1 AND start_at=$2 LIMIT 50;",
+        "params": [
+          "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+          "2026-05-03T10:00:00.000Z"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "a26cdf7e-2b40-4f91-be9c-a04216294fdb",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "69878e8c-04c8-47a6-a64e-c14989d80d4e",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "a7562ddb-7df7-470f-b69a-8a3774770930",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "checks": [
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "AVAILABLE",
+            "actual": "BOOKED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "status",
+            "expected": "AVAILABLE",
+            "actual": "BOOKED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "booking_id",
+            "expected": null,
+            "actual": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "booking_id",
+            "expected": null,
+            "actual": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "pass": false
+          }
+        ]
+      }
+    },
+    {
+      "step": 12,
+      "reason": "Step failed",
+      "evidence": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "a26cdf7e-2b40-4f91-be9c-a04216294fdb",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "4de434b1-85af-48fa-a30a-4137b2a0c3e6",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "69878e8c-04c8-47a6-a64e-c14989d80d4e",
+            "venue_id": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "companion_id": "a7562ddb-7df7-470f-b69a-8a3774770930",
+            "booking_id": "ef0d3e3e-0f13-4833-b2fe-1b7ef0b03a1c",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "venue_id",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "actual": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "venue_id",
+            "expected": "bb1823d7-6a1b-42ff-8c82-e1c45f9cd31b",
+            "actual": "a21e297f-6653-4b1c-ba31-ddc5d6a4a197",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "start_at",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "start_at",
+            "expected": "2026-05-04T10:00:00.000Z",
+            "actual": "2026-05-03T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "end_at",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "end_at",
+            "expected": "2026-05-04T12:00:00.000Z",
+            "actual": "2026-05-03T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "status",
+            "expected": "BOOKED",
+            "actual": "BOOKED",
+            "pass": true
+          }
+        ]
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

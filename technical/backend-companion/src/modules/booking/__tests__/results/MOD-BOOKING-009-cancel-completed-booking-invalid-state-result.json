@@ -1,0 +1,281 @@
+{
+  "runId": "RUN-20260502113421446-MOD-BOOKING-009",
+  "testId": "MOD-BOOKING-009",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.446Z",
+  "endedAt": "2026-05-02T11:34:21.514Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel",
+      "startedAt": "2026-05-02T11:34:21.509Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 2,
+      "target": "authorization (noop)",
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "validation (noop)",
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "API response validation",
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 0,
+      "result": "FAIL",
+      "statusCode": 404
+    },
+    {
+      "step": 5,
+      "target": "DB verify bookings",
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.511Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-05-02T11:34:21.511Z",
+      "endedAt": "2026-05-02T11:34:21.514Z",
+      "durationMs": 3,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel</pre>\n</body>\n</html>\n"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client attempts to cancel a booking that has already completed",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel",
+        "startedAt": "2026-05-02T11:34:21.509Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Verify booking exists",
+          "Verify caller owns the booking"
+        ]
+      },
+      "actor": "System",
+      "actionType": "authorization",
+      "layman": "System verifies the client owns this booking",
+      "serviceHit": {
+        "step": 2,
+        "target": "authorization (noop)",
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Check booking.status is COMPLETED",
+          "Reject cancellation (invalid state transition)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System detects the booking is completed and cannot be cancelled",
+      "serviceHit": {
+        "step": 3,
+        "target": "validation (noop)",
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "FAIL",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 404,
+            "pass": false
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects the cancellation with an invalid state transition error",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 4,
+        "target": "API response validation",
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 0,
+        "result": "FAIL",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "fb49deca-e4f1-4264-b656-28e489df620e"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "fb49deca-e4f1-4264-b656-28e489df620e",
+            "client_id": "e6b66789-b039-4c7e-857b-cc94b8c60139",
+            "venue_id": "da99d63c-8fe8-47f6-9bb0-5839c8a37024",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "COMPLETED",
+            "qr_code": "qr_fb49deca-e4f1-4264-b656-28e489df620e",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_fb49deca-e4f1-4264-b656-28e489df620e",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.483Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "fb49deca-e4f1-4264-b656-28e489df620e",
+            "actual": "fb49deca-e4f1-4264-b656-28e489df620e",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "COMPLETED",
+            "actual": "COMPLETED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify booking status remains COMPLETED (no change)",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB verify bookings",
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.511Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE companion_id IN ($1, $2) AND start_at=$3 LIMIT 50;",
+        "params": [
+          "d35f0520-2c5e-47bb-ae3b-641368bdd2de",
+          "72c67b93-e690-4c9a-8e64-00b80a375893",
+          "2026-05-03T10:00:00.000Z"
+        ],
+        "rowCount": 0,
+        "rows": [],
+        "checks": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify roster slots remain unchanged",
+      "serviceHit": {
+        "step": 6,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-05-02T11:34:21.511Z",
+        "endedAt": "2026-05-02T11:34:21.514Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 4,
+      "reason": "Step failed",
+      "evidence": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings/fb49deca-e4f1-4264-b656-28e489df620e/cancel</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 404,
+            "pass": false
+          }
+        ]
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

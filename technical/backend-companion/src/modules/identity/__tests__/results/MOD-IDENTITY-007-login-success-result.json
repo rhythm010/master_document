@@ -1,0 +1,32 @@
+{
+  "runId": "RUN-20260502113421541-MOD-IDENTITY-007",
+  "testId": "MOD-IDENTITY-007",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.541Z",
+  "endedAt": "2026-05-02T11:34:21.551Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [],
+  "stepResults": [],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": null,
+      "reason": "Seed data failed",
+      "evidence": "error: invalid input syntax for type uuid: \"user-verified\""
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

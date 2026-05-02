@@ -1,0 +1,270 @@
+{
+  "runId": "RUN-20260502113421445-MOD-BOOKING-006",
+  "testId": "MOD-BOOKING-006",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.445Z",
+  "endedAt": "2026-05-02T11:34:21.512Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings",
+      "startedAt": "2026-05-02T11:34:21.504Z",
+      "endedAt": "2026-05-02T11:34:21.509Z",
+      "durationMs": 5,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 2,
+      "target": "validation (noop)",
+      "startedAt": "2026-05-02T11:34:21.509Z",
+      "endedAt": "2026-05-02T11:34:21.509Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "API response validation",
+      "startedAt": "2026-05-02T11:34:21.509Z",
+      "endedAt": "2026-05-02T11:34:21.509Z",
+      "durationMs": 0,
+      "result": "FAIL",
+      "statusCode": 404
+    },
+    {
+      "step": 4,
+      "target": "DB verify bookings",
+      "startedAt": "2026-05-02T11:34:21.509Z",
+      "endedAt": "2026-05-02T11:34:21.510Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-05-02T11:34:21.510Z",
+      "endedAt": "2026-05-02T11:34:21.512Z",
+      "durationMs": 2,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings</pre>\n</body>\n</html>\n"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client attempts to create a second booking while having an active CONFIRMED booking",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings",
+        "startedAt": "2026-05-02T11:34:21.504Z",
+        "endedAt": "2026-05-02T11:34:21.509Z",
+        "durationMs": 5,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Authenticate client",
+          "Check for existing non-terminal bookings: SELECT id FROM bookings WHERE client_id={{CLIENT_ID}} AND status IN ('CONFIRMED', 'ACTIVE') LIMIT 1",
+          "Find existing non-terminal booking"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System detects the client already has a non-terminal booking",
+      "serviceHit": {
+        "step": 2,
+        "target": "validation (noop)",
+        "startedAt": "2026-05-02T11:34:21.509Z",
+        "endedAt": "2026-05-02T11:34:21.509Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "FAIL",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 409,
+            "actual": 404,
+            "pass": false
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects the request with a conflict error",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 3,
+        "target": "API response validation",
+        "startedAt": "2026-05-02T11:34:21.509Z",
+        "endedAt": "2026-05-02T11:34:21.509Z",
+        "durationMs": 0,
+        "result": "FAIL",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE client_id=$1 LIMIT 50;",
+        "params": [
+          "8df56821-bbe7-42c5-8173-e5ce76665654"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "877cefd8-d182-4391-a695-d223c52ce454",
+            "client_id": "8df56821-bbe7-42c5-8173-e5ce76665654",
+            "venue_id": "14cedb5e-f3db-4966-aac0-e18837853ade",
+            "start_at": "2026-05-03T10:00:00.000Z",
+            "end_at": "2026-05-03T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_877cefd8-d182-4391-a695-d223c52ce454",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_877cefd8-d182-4391-a695-d223c52ce454",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-05-02T11:34:21.480Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "877cefd8-d182-4391-a695-d223c52ce454",
+            "actual": "877cefd8-d182-4391-a695-d223c52ce454",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "CONFIRMED",
+            "actual": "CONFIRMED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify only the original booking exists (no new booking created)",
+      "serviceHit": {
+        "step": 4,
+        "target": "DB verify bookings",
+        "startedAt": "2026-05-02T11:34:21.509Z",
+        "endedAt": "2026-05-02T11:34:21.510Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE status='AVAILABLE' AND companion_id IN ($1, $2) LIMIT 50;",
+        "params": [
+          "7c0d3d97-e66a-4efc-b104-25771334d160",
+          "1a3693e8-dc15-4f02-bcef-84d7e35bd7f4"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "40717acb-41cc-411e-a80b-5993aa225635",
+            "venue_id": "a5b70574-583b-4fb7-9ec6-44f766b88fef",
+            "companion_id": "7c0d3d97-e66a-4efc-b104-25771334d160",
+            "booking_id": null,
+            "start_at": "2026-05-04T10:00:00.000Z",
+            "end_at": "2026-05-04T12:00:00.000Z",
+            "status": "AVAILABLE"
+          },
+          {
+            "id": "0b767646-083f-40bb-adf5-80c28f341e97",
+            "venue_id": "a5b70574-583b-4fb7-9ec6-44f766b88fef",
+            "companion_id": "1a3693e8-dc15-4f02-bcef-84d7e35bd7f4",
+            "booking_id": null,
+            "start_at": "2026-05-04T10:00:00.000Z",
+            "end_at": "2026-05-04T12:00:00.000Z",
+            "status": "AVAILABLE"
+          }
+        ],
+        "checks": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify no roster slots were reserved for the rejected booking",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-05-02T11:34:21.510Z",
+        "endedAt": "2026-05-02T11:34:21.512Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 3,
+      "reason": "Step failed",
+      "evidence": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 409,
+            "actual": 404,
+            "pass": false
+          }
+        ]
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

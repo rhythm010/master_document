@@ -1,98 +1,98 @@
 {
-  "runId": "RUN-20260427170959-JRN-003",
+  "runId": "RUN-20260502114156022-JRN-003",
   "testId": "JRN-003",
   "status": "FAIL",
-  "startedAt": "2026-04-27T17:09:59.418Z",
-  "endedAt": "2026-04-27T17:12:15.401Z",
+  "startedAt": "2026-05-02T11:41:56.022Z",
+  "endedAt": "2026-05-02T11:42:51.731Z",
   "environmentCheck": {
     "apiServer": "OK",
-    "mailpit": "OK",
-    "database": "OK"
+    "database": "OK",
+    "mailpit": "OK"
   },
   "serviceHitLog": [
     {
       "step": 1,
       "target": "POST /auth/signup",
-      "startedAt": "2026-04-27T17:09:59.486Z",
-      "endedAt": "2026-04-27T17:09:59.488Z",
-      "durationMs": 2,
+      "startedAt": "2026-05-02T11:41:56.060Z",
+      "endedAt": "2026-05-02T11:41:56.065Z",
+      "durationMs": 5,
       "result": "PASS",
       "statusCode": 400
     },
     {
       "step": 2,
       "target": "http://localhost:8025/api/v1/messages",
-      "startedAt": "2026-04-27T17:09:59.488Z",
-      "endedAt": "2026-04-27T17:10:44.743Z",
-      "durationMs": 45255,
+      "startedAt": "2026-05-02T11:41:56.065Z",
+      "endedAt": "2026-05-02T11:42:14.638Z",
+      "durationMs": 18573,
       "result": "FAIL"
     },
     {
       "step": 3,
       "target": "GET /auth/verify-email",
-      "startedAt": "2026-04-27T17:10:44.743Z",
-      "endedAt": "2026-04-27T17:10:44.765Z",
-      "durationMs": 22,
+      "startedAt": "2026-05-02T11:42:14.638Z",
+      "endedAt": "2026-05-02T11:42:14.645Z",
+      "durationMs": 7,
       "result": "PASS",
       "statusCode": 401
     },
     {
       "step": 4,
       "target": "POST /auth/login",
-      "startedAt": "2026-04-27T17:10:44.765Z",
-      "endedAt": "2026-04-27T17:10:44.770Z",
-      "durationMs": 5,
+      "startedAt": "2026-05-02T11:42:14.645Z",
+      "endedAt": "2026-05-02T11:42:14.647Z",
+      "durationMs": 2,
       "result": "PASS",
       "statusCode": 400
     },
     {
       "step": 5,
       "target": "POST /auth/signup",
-      "startedAt": "2026-04-27T17:10:44.770Z",
-      "endedAt": "2026-04-27T17:10:44.771Z",
-      "durationMs": 1,
+      "startedAt": "2026-05-02T11:42:14.647Z",
+      "endedAt": "2026-05-02T11:42:14.649Z",
+      "durationMs": 2,
       "result": "PASS",
       "statusCode": 400
     },
     {
       "step": 6,
       "target": "http://localhost:8025/api/v1/messages",
-      "startedAt": "2026-04-27T17:10:44.771Z",
-      "endedAt": "2026-04-27T17:11:30.042Z",
-      "durationMs": 45271,
+      "startedAt": "2026-05-02T11:42:14.649Z",
+      "endedAt": "2026-05-02T11:42:33.138Z",
+      "durationMs": 18489,
       "result": "FAIL"
     },
     {
       "step": 7,
       "target": "GET /auth/verify-email",
-      "startedAt": "2026-04-27T17:11:30.042Z",
-      "endedAt": "2026-04-27T17:11:30.056Z",
-      "durationMs": 14,
+      "startedAt": "2026-05-02T11:42:33.138Z",
+      "endedAt": "2026-05-02T11:42:33.142Z",
+      "durationMs": 4,
       "result": "PASS",
       "statusCode": 401
     },
     {
       "step": 8,
       "target": "POST /auth/login",
-      "startedAt": "2026-04-27T17:11:30.056Z",
-      "endedAt": "2026-04-27T17:11:30.060Z",
-      "durationMs": 4,
+      "startedAt": "2026-05-02T11:42:33.142Z",
+      "endedAt": "2026-05-02T11:42:33.147Z",
+      "durationMs": 5,
       "result": "PASS",
       "statusCode": 400
     },
     {
       "step": 9,
       "target": "",
-      "startedAt": "2026-04-27T17:11:30.060Z",
-      "endedAt": "2026-04-27T17:11:30.060Z",
+      "startedAt": "2026-05-02T11:42:33.147Z",
+      "endedAt": "2026-05-02T11:42:33.147Z",
       "durationMs": 0,
       "result": "FAIL"
     },
     {
       "step": 10,
       "target": "POST /auth/signup",
-      "startedAt": "2026-04-27T17:11:30.061Z",
-      "endedAt": "2026-04-27T17:11:30.062Z",
+      "startedAt": "2026-05-02T11:42:33.147Z",
+      "endedAt": "2026-05-02T11:42:33.148Z",
       "durationMs": 1,
       "result": "PASS",
       "statusCode": 400
@@ -100,25 +100,25 @@
     {
       "step": 11,
       "target": "http://localhost:8025/api/v1/messages",
-      "startedAt": "2026-04-27T17:11:30.062Z",
-      "endedAt": "2026-04-27T17:12:15.335Z",
-      "durationMs": 45273,
+      "startedAt": "2026-05-02T11:42:33.148Z",
+      "endedAt": "2026-05-02T11:42:51.672Z",
+      "durationMs": 18524,
       "result": "FAIL"
     },
     {
       "step": 12,
       "target": "GET /auth/verify-email",
-      "startedAt": "2026-04-27T17:12:15.336Z",
-      "endedAt": "2026-04-27T17:12:15.352Z",
-      "durationMs": 16,
+      "startedAt": "2026-05-02T11:42:51.672Z",
+      "endedAt": "2026-05-02T11:42:51.678Z",
+      "durationMs": 6,
       "result": "PASS",
       "statusCode": 401
     },
     {
       "step": 13,
       "target": "POST /auth/login",
-      "startedAt": "2026-04-27T17:12:15.352Z",
-      "endedAt": "2026-04-27T17:12:15.355Z",
+      "startedAt": "2026-05-02T11:42:51.678Z",
+      "endedAt": "2026-05-02T11:42:51.681Z",
       "durationMs": 3,
       "result": "PASS",
       "statusCode": 400
@@ -126,34 +126,34 @@
     {
       "step": 14,
       "target": "DB companion_profiles query",
-      "startedAt": "2026-04-27T17:12:15.355Z",
-      "endedAt": "2026-04-27T17:12:15.377Z",
-      "durationMs": 22,
+      "startedAt": "2026-05-02T11:42:51.681Z",
+      "endedAt": "2026-05-02T11:42:51.699Z",
+      "durationMs": 18,
       "result": "FAIL"
     },
     {
       "step": 15,
       "target": "POST /roster-slots/populate-for-companion",
-      "startedAt": "2026-04-27T17:12:15.377Z",
-      "endedAt": "2026-04-27T17:12:15.379Z",
+      "startedAt": "2026-05-02T11:42:51.699Z",
+      "endedAt": "2026-05-02T11:42:51.701Z",
       "durationMs": 2,
       "result": "PASS",
-      "statusCode": 400
+      "statusCode": 401
     },
     {
       "step": 16,
       "target": "POST /roster-slots/populate-for-companion",
-      "startedAt": "2026-04-27T17:12:15.379Z",
-      "endedAt": "2026-04-27T17:12:15.381Z",
-      "durationMs": 2,
+      "startedAt": "2026-05-02T11:42:51.702Z",
+      "endedAt": "2026-05-02T11:42:51.703Z",
+      "durationMs": 1,
       "result": "PASS",
-      "statusCode": 400
+      "statusCode": 401
     },
     {
       "step": 17,
       "target": "GET /availability",
-      "startedAt": "2026-04-27T17:12:15.381Z",
-      "endedAt": "2026-04-27T17:12:15.382Z",
+      "startedAt": "2026-05-02T11:42:51.703Z",
+      "endedAt": "2026-05-02T11:42:51.704Z",
       "durationMs": 1,
       "result": "PASS",
       "statusCode": 401
@@ -161,34 +161,34 @@
     {
       "step": 18,
       "target": "POST /roster-slots/reserve",
-      "startedAt": "2026-04-27T17:12:15.382Z",
-      "endedAt": "2026-04-27T17:12:15.382Z",
-      "durationMs": 0,
+      "startedAt": "2026-05-02T11:42:51.704Z",
+      "endedAt": "2026-05-02T11:42:51.705Z",
+      "durationMs": 1,
       "result": "PASS",
-      "statusCode": 400
+      "statusCode": 401
     },
     {
       "step": 19,
       "target": "DB roster_slots query",
-      "startedAt": "2026-04-27T17:12:15.382Z",
-      "endedAt": "2026-04-27T17:12:15.398Z",
-      "durationMs": 16,
+      "startedAt": "2026-05-02T11:42:51.705Z",
+      "endedAt": "2026-05-02T11:42:51.727Z",
+      "durationMs": 22,
       "result": "PASS"
     },
     {
       "step": 20,
       "target": "POST /roster-slots/release",
-      "startedAt": "2026-04-27T17:12:15.398Z",
-      "endedAt": "2026-04-27T17:12:15.399Z",
-      "durationMs": 1,
+      "startedAt": "2026-05-02T11:42:51.727Z",
+      "endedAt": "2026-05-02T11:42:51.729Z",
+      "durationMs": 2,
       "result": "PASS",
-      "statusCode": 400
+      "statusCode": 401
     },
     {
       "step": 21,
       "target": "DB roster_slots query",
-      "startedAt": "2026-04-27T17:12:15.399Z",
-      "endedAt": "2026-04-27T17:12:15.400Z",
+      "startedAt": "2026-05-02T11:42:51.729Z",
+      "endedAt": "2026-05-02T11:42:51.730Z",
       "durationMs": 1,
       "result": "PASS"
     }
@@ -209,9 +209,9 @@
       "serviceHit": {
         "step": 1,
         "target": "POST /auth/signup",
-        "startedAt": "2026-04-27T17:09:59.486Z",
-        "endedAt": "2026-04-27T17:09:59.488Z",
-        "durationMs": 2,
+        "startedAt": "2026-05-02T11:41:56.060Z",
+        "endedAt": "2026-05-02T11:41:56.065Z",
+        "durationMs": 5,
         "result": "PASS",
         "statusCode": 400
       }
@@ -229,9 +229,9 @@
       "serviceHit": {
         "step": 2,
         "target": "http://localhost:8025/api/v1/messages",
-        "startedAt": "2026-04-27T17:09:59.488Z",
-        "endedAt": "2026-04-27T17:10:44.743Z",
-        "durationMs": 45255,
+        "startedAt": "2026-05-02T11:41:56.065Z",
+        "endedAt": "2026-05-02T11:42:14.638Z",
+        "durationMs": 18573,
         "result": "FAIL"
       }
     },
@@ -250,9 +250,9 @@
       "serviceHit": {
         "step": 3,
         "target": "GET /auth/verify-email",
-        "startedAt": "2026-04-27T17:10:44.743Z",
-        "endedAt": "2026-04-27T17:10:44.765Z",
-        "durationMs": 22,
+        "startedAt": "2026-05-02T11:42:14.638Z",
+        "endedAt": "2026-05-02T11:42:14.645Z",
+        "durationMs": 7,
         "result": "PASS",
         "statusCode": 401
       }
@@ -272,9 +272,9 @@
       "serviceHit": {
         "step": 4,
         "target": "POST /auth/login",
-        "startedAt": "2026-04-27T17:10:44.765Z",
-        "endedAt": "2026-04-27T17:10:44.770Z",
-        "durationMs": 5,
+        "startedAt": "2026-05-02T11:42:14.645Z",
+        "endedAt": "2026-05-02T11:42:14.647Z",
+        "durationMs": 2,
         "result": "PASS",
         "statusCode": 400
       }
@@ -294,9 +294,9 @@
       "serviceHit": {
         "step": 5,
         "target": "POST /auth/signup",
-        "startedAt": "2026-04-27T17:10:44.770Z",
-        "endedAt": "2026-04-27T17:10:44.771Z",
-        "durationMs": 1,
+        "startedAt": "2026-05-02T11:42:14.647Z",
+        "endedAt": "2026-05-02T11:42:14.649Z",
+        "durationMs": 2,
         "result": "PASS",
         "statusCode": 400
       }
@@ -314,9 +314,9 @@
       "serviceHit": {
         "step": 6,
         "target": "http://localhost:8025/api/v1/messages",
-        "startedAt": "2026-04-27T17:10:44.771Z",
-        "endedAt": "2026-04-27T17:11:30.042Z",
-        "durationMs": 45271,
+        "startedAt": "2026-05-02T11:42:14.649Z",
+        "endedAt": "2026-05-02T11:42:33.138Z",
+        "durationMs": 18489,
         "result": "FAIL"
       }
     },
@@ -335,9 +335,9 @@
       "serviceHit": {
         "step": 7,
         "target": "GET /auth/verify-email",
-        "startedAt": "2026-04-27T17:11:30.042Z",
-        "endedAt": "2026-04-27T17:11:30.056Z",
-        "durationMs": 14,
+        "startedAt": "2026-05-02T11:42:33.138Z",
+        "endedAt": "2026-05-02T11:42:33.142Z",
+        "durationMs": 4,
         "result": "PASS",
         "statusCode": 401
       }
@@ -357,9 +357,9 @@
       "serviceHit": {
         "step": 8,
         "target": "POST /auth/login",
-        "startedAt": "2026-04-27T17:11:30.056Z",
-        "endedAt": "2026-04-27T17:11:30.060Z",
-        "durationMs": 4,
+        "startedAt": "2026-05-02T11:42:33.142Z",
+        "endedAt": "2026-05-02T11:42:33.147Z",
+        "durationMs": 5,
         "result": "PASS",
         "statusCode": 400
       }
@@ -375,8 +375,8 @@
       "serviceHit": {
         "step": 9,
         "target": "",
-        "startedAt": "2026-04-27T17:11:30.060Z",
-        "endedAt": "2026-04-27T17:11:30.060Z",
+        "startedAt": "2026-05-02T11:42:33.147Z",
+        "endedAt": "2026-05-02T11:42:33.147Z",
         "durationMs": 0,
         "result": "FAIL"
       }
@@ -396,8 +396,8 @@
       "serviceHit": {
         "step": 10,
         "target": "POST /auth/signup",
-        "startedAt": "2026-04-27T17:11:30.061Z",
-        "endedAt": "2026-04-27T17:11:30.062Z",
+        "startedAt": "2026-05-02T11:42:33.147Z",
+        "endedAt": "2026-05-02T11:42:33.148Z",
         "durationMs": 1,
         "result": "PASS",
         "statusCode": 400
@@ -416,9 +416,9 @@
       "serviceHit": {
         "step": 11,
         "target": "http://localhost:8025/api/v1/messages",
-        "startedAt": "2026-04-27T17:11:30.062Z",
-        "endedAt": "2026-04-27T17:12:15.335Z",
-        "durationMs": 45273,
+        "startedAt": "2026-05-02T11:42:33.148Z",
+        "endedAt": "2026-05-02T11:42:51.672Z",
+        "durationMs": 18524,
         "result": "FAIL"
       }
     },
@@ -437,9 +437,9 @@
       "serviceHit": {
         "step": 12,
         "target": "GET /auth/verify-email",
-        "startedAt": "2026-04-27T17:12:15.336Z",
-        "endedAt": "2026-04-27T17:12:15.352Z",
-        "durationMs": 16,
+        "startedAt": "2026-05-02T11:42:51.672Z",
+        "endedAt": "2026-05-02T11:42:51.678Z",
+        "durationMs": 6,
         "result": "PASS",
         "statusCode": 401
       }
@@ -459,8 +459,8 @@
       "serviceHit": {
         "step": 13,
         "target": "POST /auth/login",
-        "startedAt": "2026-04-27T17:12:15.352Z",
-        "endedAt": "2026-04-27T17:12:15.355Z",
+        "startedAt": "2026-05-02T11:42:51.678Z",
+        "endedAt": "2026-05-02T11:42:51.681Z",
         "durationMs": 3,
         "result": "PASS",
         "statusCode": 400
@@ -477,9 +477,9 @@
       "serviceHit": {
         "step": 14,
         "target": "DB companion_profiles query",
-        "startedAt": "2026-04-27T17:12:15.355Z",
-        "endedAt": "2026-04-27T17:12:15.377Z",
-        "durationMs": 22,
+        "startedAt": "2026-05-02T11:42:51.681Z",
+        "endedAt": "2026-05-02T11:42:51.699Z",
+        "durationMs": 18,
         "result": "FAIL"
       }
     },
@@ -487,44 +487,44 @@
       "step": 15,
       "result": "PASS",
       "observed": {
-        "code": "VALIDATION_ERROR",
-        "message": "Invalid input"
+        "code": "INTERNAL_UNAUTHORIZED",
+        "message": "Internal unauthorized"
       },
       "actor": "InternalService",
       "actionType": "apiRequest",
       "description": "Assign venue to COMPANION A and populate roster slots",
       "layman": "Link companion A to the venue and generate roster slots (internal operation).",
-      "statusCode": 400,
+      "statusCode": 401,
       "serviceHit": {
         "step": 15,
         "target": "POST /roster-slots/populate-for-companion",
-        "startedAt": "2026-04-27T17:12:15.377Z",
-        "endedAt": "2026-04-27T17:12:15.379Z",
+        "startedAt": "2026-05-02T11:42:51.699Z",
+        "endedAt": "2026-05-02T11:42:51.701Z",
         "durationMs": 2,
         "result": "PASS",
-        "statusCode": 400
+        "statusCode": 401
       }
     },
     {
       "step": 16,
       "result": "PASS",
       "observed": {
-        "code": "VALIDATION_ERROR",
-        "message": "Invalid input"
+        "code": "INTERNAL_UNAUTHORIZED",
+        "message": "Internal unauthorized"
       },
       "actor": "InternalService",
       "actionType": "apiRequest",
       "description": "Assign venue to COMPANION B and populate roster slots",
       "layman": "Link companion B to the venue and generate roster slots (internal operation).",
-      "statusCode": 400,
+      "statusCode": 401,
       "serviceHit": {
         "step": 16,
         "target": "POST /roster-slots/populate-for-companion",
-        "startedAt": "2026-04-27T17:12:15.379Z",
-        "endedAt": "2026-04-27T17:12:15.381Z",
-        "durationMs": 2,
+        "startedAt": "2026-05-02T11:42:51.702Z",
+        "endedAt": "2026-05-02T11:42:51.703Z",
+        "durationMs": 1,
         "result": "PASS",
-        "statusCode": 400
+        "statusCode": 401
       }
     },
     {
@@ -542,8 +542,8 @@
       "serviceHit": {
         "step": 17,
         "target": "GET /availability",
-        "startedAt": "2026-04-27T17:12:15.381Z",
-        "endedAt": "2026-04-27T17:12:15.382Z",
+        "startedAt": "2026-05-02T11:42:51.703Z",
+        "endedAt": "2026-05-02T11:42:51.704Z",
         "durationMs": 1,
         "result": "PASS",
         "statusCode": 401
@@ -553,22 +553,22 @@
       "step": 18,
       "result": "PASS",
       "observed": {
-        "code": "VALIDATION_ERROR",
-        "message": "Invalid input"
+        "code": "INTERNAL_UNAUTHORIZED",
+        "message": "Internal unauthorized"
       },
       "actor": "InternalService",
       "actionType": "apiRequest",
       "description": "Reserve CAPTAIN+VICE_CAPTAIN roster duo for the booking window",
       "layman": "Book a roster duo for a 2-hour window (internal booking integration step).",
-      "statusCode": 400,
+      "statusCode": 401,
       "serviceHit": {
         "step": 18,
         "target": "POST /roster-slots/reserve",
-        "startedAt": "2026-04-27T17:12:15.382Z",
-        "endedAt": "2026-04-27T17:12:15.382Z",
-        "durationMs": 0,
+        "startedAt": "2026-05-02T11:42:51.704Z",
+        "endedAt": "2026-05-02T11:42:51.705Z",
+        "durationMs": 1,
         "result": "PASS",
-        "statusCode": 400
+        "statusCode": 401
       }
     },
     {
@@ -585,9 +585,9 @@
       "serviceHit": {
         "step": 19,
         "target": "DB roster_slots query",
-        "startedAt": "2026-04-27T17:12:15.382Z",
-        "endedAt": "2026-04-27T17:12:15.398Z",
-        "durationMs": 16,
+        "startedAt": "2026-05-02T11:42:51.705Z",
+        "endedAt": "2026-05-02T11:42:51.727Z",
+        "durationMs": 22,
         "result": "PASS"
       }
     },
@@ -595,22 +595,22 @@
       "step": 20,
       "result": "PASS",
       "observed": {
-        "code": "VALIDATION_ERROR",
-        "message": "Invalid input"
+        "code": "INTERNAL_UNAUTHORIZED",
+        "message": "Internal unauthorized"
       },
       "actor": "InternalService",
       "actionType": "apiRequest",
       "description": "Release roster slots for the booking (cleanup)",
       "layman": "Undo the reservation to keep the environment reusable for future runs.",
-      "statusCode": 400,
+      "statusCode": 401,
       "serviceHit": {
         "step": 20,
         "target": "POST /roster-slots/release",
-        "startedAt": "2026-04-27T17:12:15.398Z",
-        "endedAt": "2026-04-27T17:12:15.399Z",
-        "durationMs": 1,
+        "startedAt": "2026-05-02T11:42:51.727Z",
+        "endedAt": "2026-05-02T11:42:51.729Z",
+        "durationMs": 2,
         "result": "PASS",
-        "statusCode": 400
+        "statusCode": 401
       }
     },
     {
@@ -627,8 +627,8 @@
       "serviceHit": {
         "step": 21,
         "target": "DB roster_slots query",
-        "startedAt": "2026-04-27T17:12:15.399Z",
-        "endedAt": "2026-04-27T17:12:15.400Z",
+        "startedAt": "2026-05-02T11:42:51.729Z",
+        "endedAt": "2026-05-02T11:42:51.730Z",
         "durationMs": 1,
         "result": "PASS"
       }

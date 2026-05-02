@@ -1,5 +1,8 @@
+import crypto from "crypto";
 import fs from "node:fs";
 import path from "node:path";
+
+import { Pool } from "pg";
 
 import type {
   AssertionSummary,
@@ -20,6 +23,7 @@ import {
   makeRunSuffix,
   nowIso,
   parseArgs,
+  renderTemplate,
   substitute,
   todayYmd
 } from "./utils";
@@ -82,6 +86,128 @@ function resolveBearerToken(step: StepDefinition, context: Record<string, unknow
   return undefined;
 }
 
+// Generate a cryptographically strong password that meets common requirements.
+function generateStrongPassword(): string {
+  const length = 16;
+  const charset = {
+    lowercase: 'abcdefghijklmnopqrstuvwxyz',
+    uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    numbers: '0123456789',
+    symbols: '!@#$%^&*'
+  };
+  
+  const allChars = Object.values(charset).join('');
+  
+  // Ensure at least one from each category
+  let password = '';
+  password += charset.lowercase[crypto.randomInt(charset.lowercase.length)];
+  password += charset.uppercase[crypto.randomInt(charset.uppercase.length)];
+  password += charset.numbers[crypto.randomInt(charset.numbers.length)];
+  password += charset.symbols[crypto.randomInt(charset.symbols.length)];
+  
+  // Fill remaining with random chars
+  for (let i = password.length; i < length; i++) {
+    password += allChars[crypto.randomInt(allChars.length)];
+  }
+  
+  // Shuffle the password using Fisher-Yates algorithm
+  const chars = password.split('');
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}
+
+// Pick an element from an array based on a selection strategy.
+function pickFromArray<T>(array: T[], strategy: string): T | undefined {
+  if (!Array.isArray(array) || array.length === 0) {
+    return undefined;
+  }
+  
+  switch (strategy) {
+    case 'first':
+      return array[0];
+    case 'last':
+      return array[array.length - 1];
+    case 'random':
+      return array[crypto.randomInt(array.length)];
+    default:
+      return array[0];
+  }
+}
+
+// Build a request payload by interpreting payloadRules patterns.
+function buildPayloadFromRules(
+  payloadRules: Record<string, unknown>,
+  context: Record<string, unknown>
+): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+  
+  for (const [key, value] of Object.entries(payloadRules)) {
+    // Handle template substitution (nameTemplate, emailTemplate, etc.)
+    if (key.endsWith('Template')) {
+      const fieldName = key.replace('Template', '');
+      if (typeof value === 'string') {
+        payload[fieldName] = renderTemplate(value, context);
+      }
+    }
+    // Handle password retrieval from context (takes precedence over generation)
+    else if (key === 'passwordFromStoreKey' && typeof value === 'string') {
+      const password = context[value];
+      if (password === undefined || password === null) {
+        throw new Error(`passwordFromStoreKey references '${value}' but it was not found in context. Did you forget to set passwordStoreAs in an earlier step?`);
+      }
+      payload['password'] = password;
+    }
+    // Handle password generation (only if passwordFromStoreKey is not present)
+    else if (key === 'passwordRule' && typeof value === 'string' && !payloadRules['passwordFromStoreKey']) {
+      const password = generateStrongPassword();
+      const storeAs = payloadRules['passwordStoreAs'];
+      if (typeof storeAs === 'string') {
+        context[storeAs] = password;
+      }
+      payload['password'] = password;
+    }
+    // Handle value retrieval from context (companionIdFromStoreKey, etc.)
+    else if (key.endsWith('FromStoreKey') && !key.includes('Array')) {
+      const fieldName = key.replace('FromStoreKey', '');
+      if (typeof value === 'string') {
+        payload[fieldName] = context[value];
+      }
+    }
+    // Handle array value selection (startAtFromStoreArrayKey + pickStrategy)
+    else if (key.endsWith('FromStoreArrayKey')) {
+      const fieldName = key.replace('FromStoreArrayKey', '');
+      const strategyKey = `${fieldName}PickStrategy`;
+      const strategy = typeof payloadRules[strategyKey] === 'string' 
+        ? String(payloadRules[strategyKey]) 
+        : 'first';
+      
+      if (typeof value === 'string') {
+        const array = context[value];
+        if (Array.isArray(array)) {
+          const picked = pickFromArray(array, strategy);
+          if (picked !== undefined) {
+            payload[fieldName] = picked;
+          }
+        }
+      }
+    }
+    // Skip metadata keys (StoreAs, PickStrategy, Rule)
+    else if (key.endsWith('StoreAs') || key.endsWith('PickStrategy') || key.endsWith('Rule')) {
+      // Skip these - they're metadata for other rules
+      continue;
+    }
+    // Direct value assignment for everything else
+    else {
+      payload[key] = value;
+    }
+  }
+  
+  return payload;
+}
+
 function prepareApiRequestStep(step: StepDefinition, context: Record<string, unknown>): StepDefinition {
   if (step.actionType !== "apiRequest") {
     return step;
@@ -121,6 +247,19 @@ function prepareApiRequestStep(step: StepDefinition, context: Record<string, unk
   }
 
   let payload = step.payload;
+
+  // Build payload from payloadRules if present
+  if (step.payloadRules && typeof step.payloadRules === 'object') {
+    const rulesPayload = buildPayloadFromRules(step.payloadRules, context);
+    if (payload && isRecord(payload)) {
+      const existingPayload: Record<string, unknown> = payload;
+      payload = { ...existingPayload, ...rulesPayload };
+    } else {
+      payload = rulesPayload;
+    }
+  }
+
+  // Existing auto-payload logic (fallback if no payloadRules)
   if (payload === undefined && Array.isArray(step.requiredPayloadFields) && step.requiredPayloadFields.length > 0) {
     const autoPayload: Record<string, unknown> = {};
     for (const field of step.requiredPayloadFields) {
@@ -140,7 +279,12 @@ function prepareApiRequestStep(step: StepDefinition, context: Record<string, unk
         autoPayload[field] = value;
       }
     }
-    payload = autoPayload;
+    if (payload && isRecord(payload)) {
+      const existingPayload: Record<string, unknown> = payload;
+      payload = { ...existingPayload, ...autoPayload };
+    } else {
+      payload = autoPayload;
+    }
   }
 
   return {
@@ -385,13 +529,17 @@ function updateStatus(summary: AssertionSummary, failures: Array<Record<string, 
 /** Execute a single JSON test file and return the report. */
 export async function runTestFile(
   filePath: string,
-  cleanupRequested: boolean
+  cleanupRequested: boolean,
+  pool: Pool,
+  environmentCheck?: EnvironmentCheck
 ): Promise<TestRunResult> {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   const testDef = JSON.parse(fileContents) as TestDefinition;
   const runId = makeRunId(testDef.testId);
   const startedAt = nowIso();
-  const environmentCheck = initEnvironmentCheck();
+  
+  // Use provided environmentCheck or create a new one
+  const envCheck = environmentCheck || initEnvironmentCheck();
 
   const result: TestRunResult = {
     runId,
@@ -399,7 +547,7 @@ export async function runTestFile(
     status: "PENDING",
     startedAt,
     endedAt: startedAt,
-    environmentCheck,
+    environmentCheck: envCheck,
     serviceHitLog: [],
     stepResults: [],
     assertionSummary: {
@@ -428,39 +576,30 @@ export async function runTestFile(
     context["VALID_INTERNAL_TOKEN"] = process.env.INTERNAL_API_TOKEN;
   }
 
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    environmentCheck.database = "FAIL";
-    environmentCheck.apiServer = await checkApiHealth(API_BASE);
-    environmentCheck.mailpit = await checkMailpitHealth(MAILPIT_BASE);
-    recordFailure(result.failures, null, "DATABASE_URL is not set");
-    result.status = "BLOCKED";
-    result.endedAt = nowIso();
-    return result;
-  }
+  // Only check environment if not already provided
+  if (!environmentCheck) {
+    envCheck.apiServer = await checkApiHealth(API_BASE);
+    envCheck.mailpit = await checkMailpitHealth(MAILPIT_BASE);
+    envCheck.database = await checkDatabase(pool);
 
-  const pool = createDbPool(databaseUrl);
-  try {
-    environmentCheck.apiServer = await checkApiHealth(API_BASE);
-    environmentCheck.mailpit = await checkMailpitHealth(MAILPIT_BASE);
-    environmentCheck.database = await checkDatabase(pool);
-
-    if (shouldBlock(environmentCheck)) {
-      recordFailure(result.failures, null, "Environment not ready", environmentCheck);
+    if (shouldBlock(envCheck)) {
+      recordFailure(result.failures, null, "Environment not ready", envCheck);
       result.status = "BLOCKED";
       result.endedAt = nowIso();
       return result;
     }
+  }
 
-    try {
-      await applySeedData(pool, testDef.seedData, context);
-    } catch (error) {
-      recordFailure(result.failures, null, "Seed data failed", String(error));
-      result.status = "FAIL";
-      result.endedAt = nowIso();
-      return result;
-    }
+  try {
+    await applySeedData(pool, testDef.seedData, context);
+  } catch (error) {
+    recordFailure(result.failures, null, "Seed data failed", String(error));
+    result.status = "FAIL";
+    result.endedAt = nowIso();
+    return result;
+  }
 
+  try {
     let lastApiRequest: { step: number; statusCode: number; observed: Record<string, unknown> } | null = null;
 
     for (const step of testDef.steps) {
@@ -685,8 +824,12 @@ export async function runTestFile(
     result.status = updateStatus(result.assertionSummary, result.failures);
     result.endedAt = nowIso();
     return result;
-  } finally {
-    await pool.end();
+  } catch (error) {
+    // Handle any unexpected errors
+    recordFailure(result.failures, null, "Unexpected error", String(error));
+    result.status = "FAIL";
+    result.endedAt = nowIso();
+    return result;
   }
 }
 

@@ -1,0 +1,235 @@
+{
+  "runId": "RUN-20260502185902144-MOD-ROSTER-004",
+  "testId": "MOD-ROSTER-004",
+  "status": "PASS",
+  "startedAt": "2026-05-02T18:59:02.145Z",
+  "endedAt": "2026-05-02T18:59:02.488Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /roster-slots/reserve",
+      "startedAt": "2026-05-02T18:59:02.233Z",
+      "endedAt": "2026-05-02T18:59:02.339Z",
+      "durationMs": 106,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 2,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-05-02T18:59:02.339Z",
+      "endedAt": "2026-05-02T18:59:02.340Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-05-02T18:59:02.340Z",
+      "endedAt": "2026-05-02T18:59:02.341Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "POST /roster-slots/release",
+      "startedAt": "2026-05-02T18:59:02.341Z",
+      "endedAt": "2026-05-02T18:59:02.487Z",
+      "durationMs": 146,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-05-02T18:59:02.487Z",
+      "endedAt": "2026-05-02T18:59:02.488Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-05-02T18:59:02.488Z",
+      "endedAt": "2026-05-02T18:59:02.488Z",
+      "durationMs": 0,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "reserved": true,
+        "captainSlotId": "f62a597b-da60-42a2-847e-be33ab24f5da",
+        "viceCaptainSlotId": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /roster-slots/reserve",
+        "startedAt": "2026-05-02T18:59:02.233Z",
+        "endedAt": "2026-05-02T18:59:02.339Z",
+        "durationMs": 106,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "f62a597b-da60-42a2-847e-be33ab24f5da",
+            "venue_id": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+            "companion_id": "96d51d90-a7f6-4eb9-8214-fcad3e7503e9",
+            "booking_id": "7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5",
+            "start_at": "2026-04-26T10:00:00.000Z",
+            "end_at": "2026-04-26T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Verify CAPTAIN roster_slot row booked + booking_id set (query by seeded CAPTAIN roster_slot id)",
+      "serviceHit": {
+        "step": 2,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-05-02T18:59:02.339Z",
+        "endedAt": "2026-05-02T18:59:02.340Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb",
+            "venue_id": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+            "companion_id": "1ab29da9-a6ac-4c09-9536-3f0fb530b1de",
+            "booking_id": "7353bc7e-7b8b-422f-9e9e-1fc6316ab2f5",
+            "start_at": "2026-04-26T10:00:00.000Z",
+            "end_at": "2026-04-26T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Verify VICE_CAPTAIN roster_slot row booked + booking_id set (query by seeded VICE_CAPTAIN roster_slot id)",
+      "serviceHit": {
+        "step": 3,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-05-02T18:59:02.340Z",
+        "endedAt": "2026-05-02T18:59:02.341Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "released": true,
+        "slotsReleased": 2
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /roster-slots/release",
+        "startedAt": "2026-05-02T18:59:02.341Z",
+        "endedAt": "2026-05-02T18:59:02.487Z",
+        "durationMs": 146,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "f62a597b-da60-42a2-847e-be33ab24f5da",
+            "venue_id": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+            "companion_id": "96d51d90-a7f6-4eb9-8214-fcad3e7503e9",
+            "booking_id": null,
+            "start_at": "2026-04-26T10:00:00.000Z",
+            "end_at": "2026-04-26T12:00:00.000Z",
+            "status": "AVAILABLE"
+          }
+        ],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Verify CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded CAPTAIN roster_slot id)",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-05-02T18:59:02.487Z",
+        "endedAt": "2026-05-02T18:59:02.488Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "rows": [
+          {
+            "id": "df971cbd-9e92-4d3e-ba6a-4467c56b54bb",
+            "venue_id": "b6e64090-73b1-42d3-b29b-8934c584c4d0",
+            "companion_id": "1ab29da9-a6ac-4c09-9536-3f0fb530b1de",
+            "booking_id": null,
+            "start_at": "2026-04-26T10:00:00.000Z",
+            "end_at": "2026-04-26T12:00:00.000Z",
+            "status": "AVAILABLE"
+          }
+        ],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Verify VICE_CAPTAIN roster_slot released (AVAILABLE + booking_id NULL) (query by seeded VICE_CAPTAIN roster_slot id)",
+      "serviceHit": {
+        "step": 6,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-05-02T18:59:02.488Z",
+        "endedAt": "2026-05-02T18:59:02.488Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

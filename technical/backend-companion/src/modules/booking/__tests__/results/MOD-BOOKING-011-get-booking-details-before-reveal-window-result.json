@@ -1,9 +1,9 @@
 {
-  "runId": "RUN-20260502113421444-MOD-BOOKING-003",
-  "testId": "MOD-BOOKING-003",
+  "runId": "RUN-20260502113421521-MOD-BOOKING-011",
+  "testId": "MOD-BOOKING-011",
   "status": "FAIL",
-  "startedAt": "2026-05-02T11:34:21.444Z",
-  "endedAt": "2026-05-02T11:34:21.504Z",
+  "startedAt": "2026-05-02T11:34:21.521Z",
+  "endedAt": "2026-05-02T11:34:21.538Z",
   "environmentCheck": {
     "apiServer": "OK",
     "database": "OK",
@@ -12,51 +12,43 @@
   "serviceHitLog": [
     {
       "step": 1,
-      "target": "GET /bookings/f08ebbd4-6192-45aa-b63e-e7cdc43183fc/details",
-      "startedAt": "2026-05-02T11:34:21.502Z",
-      "endedAt": "2026-05-02T11:34:21.504Z",
-      "durationMs": 2,
+      "target": "GET /bookings/8641668c-da9e-4389-a43b-1d32f521ce86/details",
+      "startedAt": "2026-05-02T11:34:21.537Z",
+      "endedAt": "2026-05-02T11:34:21.538Z",
+      "durationMs": 1,
       "result": "PASS",
       "statusCode": 404
     },
     {
       "step": 2,
       "target": "authorization (noop)",
-      "startedAt": "2026-05-02T11:34:21.504Z",
-      "endedAt": "2026-05-02T11:34:21.504Z",
+      "startedAt": "2026-05-02T11:34:21.538Z",
+      "endedAt": "2026-05-02T11:34:21.538Z",
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 3,
       "target": "DB query (skipped: missing target)",
-      "startedAt": "2026-05-02T11:34:21.504Z",
-      "endedAt": "2026-05-02T11:34:21.504Z",
+      "startedAt": "2026-05-02T11:34:21.538Z",
+      "endedAt": "2026-05-02T11:34:21.538Z",
       "durationMs": 0,
       "result": "PASS"
     },
     {
       "step": 4,
-      "target": "DB query (skipped: missing target)",
-      "startedAt": "2026-05-02T11:34:21.504Z",
-      "endedAt": "2026-05-02T11:34:21.504Z",
-      "durationMs": 0,
-      "result": "PASS"
-    },
-    {
-      "step": 5,
       "target": "API response validation",
-      "startedAt": "2026-05-02T11:34:21.504Z",
-      "endedAt": "2026-05-02T11:34:21.504Z",
+      "startedAt": "2026-05-02T11:34:21.538Z",
+      "endedAt": "2026-05-02T11:34:21.538Z",
       "durationMs": 0,
       "result": "FAIL",
       "statusCode": 404
     },
     {
-      "step": 6,
+      "step": 5,
       "target": "responseValidation (noop)",
-      "startedAt": "2026-05-02T11:34:21.504Z",
-      "endedAt": "2026-05-02T11:34:21.504Z",
+      "startedAt": "2026-05-02T11:34:21.538Z",
+      "endedAt": "2026-05-02T11:34:21.538Z",
       "durationMs": 0,
       "result": "PASS"
     }
@@ -66,18 +58,18 @@
       "step": 1,
       "result": "PASS",
       "observed": {
-        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /bookings/f08ebbd4-6192-45aa-b63e-e7cdc43183fc/details</pre>\n</body>\n</html>\n"
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /bookings/8641668c-da9e-4389-a43b-1d32f521ce86/details</pre>\n</body>\n</html>\n"
       },
       "actor": "Client",
       "actionType": "apiRequest",
-      "layman": "Client requests to view their booking details",
+      "layman": "Client requests to view their booking details before the T-5h reveal window",
       "statusCode": 404,
       "serviceHit": {
         "step": 1,
-        "target": "GET /bookings/f08ebbd4-6192-45aa-b63e-e7cdc43183fc/details",
-        "startedAt": "2026-05-02T11:34:21.502Z",
-        "endedAt": "2026-05-02T11:34:21.504Z",
-        "durationMs": 2,
+        "target": "GET /bookings/8641668c-da9e-4389-a43b-1d32f521ce86/details",
+        "startedAt": "2026-05-02T11:34:21.537Z",
+        "endedAt": "2026-05-02T11:34:21.538Z",
+        "durationMs": 1,
         "result": "PASS",
         "statusCode": 404
       }
@@ -90,17 +82,17 @@
         "expectedBehavior": [
           "Verify booking exists",
           "Verify caller is CLIENT role",
-          "Verify caller is the booking owner (booking.clientId === authenticated user ID)"
+          "Verify caller is the booking owner"
         ]
       },
       "actor": "System",
       "actionType": "authorization",
-      "layman": "System verifies the caller is the booking owner with CLIENT role",
+      "layman": "System verifies the caller is the booking owner",
       "serviceHit": {
         "step": 2,
         "target": "authorization (noop)",
-        "startedAt": "2026-05-02T11:34:21.504Z",
-        "endedAt": "2026-05-02T11:34:21.504Z",
+        "startedAt": "2026-05-02T11:34:21.538Z",
+        "endedAt": "2026-05-02T11:34:21.538Z",
         "durationMs": 0,
         "result": "PASS"
       }
@@ -111,52 +103,30 @@
       "observed": {
         "note": "Skipped dbQuery step because step.target was missing/empty (informational step).",
         "expectedBehavior": [
-          "Fetch booking by ID from bookings table",
-          "Calculate if companions should be revealed: currentTime >= (startAt - 5 hours) AND status NOT IN (CANCELLED, COMPLETED)"
+          "Fetch booking by ID",
+          "Calculate reveal condition: currentTime >= (startAt - 5 hours)",
+          "Result: reveal = false (current time < startAt - 5 hours)"
         ]
       },
       "actor": "System",
       "actionType": "dbQuery",
-      "layman": "System retrieves booking and determines if companion info should be revealed based on timing and status",
+      "layman": "System determines companions should NOT be revealed because we're outside the T-5h window",
       "serviceHit": {
         "step": 3,
         "target": "DB query (skipped: missing target)",
-        "startedAt": "2026-05-02T11:34:21.504Z",
-        "endedAt": "2026-05-02T11:34:21.504Z",
+        "startedAt": "2026-05-02T11:34:21.538Z",
+        "endedAt": "2026-05-02T11:34:21.538Z",
         "durationMs": 0,
         "result": "PASS"
       }
     },
     {
       "step": 4,
-      "result": "PASS",
-      "observed": {
-        "note": "Skipped dbQuery step because step.target was missing/empty (informational step).",
-        "expectedBehavior": [
-          "Fetch companion public info from booking_companion_assignments JOIN companion_profiles JOIN users",
-          "Include fields: designation, displayName (from users.nickname), languages, profilePictureUrl, averageRating",
-          "Order by designation (CAPTAIN first, VICE_CAPTAIN second)"
-        ]
-      },
-      "actor": "System",
-      "actionType": "dbQuery",
-      "layman": "System retrieves companion public information for the booking",
-      "serviceHit": {
-        "step": 4,
-        "target": "DB query (skipped: missing target)",
-        "startedAt": "2026-05-02T11:34:21.504Z",
-        "endedAt": "2026-05-02T11:34:21.504Z",
-        "durationMs": 0,
-        "result": "PASS"
-      }
-    },
-    {
-      "step": 5,
       "result": "FAIL",
       "observed": {
         "lastApiRequestStep": 1,
         "response": {
-          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /bookings/f08ebbd4-6192-45aa-b63e-e7cdc43183fc/details</pre>\n</body>\n</html>\n"
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /bookings/8641668c-da9e-4389-a43b-1d32f521ce86/details</pre>\n</body>\n</html>\n"
         },
         "checks": [
           {
@@ -209,42 +179,37 @@
       },
       "actor": "System",
       "actionType": "apiResponse",
-      "layman": "System returns booking details with companions array containing 2 companion objects",
+      "layman": "System returns booking details with companions set to null",
       "statusCode": 404,
       "serviceHit": {
-        "step": 5,
+        "step": 4,
         "target": "API response validation",
-        "startedAt": "2026-05-02T11:34:21.504Z",
-        "endedAt": "2026-05-02T11:34:21.504Z",
+        "startedAt": "2026-05-02T11:34:21.538Z",
+        "endedAt": "2026-05-02T11:34:21.538Z",
         "durationMs": 0,
         "result": "FAIL",
         "statusCode": 404
       }
     },
     {
-      "step": 6,
+      "step": 5,
       "result": "PASS",
       "observed": {
         "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
         "expectedBehavior": [
           "Validate all required fields are present",
-          "Validate data types (UUIDs, ISO-8601 timestamps, status enum)",
-          "Validate companions is an array with exactly 2 items",
-          "Validate companions[0].designation === 'CAPTAIN'",
-          "Validate companions[1].designation === 'VICE_CAPTAIN'",
-          "Validate each companion has: designation, displayName, languages (array), profilePictureUrl, averageRating",
-          "Validate displayName matches users.nickname (NOT full name/email/phone)",
-          "Validate no PII exposed (no qrCode, pinCode, comMatchQrCode, comMatchPinCode in response)"
+          "Validate companions field exists and is null",
+          "Validate no companion information leaked in response"
         ]
       },
       "actor": "TestExecutor",
       "actionType": "responseValidation",
-      "layman": "Verify the response contains correct booking information with properly structured companion data",
+      "layman": "Verify companions field is null and no companion info is exposed before reveal window",
       "serviceHit": {
-        "step": 6,
+        "step": 5,
         "target": "responseValidation (noop)",
-        "startedAt": "2026-05-02T11:34:21.504Z",
-        "endedAt": "2026-05-02T11:34:21.504Z",
+        "startedAt": "2026-05-02T11:34:21.538Z",
+        "endedAt": "2026-05-02T11:34:21.538Z",
         "durationMs": 0,
         "result": "PASS"
       }
@@ -258,12 +223,12 @@
   },
   "failures": [
     {
-      "step": 5,
+      "step": 4,
       "reason": "Step failed",
       "evidence": {
         "lastApiRequestStep": 1,
         "response": {
-          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /bookings/f08ebbd4-6192-45aa-b63e-e7cdc43183fc/details</pre>\n</body>\n</html>\n"
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /bookings/8641668c-da9e-4389-a43b-1d32f521ce86/details</pre>\n</body>\n</html>\n"
         },
         "checks": [
           {

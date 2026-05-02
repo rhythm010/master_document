@@ -1,0 +1,32 @@
+{
+  "runId": "RUN-20260502113421539-MOD-COMPANION-PROFILE-008",
+  "testId": "MOD-COMPANION-PROFILE-008",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T11:34:21.539Z",
+  "endedAt": "2026-05-02T11:34:21.544Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [],
+  "stepResults": [],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": null,
+      "reason": "Seed data failed",
+      "evidence": "error: invalid input syntax for type uuid: \"user-companion\""
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

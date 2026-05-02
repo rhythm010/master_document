@@ -86,7 +86,7 @@ export const identityService = {
       try {
         const venues = await prisma.venue.findMany({ select: { id: true } });
         if (venues.length > 0) {
-          const { rosterService } = await import("../roster");
+          const { rosterService } = await import("../roster/index.js");
           await rosterService.populateForCompanion({
             companionId: user.id,
             venueIds: venues.map((v) => v.id)
