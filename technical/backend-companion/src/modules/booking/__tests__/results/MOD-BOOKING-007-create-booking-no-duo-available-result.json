@@ -1,0 +1,983 @@
+{
+  "runId": "RUN-20260430030805236-MOD-BOOKING-007",
+  "testId": "MOD-BOOKING-007",
+  "status": "PASS",
+  "startedAt": "2026-04-30T03:08:05.236Z",
+  "endedAt": "2026-04-30T03:08:05.255Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings",
+      "startedAt": "2026-04-30T03:08:05.249Z",
+      "endedAt": "2026-04-30T03:08:05.254Z",
+      "durationMs": 5,
+      "result": "PASS",
+      "statusCode": 409
+    },
+    {
+      "step": 2,
+      "target": "validation (noop)",
+      "startedAt": "2026-04-30T03:08:05.254Z",
+      "endedAt": "2026-04-30T03:08:05.254Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "allocation (noop)",
+      "startedAt": "2026-04-30T03:08:05.254Z",
+      "endedAt": "2026-04-30T03:08:05.254Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "API response validation",
+      "startedAt": "2026-04-30T03:08:05.254Z",
+      "endedAt": "2026-04-30T03:08:05.254Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 409
+    },
+    {
+      "step": 5,
+      "target": "DB verify bookings",
+      "startedAt": "2026-04-30T03:08:05.254Z",
+      "endedAt": "2026-04-30T03:08:05.254Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 6,
+      "target": "DB verify booking_companion_assignments",
+      "startedAt": "2026-04-30T03:08:05.254Z",
+      "endedAt": "2026-04-30T03:08:05.255Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-04-30T03:08:05.255Z",
+      "endedAt": "2026-04-30T03:08:05.255Z",
+      "durationMs": 0,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "NO_DUO_AVAILABLE",
+        "message": "No duo available"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests a booking for a time slot where no duo is available",
+      "statusCode": 409,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings",
+        "startedAt": "2026-04-30T03:08:05.249Z",
+        "endedAt": "2026-04-30T03:08:05.254Z",
+        "durationMs": 5,
+        "result": "PASS",
+        "statusCode": 409
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Authenticate client",
+          "Validate no non-terminal bookings",
+          "Validate venue exists",
+          "Calculate endAt = startAt + 2 hours"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System validates the basic booking request",
+      "serviceHit": {
+        "step": 2,
+        "target": "validation (noop)",
+        "startedAt": "2026-04-30T03:08:05.254Z",
+        "endedAt": "2026-04-30T03:08:05.254Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Attempt to find CAPTAIN with AVAILABLE roster slot for [startAt, endAt)",
+          "Attempt to find VICE_CAPTAIN with AVAILABLE roster slot for [startAt, endAt)",
+          "Fail to allocate duo (one or both not available)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "allocation",
+      "layman": "System attempts duo allocation but finds no available duo",
+      "serviceHit": {
+        "step": 3,
+        "target": "allocation (noop)",
+        "startedAt": "2026-04-30T03:08:05.254Z",
+        "endedAt": "2026-04-30T03:08:05.254Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "NO_DUO_AVAILABLE",
+          "message": "No duo available"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 409,
+            "actual": 409,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects the booking with a deterministic error",
+      "statusCode": 409,
+      "serviceHit": {
+        "step": 4,
+        "target": "API response validation",
+        "startedAt": "2026-04-30T03:08:05.254Z",
+        "endedAt": "2026-04-30T03:08:05.254Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 409
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE client_id=$1 LIMIT 50;",
+        "params": [
+          "47bbc856-cc75-40ef-b43e-ef6d38e99689"
+        ],
+        "rowCount": 0,
+        "rows": [],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 0,
+            "actualRows": 0,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify no booking was created",
+      "serviceHit": {
+        "step": 5,
+        "target": "DB verify bookings",
+        "startedAt": "2026-04-30T03:08:05.254Z",
+        "endedAt": "2026-04-30T03:08:05.254Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id IS NOT NULL LIMIT 50;",
+        "params": [],
+        "rowCount": 50,
+        "rows": [
+          {
+            "id": "9b72eb98-3b94-45e0-aed6-8e226e5897f0",
+            "booking_id": "027e0950-06d7-4341-8319-62710f401635",
+            "companion_id": "fa231ca5-bd79-4f21-8889-b4ff576be647",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "252efebd-4399-47ad-b430-28fe59bb3c0f",
+            "booking_id": "027e0950-06d7-4341-8319-62710f401635",
+            "companion_id": "8d39d045-0db3-49b3-81d0-02972c298fd8",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "831cd9a6-cb8c-4727-b5bb-47c2a7ef1c10",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "companion_id": "87cb250c-0b12-4e5b-94a8-c1decdd37acb",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "261e529a-bf5f-4139-bcbc-3a6176af0f28",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "companion_id": "2d37e0e2-eb1b-4dc0-9582-37a6928a9b22",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "61f158c1-32a3-4ae9-996b-37651f8b968b",
+            "booking_id": "eee775f1-9202-4abf-851b-f09f7a4bec5c",
+            "companion_id": "48b04716-a9ca-4b49-8b07-dd0458bcd6a0",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "0a3c7022-2f5b-48c2-ad2a-bf2dc9f3a9a4",
+            "booking_id": "eee775f1-9202-4abf-851b-f09f7a4bec5c",
+            "companion_id": "98b74e63-6278-478a-8883-382f17fdd0b9",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "129ad4aa-4092-432d-8f1f-7558dc153c75",
+            "booking_id": "0a6e7467-fa6b-471f-9382-7d28d13f06b2",
+            "companion_id": "ef3a8219-c9c1-486b-a23e-61a6497b477d",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "b51f4c64-f004-400a-b588-aa8076fe1e1b",
+            "booking_id": "0a6e7467-fa6b-471f-9382-7d28d13f06b2",
+            "companion_id": "49b67c73-a7f6-48c1-98ca-1c036239bb88",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "d97e43e4-f40b-449d-aaeb-93690b699fd2",
+            "booking_id": "f0be7e08-dde8-4633-a07e-0d021b3b0a34",
+            "companion_id": "beef4fad-7e1b-4841-be50-7f7eee1817ad",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "b2d05f6c-4d6e-4878-8380-97ef0cee30e8",
+            "booking_id": "f0be7e08-dde8-4633-a07e-0d021b3b0a34",
+            "companion_id": "8cc01bbc-6663-4e9b-b1bc-75845f614072",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "713fa7f8-e040-4eca-8d4e-8e0a8b2cc876",
+            "booking_id": "c3ae2b89-8c6e-4aac-85d8-ad0204f67a60",
+            "companion_id": "09f95b56-a4a3-4321-b008-69f5c0cc52f7",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "72e10c56-0a3e-4ac2-8ddc-d9b58febcce1",
+            "booking_id": "c3ae2b89-8c6e-4aac-85d8-ad0204f67a60",
+            "companion_id": "139b2268-462b-4795-827f-3b19b96278a0",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "3bf46b01-ea3f-44bf-a9b5-541b0b2d6c6b",
+            "booking_id": "4b7fff21-d312-4922-ad70-8c01cbccb2df",
+            "companion_id": "ba622b8c-fac6-4b93-9172-ec88a69b7433",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "768607c2-88aa-4ab8-b725-96b8782f1829",
+            "booking_id": "4b7fff21-d312-4922-ad70-8c01cbccb2df",
+            "companion_id": "be66808e-cad2-4918-853d-ff4bb991fbfd",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "d7457165-3f4f-4654-8dfd-030b4e077ba1",
+            "booking_id": "da1e87ed-55de-426b-a662-a9033b3bc4a7",
+            "companion_id": "06da5488-aaa2-41e8-9ef4-50c992292fd2",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "4db1b124-8bdf-4843-b98e-51bbcc6cb2aa",
+            "booking_id": "da1e87ed-55de-426b-a662-a9033b3bc4a7",
+            "companion_id": "3b60072f-c1a1-44f1-95b0-d7550fad1772",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "a73e4d70-9c5a-4156-b2ae-bc2408b8736b",
+            "booking_id": "00c5461c-9599-4803-b921-38d94d77c286",
+            "companion_id": "6ac75fed-6e93-498b-85a5-5487661463b8",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "cbf41e32-f9bb-47bd-ab6c-0193ffa13870",
+            "booking_id": "00c5461c-9599-4803-b921-38d94d77c286",
+            "companion_id": "7ebe042a-9866-48b8-83c0-9421872052aa",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "64055e21-b2df-4eb5-8604-444df7425c98",
+            "booking_id": "61299c8d-10d3-4939-9b1b-0a6e829b699c",
+            "companion_id": "c36207e8-5ba0-4d64-adfe-bd036d70f04a",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "0057e681-f4bf-4eec-82c2-67b3c290d0ba",
+            "booking_id": "61299c8d-10d3-4939-9b1b-0a6e829b699c",
+            "companion_id": "ba14c974-19b7-443a-a01a-d3add0563bba",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "2f25fac9-14b1-4c63-8a26-3b524dfea927",
+            "booking_id": "57c22f11-0518-4b5f-ae5b-505f8012cc4d",
+            "companion_id": "692601ef-9eb5-493a-812b-2c9826e98009",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "c66676d1-f63f-4747-b02d-af3863159ba7",
+            "booking_id": "57c22f11-0518-4b5f-ae5b-505f8012cc4d",
+            "companion_id": "80423f2f-cc3d-4ae7-b768-5f46942b8b77",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "75d2118a-1a1a-426a-a06e-d2e72f9e84e2",
+            "booking_id": "f89bbe94-40ac-46d3-92d1-5031c6c32cf2",
+            "companion_id": "6e049a7a-5bd5-4f91-9f5a-ab893acbeb1f",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "b395ec4d-3a9d-4831-b879-fa1d4477c269",
+            "booking_id": "f89bbe94-40ac-46d3-92d1-5031c6c32cf2",
+            "companion_id": "9ea8b2da-7709-4267-a2a8-77cddcd7603b",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "f1e6d94c-f549-4411-8849-d7089fb6eae1",
+            "booking_id": "c327342f-ac19-4123-866c-992d64c70bda",
+            "companion_id": "633ecb8c-94f5-42cb-8fac-cc7121db319a",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "8ffaf087-a243-4c37-98a6-383c806df607",
+            "booking_id": "c327342f-ac19-4123-866c-992d64c70bda",
+            "companion_id": "4a03f3b8-5b6c-4d6c-a155-9e5285f30c30",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "f4977b50-1ed5-47e7-9d95-d9a132288f01",
+            "booking_id": "9e650cec-8382-4556-9c8e-80f0b2429310",
+            "companion_id": "7e597b3c-5af5-4326-9468-ef9744d97443",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "05cbe51e-0c22-4fbc-9ecd-75f918654ac9",
+            "booking_id": "9e650cec-8382-4556-9c8e-80f0b2429310",
+            "companion_id": "adf4a473-40b1-46ab-98b2-b55bc71cf14a",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "2462382f-cbff-4a0f-a757-f02448c35b71",
+            "booking_id": "371bcbf9-8547-4f1b-94d8-4cde9f1bdac1",
+            "companion_id": "8cb3d748-f21b-422c-a6b8-f1c470004cb5",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "b5e7005c-ca43-429b-9b83-fc5daf8cd9ec",
+            "booking_id": "371bcbf9-8547-4f1b-94d8-4cde9f1bdac1",
+            "companion_id": "97b693ef-11b4-4100-8891-69f0f856dcb8",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "6b41fe9e-bf3a-4b12-9857-12e8c38a6007",
+            "booking_id": "98414b33-1cbc-45bc-8c27-b3cf100c5879",
+            "companion_id": "d1870cce-921b-4eb7-be9d-e090939e7790",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "c1ad53bd-66a9-43b1-9a05-0898f0243a87",
+            "booking_id": "98414b33-1cbc-45bc-8c27-b3cf100c5879",
+            "companion_id": "1a3923ef-a8ab-4014-b561-80c6353a3d19",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "8bcec2ff-779a-4653-a0b8-edecec269eec",
+            "booking_id": "bc595917-0985-4e65-83f9-24304f27b228",
+            "companion_id": "0aa6603f-1c37-416d-a7df-99ce1925275a",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "cd88a0f0-1aae-479d-91ee-0a42c6ad7415",
+            "booking_id": "bc595917-0985-4e65-83f9-24304f27b228",
+            "companion_id": "72417ffa-a776-4b16-a7e4-e9c03fc20f50",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "d2a44475-8e2c-4e92-a4db-590585d7707c",
+            "booking_id": "7e2bd06f-7a2b-4ba6-8657-70a6fe93d707",
+            "companion_id": "2daddf84-a0b2-416b-a267-8a66730b9ed6",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "2636f4bf-d175-4c68-9efd-7abf8ebb461f",
+            "booking_id": "7e2bd06f-7a2b-4ba6-8657-70a6fe93d707",
+            "companion_id": "22c1824e-e2fb-4347-86c0-aa6f1ee3b8f3",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "5871fccc-43aa-4b27-94ce-fd56b4826833",
+            "booking_id": "2ccc3e16-edd3-4e0b-8e0f-11c25c1f4663",
+            "companion_id": "d346a3d4-59e8-48db-b4e0-6df0c9b9a5a1",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "1dedb67f-75e0-47fd-a35d-67a2578285b1",
+            "booking_id": "2ccc3e16-edd3-4e0b-8e0f-11c25c1f4663",
+            "companion_id": "cb7694c8-b38e-4368-b8cc-ae867f87c2a2",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "2681f856-4722-48ae-81d2-71f176e036c7",
+            "booking_id": "5c9bbc55-d7ad-40d0-a00a-26ce91b916d8",
+            "companion_id": "41cefcde-4bf8-4c00-a246-3f938df616a1",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "e40d9c8d-d756-4303-aff2-69fbc7e0536c",
+            "booking_id": "5c9bbc55-d7ad-40d0-a00a-26ce91b916d8",
+            "companion_id": "36eeddf2-fd21-46ec-bf63-dcb8acac0c0c",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "4563ccb7-9b0c-4ea6-a77c-9dfad51d7db5",
+            "booking_id": "87db4cc0-328f-437f-9f83-338c47778519",
+            "companion_id": "b2300eab-364f-4e67-940c-926d8fbef375",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "7d24e86a-4860-4c78-b96d-fef2dc293797",
+            "booking_id": "87db4cc0-328f-437f-9f83-338c47778519",
+            "companion_id": "075b8298-0729-4249-9b49-8aab2f835268",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "484bd272-1d4b-4dd3-8126-5effc8e4e49c",
+            "booking_id": "c88c677a-8c8e-4635-b2d6-34f2a0e27241",
+            "companion_id": "e1fb851d-707f-4a10-8175-8d4e73d06598",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "e3db8499-9227-4174-a988-14e551d7ee96",
+            "booking_id": "c88c677a-8c8e-4635-b2d6-34f2a0e27241",
+            "companion_id": "2eea9131-0b5f-48cf-9aae-64c0b0e9714d",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "64c63d12-62cc-4c27-9863-91f73700439f",
+            "booking_id": "1aa60288-3763-4a32-ad50-ed2227c92b84",
+            "companion_id": "fc52b5da-b48f-4fb6-99bc-84d2174ebd4f",
+            "designation": "CAPTAIN",
+            "presence_status": "ARRIVED",
+            "self_match_status": "MATCHED",
+            "client_match_status": "CLIENT_MATCHED"
+          },
+          {
+            "id": "c13469b7-5af7-4b2b-9664-3be07041b388",
+            "booking_id": "1aa60288-3763-4a32-ad50-ed2227c92b84",
+            "companion_id": "e64ef89a-2a42-4c6a-8d74-4f7dde15cfd2",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ARRIVED",
+            "self_match_status": "MATCHED",
+            "client_match_status": "CLIENT_MATCHED"
+          },
+          {
+            "id": "cd6179e8-d154-4908-97fc-dd964fbb4766",
+            "booking_id": "3e7a397a-20e6-4b41-a2de-8d1999c30c51",
+            "companion_id": "3369e321-f1b1-4479-9918-838b2ac3729f",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "a93d9ca1-2ffb-4b83-8332-2fd3f927686e",
+            "booking_id": "3e7a397a-20e6-4b41-a2de-8d1999c30c51",
+            "companion_id": "bb211ba5-0552-4153-b971-bb62d9949d55",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "a9b6e340-fa2b-40df-a1bd-0cff8c94bbeb",
+            "booking_id": "ce7a3b0a-fd32-42d6-830f-4091b2870b4b",
+            "companion_id": "f2933764-19cd-45de-9949-f2aaf4b635d8",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "81354dae-c8e7-4840-9a1d-433f74fb3adf",
+            "booking_id": "ce7a3b0a-fd32-42d6-830f-4091b2870b4b",
+            "companion_id": "bd6cd429-3d59-499e-a345-6ed5dddf076e",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          }
+        ],
+        "checks": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify no companion assignments were created",
+      "serviceHit": {
+        "step": 6,
+        "target": "DB verify booking_companion_assignments",
+        "startedAt": "2026-04-30T03:08:05.254Z",
+        "endedAt": "2026-04-30T03:08:05.255Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE status='BOOKED' LIMIT 50;",
+        "params": [],
+        "rowCount": 30,
+        "rows": [
+          {
+            "id": "3dbf0378-c9a3-49db-917d-84ea05ff9dd5",
+            "venue_id": "2075e816-f02a-4dbc-8f22-9f793471f7a5",
+            "companion_id": "48b04716-a9ca-4b49-8b07-dd0458bcd6a0",
+            "booking_id": "eee775f1-9202-4abf-851b-f09f7a4bec5c",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "73b5a541-8eab-4981-a3b6-47b7bfb9a661",
+            "venue_id": "2075e816-f02a-4dbc-8f22-9f793471f7a5",
+            "companion_id": "98b74e63-6278-478a-8883-382f17fdd0b9",
+            "booking_id": "eee775f1-9202-4abf-851b-f09f7a4bec5c",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "67559bdb-f159-427d-b8e4-cd422984aad7",
+            "venue_id": "34bd799b-af48-4a32-b502-0f86b108e893",
+            "companion_id": "f2933764-19cd-45de-9949-f2aaf4b635d8",
+            "booking_id": "ce7a3b0a-fd32-42d6-830f-4091b2870b4b",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "64f63e15-360d-434c-abf5-4d441cd2eae1",
+            "venue_id": "34bd799b-af48-4a32-b502-0f86b108e893",
+            "companion_id": "bd6cd429-3d59-499e-a345-6ed5dddf076e",
+            "booking_id": "ce7a3b0a-fd32-42d6-830f-4091b2870b4b",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "4b8109e2-238c-4b47-9127-7aa6756e358c",
+            "venue_id": "4c2b7a32-a835-4432-8084-1ec638ffb16a",
+            "companion_id": "beef4fad-7e1b-4841-be50-7f7eee1817ad",
+            "booking_id": "f0be7e08-dde8-4633-a07e-0d021b3b0a34",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "a6ec57a0-a847-4c44-bb61-d5ace46c7427",
+            "venue_id": "4c2b7a32-a835-4432-8084-1ec638ffb16a",
+            "companion_id": "8cc01bbc-6663-4e9b-b1bc-75845f614072",
+            "booking_id": "f0be7e08-dde8-4633-a07e-0d021b3b0a34",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "94fbe277-5acf-4c09-aec9-707861574561",
+            "venue_id": "52a85e14-f924-4c8a-b149-74699c548e11",
+            "companion_id": "2daddf84-a0b2-416b-a267-8a66730b9ed6",
+            "booking_id": "7e2bd06f-7a2b-4ba6-8657-70a6fe93d707",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "16e69076-1741-4618-8ae7-c061f9c28fc2",
+            "venue_id": "52a85e14-f924-4c8a-b149-74699c548e11",
+            "companion_id": "22c1824e-e2fb-4347-86c0-aa6f1ee3b8f3",
+            "booking_id": "7e2bd06f-7a2b-4ba6-8657-70a6fe93d707",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "a19f1a3e-2283-4cb8-836a-e7ef3edb97bc",
+            "venue_id": "5a6d3a16-3c1b-4526-9a8a-400536a23fa2",
+            "companion_id": "549f4ff7-1cee-4abd-a14f-2a798266f20e",
+            "booking_id": "496cf559-b002-4bd7-8706-5fca6d803637",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "d8181195-0969-44a8-9559-e0eae2224bfe",
+            "venue_id": "5a6d3a16-3c1b-4526-9a8a-400536a23fa2",
+            "companion_id": "d8529b7b-c484-4b0c-b25c-3043c76c3fe7",
+            "booking_id": "496cf559-b002-4bd7-8706-5fca6d803637",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "8fe9dfab-5dd0-4d45-87cc-5f4ef309e394",
+            "venue_id": "612d9a98-da98-4e31-b623-2a8a4d4b3aaf",
+            "companion_id": "2a2ca60b-527f-40c1-b3b4-0fb494160605",
+            "booking_id": "e2efc191-1916-4a97-bd4f-b9086238c7ac",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "989098b0-0332-4de9-b146-3a3211a028bf",
+            "venue_id": "612d9a98-da98-4e31-b623-2a8a4d4b3aaf",
+            "companion_id": "e290c60a-d76f-4107-9f17-8480185377c4",
+            "booking_id": "e2efc191-1916-4a97-bd4f-b9086238c7ac",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "52d28f6f-9d64-405e-ac06-2c9832e68e64",
+            "venue_id": "90ebec56-68d3-487a-97a3-6a05f9b5250a",
+            "companion_id": "8cb3d748-f21b-422c-a6b8-f1c470004cb5",
+            "booking_id": "371bcbf9-8547-4f1b-94d8-4cde9f1bdac1",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "305dafdc-ed9b-4114-adda-53f813c4de04",
+            "venue_id": "90ebec56-68d3-487a-97a3-6a05f9b5250a",
+            "companion_id": "97b693ef-11b4-4100-8891-69f0f856dcb8",
+            "booking_id": "371bcbf9-8547-4f1b-94d8-4cde9f1bdac1",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "16dbec8c-8504-416e-89ec-f7f0b74a9944",
+            "venue_id": "927fd46b-6b50-4c72-bebc-ca3d63731b66",
+            "companion_id": "d0e6da19-6c49-4c0a-84e8-1c60d5af6f15",
+            "booking_id": "c4136a71-65e2-4e35-9a2b-ce7c97aad577",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "6111b95b-7834-4b03-8729-b741f9e743c6",
+            "venue_id": "927fd46b-6b50-4c72-bebc-ca3d63731b66",
+            "companion_id": "b823a33a-f02c-4ffd-b2f4-67183fb9977e",
+            "booking_id": "c4136a71-65e2-4e35-9a2b-ce7c97aad577",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "9aea413f-d89c-4051-a8ab-90bcf15cf75a",
+            "venue_id": "a73731d6-7f9b-4051-ac2a-cd6c770a95a4",
+            "companion_id": "e160525e-bc3e-4e29-953a-228a2975ad7f",
+            "booking_id": "082b630d-14a2-47d7-b501-19fcf99b0f4c",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "db42a4c5-e001-4630-9ee4-991c126029e7",
+            "venue_id": "a73731d6-7f9b-4051-ac2a-cd6c770a95a4",
+            "companion_id": "ea6a62bb-5d28-4728-a62c-56c31e0443e1",
+            "booking_id": "082b630d-14a2-47d7-b501-19fcf99b0f4c",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "701f5b3e-a242-422a-afea-c8e17085f1e9",
+            "venue_id": "ec455b2d-cb77-40c6-b7a6-968f65e5b678",
+            "companion_id": "a59ff112-e867-4b95-9e43-373603af3520",
+            "booking_id": "f9fd93f6-b6a2-42d9-aa0c-7479add0ecd3",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "f7fa6df6-7931-4ed0-819c-7de6cf8ca5b7",
+            "venue_id": "ec455b2d-cb77-40c6-b7a6-968f65e5b678",
+            "companion_id": "94702daf-87e7-40a9-92de-dd634b49968b",
+            "booking_id": "f9fd93f6-b6a2-42d9-aa0c-7479add0ecd3",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "90512afd-4020-4bb8-8df0-52f79c6327b2",
+            "venue_id": "edc642b5-8dc4-4c91-b62b-0c4723f82582",
+            "companion_id": "a39148d3-f1af-47d4-a03e-72812e2b8d68",
+            "booking_id": "bb918cc6-0b40-4227-a547-f87b80675143",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "d41efce6-7a16-4015-ba19-0c5d68ca1ca5",
+            "venue_id": "edc642b5-8dc4-4c91-b62b-0c4723f82582",
+            "companion_id": "e22405da-55ef-450e-94d2-db2753a72327",
+            "booking_id": "bb918cc6-0b40-4227-a547-f87b80675143",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "3ba1fdc5-e43b-4ccc-b135-492db81a824c",
+            "venue_id": "f0900fc1-4a86-4aa4-bba0-a0dbb11f1fb2",
+            "companion_id": "bf642eec-5319-4deb-80ae-a2c06bdf0d70",
+            "booking_id": "82aef445-8f8f-4d08-8030-60246ccc5fc5",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "8abccb5e-b3b3-4081-bd40-0efa2c98e427",
+            "venue_id": "f0900fc1-4a86-4aa4-bba0-a0dbb11f1fb2",
+            "companion_id": "6702a20b-0d3c-4705-a200-f5d1d465e9e9",
+            "booking_id": "82aef445-8f8f-4d08-8030-60246ccc5fc5",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "44203b1d-917e-4b2b-a7de-ca06b20c58a5",
+            "venue_id": "f286b6ee-6748-483b-bb03-814fa95c80ae",
+            "companion_id": "692601ef-9eb5-493a-812b-2c9826e98009",
+            "booking_id": "57c22f11-0518-4b5f-ae5b-505f8012cc4d",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "54f608a5-0731-46cd-af9c-f8acfc279701",
+            "venue_id": "f286b6ee-6748-483b-bb03-814fa95c80ae",
+            "companion_id": "80423f2f-cc3d-4ae7-b768-5f46942b8b77",
+            "booking_id": "57c22f11-0518-4b5f-ae5b-505f8012cc4d",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "b6a92382-13a6-4d7e-bbc5-fd7cad3b21fd",
+            "venue_id": "fc231873-3ab0-404b-8e57-c9a7377c5453",
+            "companion_id": "87cb250c-0b12-4e5b-94a8-c1decdd37acb",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "4cba7b56-30e3-41cc-be40-f4c0d997aec2",
+            "venue_id": "fc231873-3ab0-404b-8e57-c9a7377c5453",
+            "companion_id": "2d37e0e2-eb1b-4dc0-9582-37a6928a9b22",
+            "booking_id": "8422636e-f70e-4ab8-ab33-fb51b1ee17d1",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "97d1bfbf-2bbf-436d-af2a-2d1ddf7f81b3",
+            "venue_id": "ff916e03-0434-4622-b1ee-822197aa7f56",
+            "companion_id": "6e049a7a-5bd5-4f91-9f5a-ab893acbeb1f",
+            "booking_id": "f89bbe94-40ac-46d3-92d1-5031c6c32cf2",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          },
+          {
+            "id": "0f6b21ef-536c-483b-b8a9-0af7107b2879",
+            "venue_id": "ff916e03-0434-4622-b1ee-822197aa7f56",
+            "companion_id": "9ea8b2da-7709-4267-a2a8-77cddcd7603b",
+            "booking_id": "f89bbe94-40ac-46d3-92d1-5031c6c32cf2",
+            "start_at": "2026-04-30T10:00:00.000Z",
+            "end_at": "2026-04-30T12:00:00.000Z",
+            "status": "BOOKED"
+          }
+        ],
+        "checks": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify roster slot states unchanged (no partial reservations)",
+      "serviceHit": {
+        "step": 7,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-04-30T03:08:05.255Z",
+        "endedAt": "2026-04-30T03:08:05.255Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

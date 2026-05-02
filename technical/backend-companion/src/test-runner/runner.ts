@@ -32,7 +32,13 @@ const INFO_NOOP_ACTION_TYPES = new Set([
   "validation",
   "allocation",
   "dbTransaction",
-  "responseValidation"
+  "responseValidation",
+
+  // DRAFT_SPEC-only actionTypes used in some module tests (informational steps)
+  "internalAuth",
+  "slotRelease",
+  "slotReservation",
+  "dbUpdate"
 ]);
 
 function toContextKey(fieldName: string): string {
@@ -95,11 +101,22 @@ function prepareApiRequestStep(step: StepDefinition, context: Record<string, unk
     headers["Authorization"] = `Bearer ${token}`;
   }
 
+  // Internal service auth using X-Internal-Token (supported via env var INTERNAL_API_TOKEN).
+  if (authType.includes("internal") && !headers["X-Internal-Token"]) {
+    const token = context["INTERNAL_API_TOKEN"] ?? context["VALID_INTERNAL_TOKEN"];
+    if (typeof token !== "string" || token.length === 0) {
+      throw new Error("apiRequest step requires Internal token auth but INTERNAL_API_TOKEN/VALID_INTERNAL_TOKEN was not found in context");
+    }
+    headers["X-Internal-Token"] = token;
+  }
+
   let endpoint = step.endpoint;
   if (step.pathParams && isRecord(step.pathParams)) {
     const renderedParams = substitute(step.pathParams, context) as Record<string, unknown>;
     for (const [key, value] of Object.entries(renderedParams)) {
+      // Support both ":id" and "{id}" patterns.
       endpoint = endpoint.replace(`:${key}`, String(value));
+      endpoint = endpoint.replace(`{${key}}`, String(value));
     }
   }
 
@@ -111,7 +128,14 @@ function prepareApiRequestStep(step: StepDefinition, context: Record<string, unk
         continue;
       }
       const contextKey = toContextKey(field);
-      const value = context[contextKey] ?? context[field];
+
+      // Prefer TARGET_* values when present (used in internal edit scenarios).
+      const value =
+        context[`TARGET_${contextKey}`] ??
+        context[contextKey] ??
+        context[`TARGET_${field}`] ??
+        context[field];
+
       if (value !== undefined) {
         autoPayload[field] = value;
       }
@@ -248,8 +272,23 @@ function validateDbRows(
     }
   }
 
+  const designationExpected = expectedFields["designation"];
+  if (Array.isArray(designationExpected)) {
+    const actual = rows.map((row) => String(row["designation"] ?? ""));
+    const expected = designationExpected.map((d) => String(d));
+    const actualSorted = [...actual].sort();
+    const expectedSorted = [...expected].sort();
+    const pass =
+      actualSorted.length === expectedSorted.length &&
+      actualSorted.every((value, idx) => value === expectedSorted[idx]);
+    checks.push({ type: "designationSet", expected, actual, pass });
+    if (!pass) {
+      ok = false;
+    }
+  }
+
   for (const [field, expected] of Object.entries(expectedFields)) {
-    if (field === "designations") {
+    if (field === "designations" || (field === "designation" && Array.isArray(designationExpected))) {
       continue;
     }
 
@@ -260,6 +299,16 @@ function validateDbRows(
       if (expected === "{{NOT_NULL}}") {
         const pass = actual !== null && actual !== undefined;
         checks.push({ type: "notNull", row: index, field, actual, pass });
+        if (!pass) {
+          ok = false;
+        }
+        continue;
+      }
+
+      if (Array.isArray(expected)) {
+        const allowed = expected.map((v) => String(v));
+        const pass = allowed.includes(String(actual));
+        checks.push({ type: "oneOf", row: index, field, allowed, actual, pass });
         if (!pass) {
           ok = false;
         }
@@ -373,6 +422,12 @@ export async function runTestFile(
     context["TODAY_DATE_YMD"] = todayYmd(process.env.TZ);
   }
 
+  // Some test designs use {{VALID_INTERNAL_TOKEN}} as a placeholder.
+  // Default it to INTERNAL_API_TOKEN when available.
+  if (context["VALID_INTERNAL_TOKEN"] === undefined && typeof process.env.INTERNAL_API_TOKEN === "string") {
+    context["VALID_INTERNAL_TOKEN"] = process.env.INTERNAL_API_TOKEN;
+  }
+
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     environmentCheck.database = "FAIL";
@@ -453,7 +508,8 @@ export async function runTestFile(
             }
 
             if (Array.isArray(expectedFieldsRaw)) {
-              const expectedFields = expectedFieldsRaw.filter((entry) => typeof entry === "string") as string[];
+              const rendered = substitute(expectedFieldsRaw, context) as unknown[];
+              const expectedFields = rendered.filter((entry) => typeof entry === "string") as string[];
               const fieldResult = validateExpectedResponseFields(expectedFields, lastApiRequest.observed);
               checks.push(...fieldResult.checks);
               if (!fieldResult.pass) {
@@ -481,6 +537,34 @@ export async function runTestFile(
           const renderedExpectedFields = step.expectedFields
             ? (substitute(step.expectedFields, context) as Record<string, unknown>)
             : undefined;
+
+          // Support {{SAME_CAPTAIN_ID, SAME_VICE_CAPTAIN_ID}} style placeholders by expanding
+          // them into allowed sets based on the current run context.
+          if (renderedExpectedFields) {
+            for (const [field, expected] of Object.entries(renderedExpectedFields)) {
+              if (typeof expected !== "string") {
+                continue;
+              }
+              const match = expected.match(/^\{\{(.+)\}\}$/);
+              if (!match) {
+                continue;
+              }
+              const tokens = match[1]
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean);
+              if (tokens.length === 0 || !tokens.every((t) => t.startsWith("SAME_"))) {
+                continue;
+              }
+              const allowed = tokens
+                .map((t) => t.slice("SAME_".length))
+                .map((key) => context[key])
+                .filter((value): value is string => typeof value === "string" && value.length > 0);
+              if (allowed.length > 0) {
+                renderedExpectedFields[field] = allowed;
+              }
+            }
+          }
 
           const limit = 50;
           let sql = `SELECT * FROM "${table}"`;

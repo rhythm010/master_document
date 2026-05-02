@@ -1,0 +1,650 @@
+{
+  "runId": "RUN-20260430030805293-MOD-BOOKING-010",
+  "testId": "MOD-BOOKING-010",
+  "status": "FAIL",
+  "startedAt": "2026-04-30T03:08:05.293Z",
+  "endedAt": "2026-04-30T03:08:05.309Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+      "startedAt": "2026-04-30T03:08:05.306Z",
+      "endedAt": "2026-04-30T03:08:05.307Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 2,
+      "target": "internalAuth (noop)",
+      "startedAt": "2026-04-30T03:08:05.307Z",
+      "endedAt": "2026-04-30T03:08:05.307Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "validation (noop)",
+      "startedAt": "2026-04-30T03:08:05.307Z",
+      "endedAt": "2026-04-30T03:08:05.307Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "dbTransaction (noop)",
+      "startedAt": "2026-04-30T03:08:05.307Z",
+      "endedAt": "2026-04-30T03:08:05.307Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "target": "API response validation",
+      "startedAt": "2026-04-30T03:08:05.307Z",
+      "endedAt": "2026-04-30T03:08:05.307Z",
+      "durationMs": 0,
+      "result": "FAIL",
+      "statusCode": 404
+    },
+    {
+      "step": 6,
+      "target": "DB verify bookings",
+      "startedAt": "2026-04-30T03:08:05.307Z",
+      "endedAt": "2026-04-30T03:08:05.308Z",
+      "durationMs": 1,
+      "result": "FAIL"
+    },
+    {
+      "step": 7,
+      "target": "DB verify roster_slots",
+      "startedAt": "2026-04-30T03:08:05.308Z",
+      "endedAt": "2026-04-30T03:08:05.308Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 8,
+      "target": "DB verify booking_companion_assignments",
+      "startedAt": "2026-04-30T03:08:05.308Z",
+      "endedAt": "2026-04-30T03:08:05.309Z",
+      "durationMs": 1,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e</pre>\n</body>\n</html>\n"
+      },
+      "actor": "InternalService",
+      "actionType": "apiRequest",
+      "layman": "Internal service attempts to edit a booking that violates safety constraints",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 1,
+        "target": "PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+        "startedAt": "2026-04-30T03:08:05.306Z",
+        "endedAt": "2026-04-30T03:08:05.307Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Validate X-Internal-Token"
+        ]
+      },
+      "actor": "System",
+      "actionType": "internalAuth",
+      "layman": "System verifies internal authorization",
+      "serviceHit": {
+        "step": 2,
+        "target": "internalAuth (noop)",
+        "startedAt": "2026-04-30T03:08:05.307Z",
+        "endedAt": "2026-04-30T03:08:05.307Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS).",
+        "expectedBehavior": [
+          "Booking exists",
+          "Lock booking FOR UPDATE",
+          "Check booking.status == CONFIRMED (variant A/B/C: fail here)",
+          "Check booking.extended_at IS NULL (variant D: fail here)",
+          "Check now < booking.start_at (variant E: fail here)",
+          "Load assignment rows FOR UPDATE",
+          "Check all assignments at default statuses (variants F/G/H: fail here)"
+        ]
+      },
+      "actor": "System",
+      "actionType": "validation",
+      "layman": "System validates safety constraints and detects violation based on test variant",
+      "serviceHit": {
+        "step": 3,
+        "target": "validation (noop)",
+        "startedAt": "2026-04-30T03:08:05.307Z",
+        "endedAt": "2026-04-30T03:08:05.307Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "note": "Informational DRAFT_SPEC step (runner treats as NOOP PASS)."
+      },
+      "actor": "System",
+      "actionType": "dbTransaction",
+      "layman": "System rolls back transaction due to validation failure",
+      "serviceHit": {
+        "step": 4,
+        "target": "dbTransaction (noop)",
+        "startedAt": "2026-04-30T03:08:05.307Z",
+        "endedAt": "2026-04-30T03:08:05.307Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 5,
+      "result": "FAIL",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 404,
+            "pass": false
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects the edit with appropriate error message",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 5,
+        "target": "API response validation",
+        "startedAt": "2026-04-30T03:08:05.307Z",
+        "endedAt": "2026-04-30T03:08:05.307Z",
+        "durationMs": 0,
+        "result": "FAIL",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 6,
+      "result": "FAIL",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "client_id": "ea51050f-2062-4afd-a2d9-f1fbd10a0815",
+            "venue_id": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-04-30T03:08:05.303Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "actual": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "{{ORIGINAL_STATUS}}",
+            "actual": "CONFIRMED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "venue_id",
+            "expected": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+            "actual": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "start_at",
+            "expected": "2026-05-01T10:00:00.000Z",
+            "actual": "2026-05-01T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "end_at",
+            "expected": "2026-05-01T12:00:00.000Z",
+            "actual": "2026-05-01T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "extended_at",
+            "expected": "{{ORIGINAL_EXTENDED_AT}}",
+            "actual": null,
+            "pass": false
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify booking remains completely unchanged (transaction rolled back)",
+      "serviceHit": {
+        "step": 6,
+        "target": "DB verify bookings",
+        "startedAt": "2026-04-30T03:08:05.307Z",
+        "endedAt": "2026-04-30T03:08:05.308Z",
+        "durationMs": 1,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"roster_slots\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+        ],
+        "rowCount": 0,
+        "rows": [],
+        "checks": []
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify roster slots unchanged (no partial reservation/release)",
+      "serviceHit": {
+        "step": 7,
+        "target": "DB verify roster_slots",
+        "startedAt": "2026-04-30T03:08:05.308Z",
+        "endedAt": "2026-04-30T03:08:05.308Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 8,
+      "result": "FAIL",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "9cca29e8-e9a3-4ea9-96c2-2052913d9c4d",
+            "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "companion_id": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "a2fb388b-b551-410a-98cb-0fd81de44768",
+            "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "companion_id": "61be6071-a4d9-430e-bfea-5c4424900a96",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "companion_id",
+            "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+            "actual": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "companion_id",
+            "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+            "actual": "61be6071-a4d9-430e-bfea-5c4424900a96",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "presence_status",
+            "expected": "{{ORIGINAL_PRESENCE_STATUS}}",
+            "actual": "ASSIGNED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "presence_status",
+            "expected": "{{ORIGINAL_PRESENCE_STATUS}}",
+            "actual": "ASSIGNED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "self_match_status",
+            "expected": "{{ORIGINAL_SELF_MATCH_STATUS}}",
+            "actual": "NOT_MATCHED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "self_match_status",
+            "expected": "{{ORIGINAL_SELF_MATCH_STATUS}}",
+            "actual": "NOT_MATCHED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "client_match_status",
+            "expected": "{{ORIGINAL_CLIENT_MATCH_STATUS}}",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "client_match_status",
+            "expected": "{{ORIGINAL_CLIENT_MATCH_STATUS}}",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": false
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify companion assignments unchanged",
+      "serviceHit": {
+        "step": 8,
+        "target": "DB verify booking_companion_assignments",
+        "startedAt": "2026-04-30T03:08:05.308Z",
+        "endedAt": "2026-04-30T03:08:05.309Z",
+        "durationMs": 1,
+        "result": "FAIL"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 5,
+      "reason": "Step failed",
+      "evidence": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PATCH /bookings/6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e</pre>\n</body>\n</html>\n"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 404,
+            "pass": false
+          }
+        ]
+      }
+    },
+    {
+      "step": 6,
+      "reason": "Step failed",
+      "evidence": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "client_id": "ea51050f-2062-4afd-a2d9-f1fbd10a0815",
+            "venue_id": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+            "start_at": "2026-05-01T10:00:00.000Z",
+            "end_at": "2026-05-01T12:00:00.000Z",
+            "status": "CONFIRMED",
+            "qr_code": "qr_6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "pin_code": "111111",
+            "booking_color": "BLUE",
+            "com_match_qr_code": "com_qr_6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "com_match_pin_code": "222222",
+            "extended_at": null,
+            "created_at": "2026-04-30T03:08:05.303Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "actual": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "{{ORIGINAL_STATUS}}",
+            "actual": "CONFIRMED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "venue_id",
+            "expected": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+            "actual": "7a7d38d1-62e9-4ff4-a626-5343fccb8a06",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "start_at",
+            "expected": "2026-05-01T10:00:00.000Z",
+            "actual": "2026-05-01T10:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "end_at",
+            "expected": "2026-05-01T12:00:00.000Z",
+            "actual": "2026-05-01T12:00:00.000Z",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "extended_at",
+            "expected": "{{ORIGINAL_EXTENDED_AT}}",
+            "actual": null,
+            "pass": false
+          }
+        ]
+      }
+    },
+    {
+      "step": 8,
+      "reason": "Step failed",
+      "evidence": {
+        "sql": "SELECT * FROM \"booking_companion_assignments\" WHERE booking_id=$1 LIMIT 50;",
+        "params": [
+          "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "9cca29e8-e9a3-4ea9-96c2-2052913d9c4d",
+            "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "companion_id": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+            "designation": "CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          },
+          {
+            "id": "a2fb388b-b551-410a-98cb-0fd81de44768",
+            "booking_id": "6a1ec3f5-f9f6-4d52-b911-d961ce43ff6e",
+            "companion_id": "61be6071-a4d9-430e-bfea-5c4424900a96",
+            "designation": "VICE_CAPTAIN",
+            "presence_status": "ASSIGNED",
+            "self_match_status": "NOT_MATCHED",
+            "client_match_status": "WAITING_FOR_CLIENT"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 2,
+            "actualRows": 2,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "companion_id",
+            "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+            "actual": "b73a196a-78b1-43bb-a25a-d9c6a7ccb8ff",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "companion_id",
+            "expected": "{{ORIGINAL_CAPTAIN_ID, ORIGINAL_VICE_CAPTAIN_ID}}",
+            "actual": "61be6071-a4d9-430e-bfea-5c4424900a96",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "presence_status",
+            "expected": "{{ORIGINAL_PRESENCE_STATUS}}",
+            "actual": "ASSIGNED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "presence_status",
+            "expected": "{{ORIGINAL_PRESENCE_STATUS}}",
+            "actual": "ASSIGNED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "self_match_status",
+            "expected": "{{ORIGINAL_SELF_MATCH_STATUS}}",
+            "actual": "NOT_MATCHED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "self_match_status",
+            "expected": "{{ORIGINAL_SELF_MATCH_STATUS}}",
+            "actual": "NOT_MATCHED",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "client_match_status",
+            "expected": "{{ORIGINAL_CLIENT_MATCH_STATUS}}",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": false
+          },
+          {
+            "type": "equals",
+            "row": 1,
+            "field": "client_match_status",
+            "expected": "{{ORIGINAL_CLIENT_MATCH_STATUS}}",
+            "actual": "WAITING_FOR_CLIENT",
+            "pass": false
+          }
+        ]
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
