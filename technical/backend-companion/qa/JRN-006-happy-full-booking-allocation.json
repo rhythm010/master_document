@@ -1,0 +1,800 @@
+{
+  "testId": "JRN-006",
+  "type": "journey",
+  "priority": "P1",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Happy path: Full Booking Allocation with CAPTAIN+VICE duo assignment",
+  "flowType": "happy",
+  "linkedRequirements": [
+    "identity/signup",
+    "identity/email_verification",
+    "identity/login",
+    "roster/slot_population",
+    "roster/availability_check",
+    "booking/creation",
+    "booking/duo_allocation",
+    "booking/captain_vice_assignment",
+    "booking/roster_slot_reservation",
+    "booking/details_retrieval"
+  ],
+  "filePath": "technical/backend-companion/qa/JRN-006-happy-full-booking-allocation.json",
+  "executionMode": "api+db+external",
+  "objective": "Validate the complete end-to-end booking allocation flow with proper CAPTAIN/VICE_CAPTAIN duo assignment, from user signup through booking creation and verification of companion assignments and roster slot updates.",
+  "preconditions": [
+    "Backend server running on localhost:3000",
+    "Database container running and accessible",
+    "Mailpit email server running on localhost:8025",
+    "INTERNAL_API_TOKEN environment variable configured",
+    "TZ=Asia/Dubai timezone setting active",
+    "Database schema fully migrated",
+    "Test venue exists or can be created"
+  ],
+  "environmentRequirements": {
+    "services": [
+      {
+        "name": "API Server",
+        "endpoint": "http://localhost:3000",
+        "healthCheck": "GET /health or GET /venues"
+      },
+      {
+        "name": "Mailpit",
+        "endpoint": "http://localhost:8025",
+        "purpose": "Email verification token retrieval"
+      },
+      {
+        "name": "PostgreSQL",
+        "connection": "localhost:5432",
+        "purpose": "Database queries and validations"
+      }
+    ],
+    "environment": {
+      "TZ": "Asia/Dubai",
+      "INTERNAL_API_TOKEN": "required for internal roster endpoints"
+    }
+  },
+  "testData": {
+    "users": {
+      "client": {
+        "email": "client-jrn006-{{RUN_ID}}@test.com",
+        "password": "SecurePass123!",
+        "role": "CLIENT",
+        "nickname": "Test Client JRN006"
+      },
+      "companionA": {
+        "email": "companion-a-jrn006-{{RUN_ID}}@test.com",
+        "password": "SecurePass123!",
+        "role": "COMPANION",
+        "nickname": "Companion Alpha JRN006",
+        "expectedDesignation": "CAPTAIN or VICE_CAPTAIN"
+      },
+      "companionB": {
+        "email": "companion-b-jrn006-{{RUN_ID}}@test.com",
+        "password": "SecurePass123!",
+        "role": "COMPANION",
+        "nickname": "Companion Beta JRN006",
+        "expectedDesignation": "CAPTAIN or VICE_CAPTAIN (opposite of companionA)"
+      }
+    },
+    "venue": {
+      "strategy": "Use existing test venue or first available venue from GET /venues",
+      "fallback": "Create test venue if needed via internal API"
+    },
+    "booking": {
+      "date": "2026-05-10",
+      "startTime": "14:00",
+      "duration": "2 hours (default)",
+      "note": "Ensure roster slots exist for this date/time"
+    },
+    "roster": {
+      "populationRange": "2026-05-10 to 2026-05-11",
+      "slotDuration": "30 minutes",
+      "minimumSlots": "4 slots per companion (to cover 2-hour booking)"
+    }
+  },
+  "waitPolicy": {
+    "emailVerification": {
+      "maxSeconds": 30,
+      "pollEveryMs": 2000,
+      "retryCount": 15
+    },
+    "dbPropagation": {
+      "maxSeconds": 5,
+      "pollEveryMs": 500,
+      "retryCount": 10
+    }
+  },
+  "steps": [
+    {
+      "step": 1,
+      "phase": "Setup - Client Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "layman": "Register a new client user account to simulate a customer wanting to make a booking.",
+      "requiredPayloadFields": ["email", "password", "role"],
+      "payloadTemplate": {
+        "email": "{{CLIENT_EMAIL}}",
+        "password": "{{CLIENT_PASSWORD}}",
+        "role": "CLIENT"
+      },
+      "expectedResponse": {
+        "status": 201,
+        "bodyContains": ["id", "email", "role"]
+      },
+      "validations": [
+        "Response status is 201",
+        "Response contains user id",
+        "Response email matches request email",
+        "Response role is CLIENT",
+        "emailVerified is false"
+      ],
+      "dataExtraction": {
+        "clientUserId": "response.body.id",
+        "clientEmail": "response.body.email"
+      }
+    },
+    {
+      "step": 2,
+      "phase": "Setup - Client Identity",
+      "actor": "MailpitClient",
+      "actionType": "waitForEmail",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "layman": "Wait for the verification email to arrive at Mailpit so we can extract the email verification token.",
+      "validations": [
+        "Email received within 30 seconds",
+        "Email recipient matches client email",
+        "Email subject contains 'verify' or 'verification'",
+        "Email body contains verification token or link"
+      ],
+      "dataExtraction": {
+        "clientVerifyToken": "Extract token from email body or verification link"
+      }
+    },
+    {
+      "step": 3,
+      "phase": "Setup - Client Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "layman": "Verify the client's email address using the token from the email to activate the account.",
+      "requiredPayloadFields": ["token"],
+      "queryParams": {
+        "token": "{{CLIENT_VERIFY_TOKEN}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["success", "verified"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Email verification successful message returned"
+      ]
+    },
+    {
+      "step": 4,
+      "phase": "Setup - Client Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "layman": "Log in as the client to get an authentication token for making authenticated requests.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadTemplate": {
+        "email": "{{CLIENT_EMAIL}}",
+        "password": "{{CLIENT_PASSWORD}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["accessToken", "user"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response contains accessToken",
+        "Response user.role is CLIENT",
+        "Response user.emailVerified is true"
+      ],
+      "dataExtraction": {
+        "clientAccessToken": "response.body.accessToken"
+      }
+    },
+    {
+      "step": 5,
+      "phase": "Setup - Companion A Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "layman": "Register the first companion user who will be assigned to the booking (either as CAPTAIN or VICE_CAPTAIN).",
+      "requiredPayloadFields": ["email", "password", "role"],
+      "payloadTemplate": {
+        "email": "{{COMPANION_A_EMAIL}}",
+        "password": "{{COMPANION_A_PASSWORD}}",
+        "role": "COMPANION"
+      },
+      "expectedResponse": {
+        "status": 201,
+        "bodyContains": ["id", "email", "role"]
+      },
+      "validations": [
+        "Response status is 201",
+        "Response contains user id",
+        "Response email matches request email",
+        "Response role is COMPANION",
+        "emailVerified is false"
+      ],
+      "dataExtraction": {
+        "companionAUserId": "response.body.id",
+        "companionAEmail": "response.body.email"
+      }
+    },
+    {
+      "step": 6,
+      "phase": "Setup - Companion A Identity",
+      "actor": "MailpitClient",
+      "actionType": "waitForEmail",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "layman": "Wait for Companion A's verification email to extract the verification token.",
+      "validations": [
+        "Email received within 30 seconds",
+        "Email recipient matches companion A email",
+        "Email subject contains 'verify' or 'verification'",
+        "Email body contains verification token or link"
+      ],
+      "dataExtraction": {
+        "companionAVerifyToken": "Extract token from email body or verification link"
+      }
+    },
+    {
+      "step": 7,
+      "phase": "Setup - Companion A Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "layman": "Verify Companion A's email address to activate their companion account.",
+      "requiredPayloadFields": ["token"],
+      "queryParams": {
+        "token": "{{COMPANION_A_VERIFY_TOKEN}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["success", "verified"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Email verification successful message returned"
+      ]
+    },
+    {
+      "step": 8,
+      "phase": "Setup - Companion A Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "layman": "Log in as Companion A to get their authentication token.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadTemplate": {
+        "email": "{{COMPANION_A_EMAIL}}",
+        "password": "{{COMPANION_A_PASSWORD}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["accessToken", "user"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response contains accessToken",
+        "Response user.role is COMPANION",
+        "Response user.emailVerified is true"
+      ],
+      "dataExtraction": {
+        "companionAAccessToken": "response.body.accessToken"
+      }
+    },
+    {
+      "step": 9,
+      "phase": "Setup - Companion A Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/companion-profiles/me",
+      "layman": "Retrieve Companion A's profile to verify their designation (CAPTAIN or VICE_CAPTAIN) was assigned during signup.",
+      "headers": {
+        "Authorization": "Bearer {{COMPANION_A_ACCESS_TOKEN}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["designation", "isActive"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response designation is either CAPTAIN or VICE_CAPTAIN",
+        "Response isActive is true"
+      ],
+      "dataExtraction": {
+        "companionADesignation": "response.body.designation",
+        "companionAProfileId": "response.body.id"
+      }
+    },
+    {
+      "step": 10,
+      "phase": "Setup - Companion B Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "layman": "Register the second companion user who will be assigned to the booking with the opposite designation from Companion A.",
+      "requiredPayloadFields": ["email", "password", "role"],
+      "payloadTemplate": {
+        "email": "{{COMPANION_B_EMAIL}}",
+        "password": "{{COMPANION_B_PASSWORD}}",
+        "role": "COMPANION"
+      },
+      "expectedResponse": {
+        "status": 201,
+        "bodyContains": ["id", "email", "role"]
+      },
+      "validations": [
+        "Response status is 201",
+        "Response contains user id",
+        "Response email matches request email",
+        "Response role is COMPANION",
+        "emailVerified is false"
+      ],
+      "dataExtraction": {
+        "companionBUserId": "response.body.id",
+        "companionBEmail": "response.body.email"
+      }
+    },
+    {
+      "step": 11,
+      "phase": "Setup - Companion B Identity",
+      "actor": "MailpitClient",
+      "actionType": "waitForEmail",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "layman": "Wait for Companion B's verification email to extract the verification token.",
+      "validations": [
+        "Email received within 30 seconds",
+        "Email recipient matches companion B email",
+        "Email subject contains 'verify' or 'verification'",
+        "Email body contains verification token or link"
+      ],
+      "dataExtraction": {
+        "companionBVerifyToken": "Extract token from email body or verification link"
+      }
+    },
+    {
+      "step": 12,
+      "phase": "Setup - Companion B Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "layman": "Verify Companion B's email address to activate their companion account.",
+      "requiredPayloadFields": ["token"],
+      "queryParams": {
+        "token": "{{COMPANION_B_VERIFY_TOKEN}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["success", "verified"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Email verification successful message returned"
+      ]
+    },
+    {
+      "step": 13,
+      "phase": "Setup - Companion B Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "layman": "Log in as Companion B to get their authentication token.",
+      "requiredPayloadFields": ["email", "password"],
+      "payloadTemplate": {
+        "email": "{{COMPANION_B_EMAIL}}",
+        "password": "{{COMPANION_B_PASSWORD}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["accessToken", "user"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response contains accessToken",
+        "Response user.role is COMPANION",
+        "Response user.emailVerified is true"
+      ],
+      "dataExtraction": {
+        "companionBAccessToken": "response.body.accessToken"
+      }
+    },
+    {
+      "step": 14,
+      "phase": "Setup - Companion B Identity",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/companion-profiles/me",
+      "layman": "Retrieve Companion B's profile to verify their designation was assigned and is opposite to Companion A.",
+      "headers": {
+        "Authorization": "Bearer {{COMPANION_B_ACCESS_TOKEN}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["designation", "isActive"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response designation is either CAPTAIN or VICE_CAPTAIN",
+        "Response designation is different from Companion A's designation",
+        "Response isActive is true"
+      ],
+      "dataExtraction": {
+        "companionBDesignation": "response.body.designation",
+        "companionBProfileId": "response.body.id"
+      }
+    },
+    {
+      "step": 15,
+      "phase": "Venue Selection",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/venues",
+      "layman": "Search for available venues to find a suitable location for the booking.",
+      "headers": {
+        "Authorization": "Bearer {{CLIENT_ACCESS_TOKEN}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["venues"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response contains array of venues",
+        "At least one venue is returned"
+      ],
+      "dataExtraction": {
+        "testVenueId": "Select first venue or venue matching test criteria",
+        "testVenueName": "response.body.venues[0].name"
+      }
+    },
+    {
+      "step": 16,
+      "phase": "Roster Population - Companion A",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "layman": "Populate roster slots for Companion A at the test venue to ensure they have availability for the booking date.",
+      "headers": {
+        "Authorization": "Bearer {{INTERNAL_API_TOKEN}}"
+      },
+      "requiredPayloadFields": ["companionProfileId", "venueId", "startDate", "endDate"],
+      "payloadTemplate": {
+        "companionProfileId": "{{COMPANION_A_PROFILE_ID}}",
+        "venueId": "{{TEST_VENUE_ID}}",
+        "startDate": "2026-05-10",
+        "endDate": "2026-05-11"
+      },
+      "expectedResponse": {
+        "status": 201,
+        "bodyContains": ["slotsCreated"]
+      },
+      "validations": [
+        "Response status is 201",
+        "Response indicates slots were created",
+        "Number of slots created is at least 4"
+      ],
+      "dataExtraction": {
+        "companionASlotsCreated": "response.body.slotsCreated or response.body.count"
+      }
+    },
+    {
+      "step": 17,
+      "phase": "Roster Population - Companion B",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "layman": "Populate roster slots for Companion B at the test venue to ensure they also have availability for the booking date.",
+      "headers": {
+        "Authorization": "Bearer {{INTERNAL_API_TOKEN}}"
+      },
+      "requiredPayloadFields": ["companionProfileId", "venueId", "startDate", "endDate"],
+      "payloadTemplate": {
+        "companionProfileId": "{{COMPANION_B_PROFILE_ID}}",
+        "venueId": "{{TEST_VENUE_ID}}",
+        "startDate": "2026-05-10",
+        "endDate": "2026-05-11"
+      },
+      "expectedResponse": {
+        "status": 201,
+        "bodyContains": ["slotsCreated"]
+      },
+      "validations": [
+        "Response status is 201",
+        "Response indicates slots were created",
+        "Number of slots created is at least 4"
+      ],
+      "dataExtraction": {
+        "companionBSlotsCreated": "response.body.slotsCreated or response.body.count"
+      }
+    },
+    {
+      "step": 18,
+      "phase": "Roster Population - Verification",
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "layman": "Query the database to verify roster slots were created with AVAILABLE status for both companions.",
+      "query": "SELECT id, companionProfileId, venueId, startTime, endTime, status FROM roster_slots WHERE venueId = {{TEST_VENUE_ID}} AND date = '2026-05-10' AND status = 'AVAILABLE'",
+      "validations": [
+        "At least 8 roster slots exist (4 per companion minimum)",
+        "All slots have status AVAILABLE",
+        "Slots exist for both companion profile IDs",
+        "Slots cover timespan including 14:00-16:00"
+      ]
+    },
+    {
+      "step": 19,
+      "phase": "Availability Check",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/availability",
+      "layman": "Check available booking start times for the test venue on the booking date to confirm slots are visible to the client.",
+      "headers": {
+        "Authorization": "Bearer {{CLIENT_ACCESS_TOKEN}}"
+      },
+      "queryParams": {
+        "venueId": "{{TEST_VENUE_ID}}",
+        "date": "2026-05-10"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["availableStartTimes"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response contains array of available start times",
+        "Available start times include 14:00 or nearby times",
+        "At least 2 start times are available"
+      ],
+      "dataExtraction": {
+        "selectedStartTime": "14:00 or first available start time from response"
+      }
+    },
+    {
+      "step": 20,
+      "phase": "Booking Creation",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings",
+      "layman": "Create a booking for the client at the test venue to trigger the allocation engine to assign companions.",
+      "headers": {
+        "Authorization": "Bearer {{CLIENT_ACCESS_TOKEN}}"
+      },
+      "requiredPayloadFields": ["venueId", "startTime"],
+      "payloadTemplate": {
+        "venueId": "{{TEST_VENUE_ID}}",
+        "startTime": "2026-05-10T14:00:00+04:00"
+      },
+      "expectedResponse": {
+        "status": 201,
+        "bodyContains": ["id", "status", "qrCode", "pinCode", "bookingColor"]
+      },
+      "validations": [
+        "Response status is 201",
+        "Response contains booking id",
+        "Response status is CONFIRMED",
+        "Response contains qrCode",
+        "Response contains pinCode",
+        "Response contains bookingColor",
+        "Response contains companionMatchQrCode",
+        "Response contains companionMatchPinCode"
+      ],
+      "dataExtraction": {
+        "bookingId": "response.body.id",
+        "bookingStatus": "response.body.status",
+        "bookingQrCode": "response.body.qrCode",
+        "bookingPinCode": "response.body.pinCode",
+        "bookingColor": "response.body.bookingColor"
+      }
+    },
+    {
+      "step": 21,
+      "phase": "Allocation Verification - Assignment Count",
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "target": "booking_companion_assignments",
+      "layman": "Query the database to verify exactly 2 companion assignments were created for the booking.",
+      "query": "SELECT id, bookingId, companionProfileId, designation, presenceStatus, selfMatchStatus, clientMatchStatus FROM booking_companion_assignments WHERE bookingId = {{BOOKING_ID}}",
+      "validations": [
+        "Exactly 2 assignment records exist",
+        "Both assignments reference the same bookingId",
+        "Both assignments have non-null companionProfileId"
+      ],
+      "dataExtraction": {
+        "assignment1": "First assignment record",
+        "assignment2": "Second assignment record"
+      }
+    },
+    {
+      "step": 22,
+      "phase": "Allocation Verification - Designation Check",
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "target": "booking_companion_assignments",
+      "layman": "Verify that one assignment has designation CAPTAIN and the other has VICE_CAPTAIN to confirm proper duo allocation.",
+      "query": "SELECT designation, COUNT(*) as count FROM booking_companion_assignments WHERE bookingId = {{BOOKING_ID}} GROUP BY designation",
+      "validations": [
+        "One assignment has designation CAPTAIN with count 1",
+        "One assignment has designation VICE_CAPTAIN with count 1",
+        "No other designations exist for this booking"
+      ]
+    },
+    {
+      "step": 23,
+      "phase": "Allocation Verification - Companion Uniqueness",
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "target": "booking_companion_assignments",
+      "layman": "Verify that the two assigned companions are different users, not the same companion assigned twice.",
+      "query": "SELECT DISTINCT companionProfileId FROM booking_companion_assignments WHERE bookingId = {{BOOKING_ID}}",
+      "validations": [
+        "Exactly 2 distinct companionProfileIds exist",
+        "Both companionProfileIds match either Companion A or Companion B profile IDs",
+        "No companion is assigned more than once to the same booking"
+      ]
+    },
+    {
+      "step": 24,
+      "phase": "Allocation Verification - Companion Profile Match",
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "target": "booking_companion_assignments JOIN companion_profiles",
+      "layman": "Join assignment records with companion profiles to verify the designation in the assignment matches the companion's profile designation.",
+      "query": "SELECT bca.designation as assignmentDesignation, cp.designation as profileDesignation, bca.companionProfileId FROM booking_companion_assignments bca JOIN companion_profiles cp ON bca.companionProfileId = cp.id WHERE bca.bookingId = {{BOOKING_ID}}",
+      "validations": [
+        "Each assignment designation matches the companion profile designation",
+        "CAPTAIN assignment references companion profile with designation CAPTAIN",
+        "VICE_CAPTAIN assignment references companion profile with designation VICE_CAPTAIN"
+      ]
+    },
+    {
+      "step": 25,
+      "phase": "Roster Slot Verification - Booking Status",
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "target": "roster_slots",
+      "layman": "Verify that roster slots for both assigned companions were updated to BOOKED status with the booking ID reference.",
+      "query": "SELECT id, companionProfileId, status, bookingId, startTime, endTime FROM roster_slots WHERE companionProfileId IN ({{COMPANION_A_PROFILE_ID}}, {{COMPANION_B_PROFILE_ID}}) AND venueId = {{TEST_VENUE_ID}} AND date = '2026-05-10' AND startTime >= '14:00:00' AND endTime <= '16:00:00'",
+      "validations": [
+        "At least 4 slots per companion have status BOOKED (to cover 2-hour booking)",
+        "All BOOKED slots reference the correct bookingId",
+        "Both companions have slots booked for the same time range",
+        "No slots remain AVAILABLE for the booked time range for these companions"
+      ]
+    },
+    {
+      "step": 26,
+      "phase": "Booking Details Retrieval",
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/{{BOOKING_ID}}/details",
+      "layman": "Retrieve the full booking details via the API to verify all booking information is accessible to the client.",
+      "headers": {
+        "Authorization": "Bearer {{CLIENT_ACCESS_TOKEN}}"
+      },
+      "expectedResponse": {
+        "status": 200,
+        "bodyContains": ["id", "status", "venue", "startTime", "endTime"]
+      },
+      "validations": [
+        "Response status is 200",
+        "Response booking id matches created booking id",
+        "Response status is CONFIRMED",
+        "Response venue information is included",
+        "Response startTime matches 2026-05-10T14:00:00+04:00",
+        "Response endTime is 2 hours after startTime",
+        "Response includes companion assignment information"
+      ]
+    },
+    {
+      "step": 27,
+      "phase": "Final Journey Validation",
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "target": "bookings",
+      "layman": "Perform a final database check to confirm the booking record is in the expected state with all required fields populated.",
+      "query": "SELECT id, clientUserId, venueId, status, startTime, endTime, qrCode, pinCode, bookingColor, companionMatchQrCode, companionMatchPinCode FROM bookings WHERE id = {{BOOKING_ID}}",
+      "validations": [
+        "Booking record exists",
+        "clientUserId matches the client user id",
+        "venueId matches the test venue id",
+        "status is CONFIRMED",
+        "startTime is 2026-05-10 14:00 Asia/Dubai",
+        "endTime is 2026-05-10 16:00 Asia/Dubai",
+        "qrCode is not null",
+        "pinCode is not null",
+        "bookingColor is not null",
+        "companionMatchQrCode is not null",
+        "companionMatchPinCode is not null"
+      ]
+    }
+  ],
+  "postConditions": [
+    "Client user created, verified, and logged in",
+    "Two companion users created, verified, logged in, with opposite designations",
+    "Roster slots populated for both companions at test venue",
+    "Booking created with status CONFIRMED",
+    "Exactly 2 BookingCompanionAssignment records created",
+    "One assignment is CAPTAIN, one is VICE_CAPTAIN",
+    "Both assignments reference different companions",
+    "Assignment designations match companion profile designations",
+    "Roster slots updated to BOOKED with correct bookingId",
+    "Booking details retrievable via API"
+  ],
+  "assertions": {
+    "api": [
+      "All signup requests return 201",
+      "All email verifications return 200",
+      "All login requests return 200 with accessToken",
+      "Venue search returns at least one venue",
+      "Availability check returns available start times",
+      "Booking creation returns 201 with CONFIRMED status",
+      "Booking details retrieval returns 200"
+    ],
+    "db": [
+      "Exactly 2 BookingCompanionAssignment records exist for booking",
+      "One assignment has designation CAPTAIN",
+      "One assignment has designation VICE_CAPTAIN",
+      "Both assignments reference different companionProfileIds",
+      "Assignment designations match companion profile designations",
+      "Roster slots updated to BOOKED status",
+      "Roster slots reference correct bookingId",
+      "Booking record has all required fields populated"
+    ],
+    "mustNotOccur": [
+      "More than 2 companion assignments for the booking",
+      "Same companion assigned twice to the same booking",
+      "Assignment designation mismatch with companion profile designation",
+      "Roster slots remain AVAILABLE after booking creation",
+      "Roster slots reference incorrect bookingId",
+      "Email verification failures",
+      "Login failures for verified users"
+    ]
+  },
+  "cleanupStrategy": {
+    "automatic": false,
+    "manual": [
+      "Delete booking_companion_assignments for booking",
+      "Delete roster_slots for test companions",
+      "Delete booking record",
+      "Delete companion_profiles for test companions",
+      "Delete users for client and companions",
+      "Clear Mailpit messages"
+    ],
+    "note": "Cleanup is optional for isolated test runs. Database may be reset between test executions."
+  },
+  "notes": [
+    "This test validates the core allocation engine requirement: proper CAPTAIN + VICE_CAPTAIN duo assignment",
+    "The test uses Mailpit for email verification, requiring it to be running and accessible",
+    "Internal API endpoints require INTERNAL_API_TOKEN authentication",
+    "Roster population must occur before availability check and booking creation",
+    "The test assumes companions are assigned designations during signup/profile creation",
+    "Booking duration is assumed to be 2 hours (default per SDS)",
+    "Time zone is Asia/Dubai (+04:00) for all timestamp handling",
+    "RUN_ID placeholder must be replaced with unique identifier during test execution",
+    "Test can be run multiple times with different RUN_ID values without conflicts"
+  ]
+}

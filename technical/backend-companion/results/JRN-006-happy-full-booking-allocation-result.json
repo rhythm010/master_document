@@ -1,0 +1,903 @@
+{
+  "runId": "RUN-20260502101816967-JRN-006",
+  "testId": "JRN-006",
+  "status": "FAIL",
+  "startedAt": "2026-05-02T10:18:16.967Z",
+  "endedAt": "2026-05-02T10:18:18.772Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-02T10:18:17.061Z",
+      "endedAt": "2026-05-02T10:18:17.357Z",
+      "durationMs": 296,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-02T10:18:17.357Z",
+      "endedAt": "2026-05-02T10:18:17.367Z",
+      "durationMs": 10,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNGE5MDVlMy1kODJjLTQzM2YtYjJjZi00MTkyM2UwNDIzZDIiLCJlbWFpbCI6ImNsaWVudC1qcm4wMDYtMjAyNjA1MDIxMDE4MTY5NjdAdGVzdC5jb20iLCJwdXJwb3NlIjoiRU1BSUxfVkVSSUZZIiwiaWF0IjoxNzc3NzE3MDk3LCJleHAiOjE3Nzc4MDM0OTd9.DpJXwqKsQ2_Ic3sIJU3m90Ge8aEkilk8QNqoRweADNk",
+      "startedAt": "2026-05-02T10:18:17.367Z",
+      "endedAt": "2026-05-02T10:18:17.371Z",
+      "durationMs": 4,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-02T10:18:17.371Z",
+      "endedAt": "2026-05-02T10:18:17.611Z",
+      "durationMs": 240,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-02T10:18:17.611Z",
+      "endedAt": "2026-05-02T10:18:17.876Z",
+      "durationMs": 265,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 6,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-02T10:18:17.876Z",
+      "endedAt": "2026-05-02T10:18:17.881Z",
+      "durationMs": 5,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5N2EyOGUxOC03ZDhjLTQ1N2EtYjVmNC0xZjY5OThiOTNlZDkiLCJlbWFpbCI6ImNvbXBhbmlvbi1hLWpybjAwNi0yMDI2MDUwMjEwMTgxNjk2N0B0ZXN0LmNvbSIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc3MTcwOTcsImV4cCI6MTc3NzgwMzQ5N30.r5NgR3V_tbHvmMDBCaKv70tMMeEmF1Dm1z51aU_y7D4",
+      "startedAt": "2026-05-02T10:18:17.881Z",
+      "endedAt": "2026-05-02T10:18:17.884Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-02T10:18:17.884Z",
+      "endedAt": "2026-05-02T10:18:18.116Z",
+      "durationMs": 232,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 9,
+      "target": "GET /companion-profiles/me",
+      "startedAt": "2026-05-02T10:18:18.116Z",
+      "endedAt": "2026-05-02T10:18:18.117Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 10,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-02T10:18:18.117Z",
+      "endedAt": "2026-05-02T10:18:18.462Z",
+      "durationMs": 345,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 11,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-02T10:18:18.462Z",
+      "endedAt": "2026-05-02T10:18:18.468Z",
+      "durationMs": 6,
+      "result": "PASS"
+    },
+    {
+      "step": 12,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NTgyYjVhMy1lYmRhLTRjMTEtOTQzOS0yZDJhOTk3N2Y0ZDEiLCJlbWFpbCI6ImNvbXBhbmlvbi1iLWpybjAwNi0yMDI2MDUwMjEwMTgxNjk2N0B0ZXN0LmNvbSIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc3MTcwOTgsImV4cCI6MTc3NzgwMzQ5OH0.mfEx5Gd1BeU-BAop_7QxKfLDdoI2wx-pGorDKqQ01VA",
+      "startedAt": "2026-05-02T10:18:18.468Z",
+      "endedAt": "2026-05-02T10:18:18.471Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 13,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-02T10:18:18.471Z",
+      "endedAt": "2026-05-02T10:18:18.705Z",
+      "durationMs": 234,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 14,
+      "target": "GET /companion-profiles/me",
+      "startedAt": "2026-05-02T10:18:18.705Z",
+      "endedAt": "2026-05-02T10:18:18.706Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 15,
+      "target": "GET /venues?q=a",
+      "startedAt": "2026-05-02T10:18:18.706Z",
+      "endedAt": "2026-05-02T10:18:18.718Z",
+      "durationMs": 12,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 16,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-05-02T10:18:18.718Z",
+      "endedAt": "2026-05-02T10:18:18.720Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 17,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-05-02T10:18:18.720Z",
+      "endedAt": "2026-05-02T10:18:18.720Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 18,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-05-02T10:18:18.720Z",
+      "endedAt": "2026-05-02T10:18:18.722Z",
+      "durationMs": 2,
+      "result": "FAIL"
+    },
+    {
+      "step": 19,
+      "target": "GET /availability?venueId=%7B%7BTEST_VENUE_ID%7D%7D&date=2026-05-10",
+      "startedAt": "2026-05-02T10:18:18.722Z",
+      "endedAt": "2026-05-02T10:18:18.723Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 20,
+      "target": "POST /bookings",
+      "startedAt": "2026-05-02T10:18:18.723Z",
+      "endedAt": "2026-05-02T10:18:18.723Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 21,
+      "target": "DB booking_companion_assignments query",
+      "startedAt": "2026-05-02T10:18:18.723Z",
+      "endedAt": "2026-05-02T10:18:18.734Z",
+      "durationMs": 11,
+      "result": "FAIL"
+    },
+    {
+      "step": 22,
+      "target": "DB booking_companion_assignments query",
+      "startedAt": "2026-05-02T10:18:18.734Z",
+      "endedAt": "2026-05-02T10:18:18.746Z",
+      "durationMs": 12,
+      "result": "FAIL"
+    },
+    {
+      "step": 23,
+      "target": "DB booking_companion_assignments query",
+      "startedAt": "2026-05-02T10:18:18.746Z",
+      "endedAt": "2026-05-02T10:18:18.757Z",
+      "durationMs": 11,
+      "result": "FAIL"
+    },
+    {
+      "step": 24,
+      "target": "DB booking_companion_assignments JOIN companion_profiles query",
+      "startedAt": "2026-05-02T10:18:18.757Z",
+      "endedAt": "2026-05-02T10:18:18.762Z",
+      "durationMs": 5,
+      "result": "FAIL"
+    },
+    {
+      "step": 25,
+      "target": "DB roster_slots query",
+      "startedAt": "2026-05-02T10:18:18.762Z",
+      "endedAt": "2026-05-02T10:18:18.766Z",
+      "durationMs": 4,
+      "result": "FAIL"
+    },
+    {
+      "step": 26,
+      "target": "GET /bookings/c4a905e3-d82c-433f-b2cf-41923e0423d2/details",
+      "startedAt": "2026-05-02T10:18:18.766Z",
+      "endedAt": "2026-05-02T10:18:18.767Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 27,
+      "target": "DB bookings query",
+      "startedAt": "2026-05-02T10:18:18.767Z",
+      "endedAt": "2026-05-02T10:18:18.771Z",
+      "durationMs": 4,
+      "result": "FAIL"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "c4a905e3-d82c-433f-b2cf-41923e0423d2",
+        "role": "CLIENT",
+        "name": "Test Client JRN006",
+        "nickname": "Test Client JRN006",
+        "email": "client-jrn006-20260502101816967@test.com",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-02T10:18:17.315Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Register a new client user account to simulate a customer wanting to make a booking.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-02T10:18:17.061Z",
+        "endedAt": "2026-05-02T10:18:17.357Z",
+        "durationMs": 296,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "MailpitClient",
+      "actionType": "waitForEmail",
+      "layman": "Wait for the verification email to arrive at Mailpit so we can extract the email verification token.",
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-02T10:18:17.357Z",
+        "endedAt": "2026-05-02T10:18:17.367Z",
+        "durationMs": 10,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Verify the client's email address using the token from the email to activate the account.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNGE5MDVlMy1kODJjLTQzM2YtYjJjZi00MTkyM2UwNDIzZDIiLCJlbWFpbCI6ImNsaWVudC1qcm4wMDYtMjAyNjA1MDIxMDE4MTY5NjdAdGVzdC5jb20iLCJwdXJwb3NlIjoiRU1BSUxfVkVSSUZZIiwiaWF0IjoxNzc3NzE3MDk3LCJleHAiOjE3Nzc4MDM0OTd9.DpJXwqKsQ2_Ic3sIJU3m90Ge8aEkilk8QNqoRweADNk",
+        "startedAt": "2026-05-02T10:18:17.367Z",
+        "endedAt": "2026-05-02T10:18:17.371Z",
+        "durationMs": 4,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNGE5MDVlMy1kODJjLTQzM2YtYjJjZi00MTkyM2UwNDIzZDIiLCJyb2xlIjoiQ0xJRU5UIiwiZW1haWwiOiJjbGllbnQtanJuMDA2LTIwMjYwNTAyMTAxODE2OTY3QHRlc3QuY29tIiwiaWF0IjoxNzc3NzE3MDk3LCJleHAiOjE3Nzc3MjA2OTd9.ydY0d8rOrnd7FIFiMbu1AFszgZRH7S7EClKfeBBRG7g",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "c4a905e3-d82c-433f-b2cf-41923e0423d2",
+          "role": "CLIENT",
+          "name": "Test Client JRN006",
+          "nickname": "Test Client JRN006",
+          "email": "client-jrn006-20260502101816967@test.com",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-05-02T10:18:17.315Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Log in as the client to get an authentication token for making authenticated requests.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-02T10:18:17.371Z",
+        "endedAt": "2026-05-02T10:18:17.611Z",
+        "durationMs": 240,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "id": "97a28e18-7d8c-457a-b5f4-1f6998b93ed9",
+        "role": "COMPANION",
+        "name": "Companion Alpha JRN006",
+        "nickname": "Companion Alpha JRN006",
+        "email": "companion-a-jrn006-20260502101816967@test.com",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-02T10:18:17.856Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Register the first companion user who will be assigned to the booking (either as CAPTAIN or VICE_CAPTAIN).",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 5,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-02T10:18:17.611Z",
+        "endedAt": "2026-05-02T10:18:17.876Z",
+        "durationMs": 265,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "MailpitClient",
+      "actionType": "waitForEmail",
+      "layman": "Wait for Companion A's verification email to extract the verification token.",
+      "serviceHit": {
+        "step": 6,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-02T10:18:17.876Z",
+        "endedAt": "2026-05-02T10:18:17.881Z",
+        "durationMs": 5,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Verify Companion A's email address to activate their companion account.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 7,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5N2EyOGUxOC03ZDhjLTQ1N2EtYjVmNC0xZjY5OThiOTNlZDkiLCJlbWFpbCI6ImNvbXBhbmlvbi1hLWpybjAwNi0yMDI2MDUwMjEwMTgxNjk2N0B0ZXN0LmNvbSIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc3MTcwOTcsImV4cCI6MTc3NzgwMzQ5N30.r5NgR3V_tbHvmMDBCaKv70tMMeEmF1Dm1z51aU_y7D4",
+        "startedAt": "2026-05-02T10:18:17.881Z",
+        "endedAt": "2026-05-02T10:18:17.884Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5N2EyOGUxOC03ZDhjLTQ1N2EtYjVmNC0xZjY5OThiOTNlZDkiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb24tYS1qcm4wMDYtMjAyNjA1MDIxMDE4MTY5NjdAdGVzdC5jb20iLCJpYXQiOjE3Nzc3MTcwOTgsImV4cCI6MTc3NzcyMDY5OH0.bVDn5UW-wRjzAmTrz6Jt2ft0uw859Im0ApAlv7Q7tlE",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "97a28e18-7d8c-457a-b5f4-1f6998b93ed9",
+          "role": "COMPANION",
+          "name": "Companion Alpha JRN006",
+          "nickname": "Companion Alpha JRN006",
+          "email": "companion-a-jrn006-20260502101816967@test.com",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-05-02T10:18:17.856Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Log in as Companion A to get their authentication token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 8,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-02T10:18:17.884Z",
+        "endedAt": "2026-05-02T10:18:18.116Z",
+        "durationMs": 232,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 9,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Retrieve Companion A's profile to verify their designation (CAPTAIN or VICE_CAPTAIN) was assigned during signup.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 9,
+        "target": "GET /companion-profiles/me",
+        "startedAt": "2026-05-02T10:18:18.116Z",
+        "endedAt": "2026-05-02T10:18:18.117Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "id": "7582b5a3-ebda-4c11-9439-2d2a9977f4d1",
+        "role": "COMPANION",
+        "name": "Companion Beta JRN006",
+        "nickname": "Companion Beta JRN006",
+        "email": "companion-b-jrn006-20260502101816967@test.com",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-02T10:18:18.446Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Register the second companion user who will be assigned to the booking with the opposite designation from Companion A.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 10,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-02T10:18:18.117Z",
+        "endedAt": "2026-05-02T10:18:18.462Z",
+        "durationMs": 345,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 11,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "MailpitClient",
+      "actionType": "waitForEmail",
+      "layman": "Wait for Companion B's verification email to extract the verification token.",
+      "serviceHit": {
+        "step": 11,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-02T10:18:18.462Z",
+        "endedAt": "2026-05-02T10:18:18.468Z",
+        "durationMs": 6,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 12,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Verify Companion B's email address to activate their companion account.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 12,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NTgyYjVhMy1lYmRhLTRjMTEtOTQzOS0yZDJhOTk3N2Y0ZDEiLCJlbWFpbCI6ImNvbXBhbmlvbi1iLWpybjAwNi0yMDI2MDUwMjEwMTgxNjk2N0B0ZXN0LmNvbSIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc3MTcwOTgsImV4cCI6MTc3NzgwMzQ5OH0.mfEx5Gd1BeU-BAop_7QxKfLDdoI2wx-pGorDKqQ01VA",
+        "startedAt": "2026-05-02T10:18:18.468Z",
+        "endedAt": "2026-05-02T10:18:18.471Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 13,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NTgyYjVhMy1lYmRhLTRjMTEtOTQzOS0yZDJhOTk3N2Y0ZDEiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjb21wYW5pb24tYi1qcm4wMDYtMjAyNjA1MDIxMDE4MTY5NjdAdGVzdC5jb20iLCJpYXQiOjE3Nzc3MTcwOTgsImV4cCI6MTc3NzcyMDY5OH0.5EiEc-tcowW_bLwEsIxsqY37zWgKuBtTubt8K6DdUiw",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "7582b5a3-ebda-4c11-9439-2d2a9977f4d1",
+          "role": "COMPANION",
+          "name": "Companion Beta JRN006",
+          "nickname": "Companion Beta JRN006",
+          "email": "companion-b-jrn006-20260502101816967@test.com",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-05-02T10:18:18.446Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Log in as Companion B to get their authentication token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 13,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-02T10:18:18.471Z",
+        "endedAt": "2026-05-02T10:18:18.705Z",
+        "durationMs": 234,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 14,
+      "result": "PASS",
+      "observed": {
+        "code": "TOKEN_INVALID",
+        "message": "Invalid token"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Retrieve Companion B's profile to verify their designation was assigned and is opposite to Companion A.",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 14,
+        "target": "GET /companion-profiles/me",
+        "startedAt": "2026-05-02T10:18:18.705Z",
+        "endedAt": "2026-05-02T10:18:18.706Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 15,
+      "result": "PASS",
+      "observed": {
+        "items": []
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Search for available venues to find a suitable location for the booking.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 15,
+        "target": "GET /venues?q=a",
+        "startedAt": "2026-05-02T10:18:18.706Z",
+        "endedAt": "2026-05-02T10:18:18.718Z",
+        "durationMs": 12,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 16,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Populate roster slots for Companion A at the test venue to ensure they have availability for the booking date.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 16,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-05-02T10:18:18.718Z",
+        "endedAt": "2026-05-02T10:18:18.720Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 17,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Populate roster slots for Companion B at the test venue to ensure they also have availability for the booking date.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 17,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-05-02T10:18:18.720Z",
+        "endedAt": "2026-05-02T10:18:18.720Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 18,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "layman": "Query the database to verify roster slots were created with AVAILABLE status for both companions.",
+      "serviceHit": {
+        "step": 18,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-05-02T10:18:18.720Z",
+        "endedAt": "2026-05-02T10:18:18.722Z",
+        "durationMs": 2,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 19,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Check available booking start times for the test venue on the booking date to confirm slots are visible to the client.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 19,
+        "target": "GET /availability?venueId=%7B%7BTEST_VENUE_ID%7D%7D&date=2026-05-10",
+        "startedAt": "2026-05-02T10:18:18.722Z",
+        "endedAt": "2026-05-02T10:18:18.723Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 20,
+      "result": "PASS",
+      "observed": {
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /bookings</pre>\n</body>\n</html>\n"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Create a booking for the client at the test venue to trigger the allocation engine to assign companions.",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 20,
+        "target": "POST /bookings",
+        "startedAt": "2026-05-02T10:18:18.723Z",
+        "endedAt": "2026-05-02T10:18:18.723Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 21,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "layman": "Query the database to verify exactly 2 companion assignments were created for the booking.",
+      "serviceHit": {
+        "step": 21,
+        "target": "DB booking_companion_assignments query",
+        "startedAt": "2026-05-02T10:18:18.723Z",
+        "endedAt": "2026-05-02T10:18:18.734Z",
+        "durationMs": 11,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 22,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "layman": "Verify that one assignment has designation CAPTAIN and the other has VICE_CAPTAIN to confirm proper duo allocation.",
+      "serviceHit": {
+        "step": 22,
+        "target": "DB booking_companion_assignments query",
+        "startedAt": "2026-05-02T10:18:18.734Z",
+        "endedAt": "2026-05-02T10:18:18.746Z",
+        "durationMs": 12,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 23,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "layman": "Verify that the two assigned companions are different users, not the same companion assigned twice.",
+      "serviceHit": {
+        "step": 23,
+        "target": "DB booking_companion_assignments query",
+        "startedAt": "2026-05-02T10:18:18.746Z",
+        "endedAt": "2026-05-02T10:18:18.757Z",
+        "durationMs": 11,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 24,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "layman": "Join assignment records with companion profiles to verify the designation in the assignment matches the companion's profile designation.",
+      "serviceHit": {
+        "step": 24,
+        "target": "DB booking_companion_assignments JOIN companion_profiles query",
+        "startedAt": "2026-05-02T10:18:18.757Z",
+        "endedAt": "2026-05-02T10:18:18.762Z",
+        "durationMs": 5,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 25,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "layman": "Verify that roster slots for both assigned companions were updated to BOOKED status with the booking ID reference.",
+      "serviceHit": {
+        "step": 25,
+        "target": "DB roster_slots query",
+        "startedAt": "2026-05-02T10:18:18.762Z",
+        "endedAt": "2026-05-02T10:18:18.766Z",
+        "durationMs": 4,
+        "result": "FAIL"
+      }
+    },
+    {
+      "step": 26,
+      "result": "PASS",
+      "observed": {
+        "raw": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot GET /bookings/c4a905e3-d82c-433f-b2cf-41923e0423d2/details</pre>\n</body>\n</html>\n"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "layman": "Retrieve the full booking details via the API to verify all booking information is accessible to the client.",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 26,
+        "target": "GET /bookings/c4a905e3-d82c-433f-b2cf-41923e0423d2/details",
+        "startedAt": "2026-05-02T10:18:18.766Z",
+        "endedAt": "2026-05-02T10:18:18.767Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 27,
+      "result": "FAIL",
+      "observed": {},
+      "actor": "DatabaseClient",
+      "actionType": "dbQuery",
+      "layman": "Perform a final database check to confirm the booking record is in the expected state with all required fields populated.",
+      "serviceHit": {
+        "step": 27,
+        "target": "DB bookings query",
+        "startedAt": "2026-05-02T10:18:18.767Z",
+        "endedAt": "2026-05-02T10:18:18.771Z",
+        "durationMs": 4,
+        "result": "FAIL"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [
+    {
+      "step": 18,
+      "reason": "Step execution failed",
+      "evidence": "error: syntax error at or near \"{\""
+    },
+    {
+      "step": 18,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 21,
+      "reason": "Step execution failed",
+      "evidence": "error: trailing junk after numeric literal at or near \"433f\""
+    },
+    {
+      "step": 21,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 22,
+      "reason": "Step execution failed",
+      "evidence": "error: trailing junk after numeric literal at or near \"433f\""
+    },
+    {
+      "step": 22,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 23,
+      "reason": "Step execution failed",
+      "evidence": "error: trailing junk after numeric literal at or near \"433f\""
+    },
+    {
+      "step": 23,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 24,
+      "reason": "Step execution failed",
+      "evidence": "error: trailing junk after numeric literal at or near \"433f\""
+    },
+    {
+      "step": 24,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 25,
+      "reason": "Step execution failed",
+      "evidence": "error: syntax error at or near \"{\""
+    },
+    {
+      "step": 25,
+      "reason": "Step failed",
+      "evidence": {}
+    },
+    {
+      "step": 27,
+      "reason": "Step execution failed",
+      "evidence": "error: trailing junk after numeric literal at or near \"433f\""
+    },
+    {
+      "step": 27,
+      "reason": "Step failed",
+      "evidence": {}
+    }
+  ],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
