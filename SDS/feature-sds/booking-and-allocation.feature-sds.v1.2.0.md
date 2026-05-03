@@ -1,7 +1,7 @@
 Feature: Booking & Allocation
 Version: 1.2.0
 Status: Archived
-Previous Version: booking-and-allocation.feature-sds.v1.1.1.md
+Previous Version: (retention-pruned: booking-and-allocation.feature-sds.v1.1.1.md)
 Change Type: MINOR
 Change Summary: Add GET /bookings/{id}/details client-only endpoint with timed companion reveal (T-5h) per master-document/1.3
 Created At: 2026-04-24T03:10:02Z

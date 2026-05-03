@@ -153,6 +153,9 @@ CREATE TABLE bookings (
 	-- Null until the booking is extended (at most once)
 	extended_at timestamptz NULL,
 
+	-- Null until the 15-min near-end notification has fired (session-in-progress)
+	near_end_notified_at timestamptz NULL,
+
 	created_at timestamptz NOT NULL DEFAULT now(),
 
 	CONSTRAINT chk_bookings_time_range CHECK (end_at > start_at),
