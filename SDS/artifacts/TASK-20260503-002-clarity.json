@@ -1,0 +1,178 @@
+{
+  "status": "READY_FOR_FEATURE_SDS",
+  "targetAgent": "feature_sds",
+  "requestType": "new_feature",
+  "sdsOperation": "create_new_feature_sds",
+  "duplicateCheck": {
+    "result": "partially_exists",
+    "details": "master-document/1.6_End_Session_Flow.md contains a narrative description of the rating flow. No Feature SDS exists for ratings yet. The booking-and-allocation Feature SDS references BookingRating as an entity but does not define the rating submission flow, validation rules, or UI contract. This SDS covers the full rating feature from session end through submission for both client and companion."
+  },
+  "rawRequestSummary": "Create a Feature SDS for the Rating Flow covering the client rating screen (duo rating, positive + negative tags, optional stars, min 1 tag, 300-char comment), companion rating flow (mandatory stars), API contract, schema changes, and tag architecture.",
+  "approvedRequirement": "After a session ends (ACTIVE → COMPLETED or client cancels from ACTIVE), both client and companions are redirected to a rating page. The client sees a single screen showing both companions with a 5-star selector (optional), two tag sections (positive and negative, variable list, min 1 tag total required across both sections), and an optional free-text comment (max 300 chars). The X button is only available once at least 1 tag is selected — tapping X skips submission and sends client to home with no API call. Submit calls POST /bookings/:id/rating. Stars are nullable. Tags are stored as text[] (open set, no server-side enum validation). Companions rate the client independently with mandatory stars. Schema changes: stars becomes nullable, comment gets a 300-char constraint.",
+  "businessGoal": "Define the complete rating feature so it can be built as a coherent SDS: client rating UX, companion rating rules, API contract, schema constraints, and the tag architecture pattern that allows future tag additions without migrations.",
+  "owningFeature": {
+    "name": "ratings",
+    "confidence": "high",
+    "reason": "Net-new Feature SDS. No existing Feature SDS owns the rating submission flow. BookingRating entity exists in core SDS and schema but has no feature-level specification."
+  },
+  "sdsContext": {
+    "sdsRoot": "SDS",
+    "coreSds": "SDS/core_sds.md",
+    "schema": "SDS/data-model/schema.md",
+    "template": "SDS/templates/feature_SDS_template.md",
+    "relevantFeatureSds": [
+      "SDS/feature-sds/booking-and-allocation.feature-sds.md"
+    ],
+    "relevantMasterDocSections": [
+      "master-document/1.6_End_Session_Flow.md",
+      "master-document/1.5_Session_In_Progress_Flow.md"
+    ]
+  },
+  "featureSdsInputs": {
+    "affectedFlows": [
+      "client rating (post session end)",
+      "client rating (post session cancel from ACTIVE)",
+      "companion rating (post session end)",
+      "rating submission",
+      "rating skip (client only)"
+    ],
+    "affectedEntities": [
+      "BookingRating",
+      "Booking",
+      "CompanionProfile"
+    ],
+    "businessRules": [
+      "Rating page is shown to client and companions immediately after booking transitions to COMPLETED, or after client cancels from ACTIVE.",
+      "CLIENT RATING — single screen showing both companions (duo context): Captain photo + name, Vice Captain photo + name.",
+      "CLIENT RATING — stars: 1–5, optional. Client can submit without selecting stars. Stored as NULL if not selected.",
+      "CLIENT RATING — positive tags section: label 'What did you appreciate the most?'. Multi-select. Starting set: Professional, Charismatic, Punctual, Excellent Conversation, Attentive, Elegant. List is variable — managed in app config, not DB enum.",
+      "CLIENT RATING — negative tags section: label 'What could have been better?'. Multi-select. Tag list TBD, same variable/configurable pattern as positive tags.",
+      "CLIENT RATING — minimum 1 tag total must be selected across positive and negative sections combined before Submit or X becomes available.",
+      "CLIENT RATING — text comment: optional, max 300 characters. Label: OVERALL SERVICE.",
+      "CLIENT RATING — X button: disabled/non-functional until at least 1 tag is selected. Once 1 tag is selected, X is available. Tapping X sends client to home with NO API call — rating is skipped entirely.",
+      "CLIENT RATING — Submit: calls POST /bookings/:id/rating with stars (nullable), tags (array, min 1), comment (optional string max 300). After submission, client is redirected to home.",
+      "CLIENT RATING — ratingType stored as CLIENT_RATING_DUO (existing enum value, no change at this stage).",
+      "COMPANION RATING — Captain and Vice Captain each rate the client independently on a separate screen.",
+      "COMPANION RATING — stars: mandatory for companions. Cannot submit without selecting stars.",
+      "COMPANION RATING — tags and comment: same structure as client (positive/negative tags, optional text). Same min 1 tag rule applies.",
+      "COMPANION RATING — ratingType stored as COMPANION_RATING_CLIENT.",
+      "COMPANION RATING — mandatory: companions cannot skip. No X button.",
+      "average_rating on companion_profiles is updated after each CLIENT_RATING_DUO submission using AVG(stars) across all non-null CLIENT_RATING_DUO rows for companions on that booking. Note: current model is duo-level; per-companion rating is deferred to a future change.",
+      "BookingRatings are immutable once created (core SDS invariant — preserved).",
+      "A rater may only submit once per booking per ratingType (enforced by existing unique constraint: booking_id, rating_type, rater_user_id)."
+    ],
+    "stateTransitions": [
+      "No booking state transitions occur during rating. Booking is already COMPLETED or CANCELLED when rating page is shown.",
+      "CompanionProfile.averageRating: updated (recalculated) after client submits rating with non-null stars."
+    ],
+    "validations": [
+      "POST /bookings/:id/rating — booking must exist and caller must be the client or an assigned companion.",
+      "POST /bookings/:id/rating — booking status must be COMPLETED, or CANCELLED with bookings.startAt <= now() (guard for cancel-from-ACTIVE).",
+      "POST /bookings/:id/rating — tags array must have length >= 1 (server-side).",
+      "POST /bookings/:id/rating — stars must be 1–5 if provided, or null/omitted (server-side: relax NOT NULL constraint).",
+      "POST /bookings/:id/rating — comment must be <= 300 characters if provided.",
+      "POST /bookings/:id/rating — if caller is COMPANION, stars must not be null (mandatory for companions).",
+      "POST /bookings/:id/rating — duplicate submission: unique constraint (booking_id, rating_type, rater_user_id). On violation, server returns 200 with existing rating payload (retry-safe)."
+    ],
+    "tagArchitecture": {
+      "storagePattern": "Tags stored as text[] in booking_ratings.tags. No server-side enum validation of tag values — open set.",
+      "managementPattern": "Tag list and grouping (positive vs negative) managed in app config/content layer, not in DB.",
+      "extensibility": "Adding or removing tags requires only an app config update. No DB migration needed.",
+      "startingPositiveTags": [
+        "Professional",
+        "Charismatic",
+        "Punctual",
+        "Excellent Conversation",
+        "Attentive",
+        "Elegant"
+      ],
+      "startingNegativeTags": "TBD — to be defined before frontend implementation. Same storage pattern applies."
+    },
+    "apiContract": {
+      "endpoint": "POST /bookings/:id/rating",
+      "payload": {
+        "stars": "integer 1–5 or null (optional for client, required for companion)",
+        "tags": "string[] — min length 1, open set of tag strings",
+        "comment": "string max 300 chars, optional"
+      },
+      "successResponse": "201 with rating id and submitted fields",
+      "callerScope": "Client or assigned companion of the booking"
+    },
+    "schemaChanges": [
+      {
+        "entity": "booking_ratings",
+        "field": "stars",
+        "change": "Change from smallint NOT NULL to smallint NULL. Relax or conditionally apply CHECK (stars BETWEEN 1 AND 5) — check applies only when stars IS NOT NULL."
+      },
+      {
+        "entity": "booking_ratings",
+        "field": "comment",
+        "change": "Add CHECK (comment IS NULL OR char_length(comment) <= 300)."
+      },
+      {
+        "entity": "booking_ratings",
+        "field": "tags",
+        "change": "No structural change. Existing text[] NOT NULL DEFAULT '{}' is correct. Server-side logic enforces array_length >= 1."
+      }
+    ],
+    "dependencies": [
+      "booking-and-allocation Feature SDS (Booking lifecycle, COMPLETED/CANCELLED states)",
+      "session-in-progress Feature SDS (defines when rating page is triggered)",
+      "BookingRating entity already defined in core_sds.md and schema.md — do not redefine, reference only",
+      "booking_rating_type enum: CLIENT_RATING_DUO and COMPANION_RATING_CLIENT already exist — no enum changes in this scope"
+    ],
+    "nonGoals": [
+      "Per-companion individual client rating (CLIENT_RATING_CAPTAIN / CLIENT_RATING_VICE_CAPTAIN) — deferred to a future change",
+      "Negative tag list definition — TBD, placeholder in SDS",
+      "Push notification to prompt rating submission — out of scope",
+      "Admin-facing rating dashboard or aggregation — out of scope",
+      "Rating edit or deletion — BookingRatings are immutable (core SDS invariant)"
+    ]
+  },
+  "versioningHint": {
+    "recommendedChangeType": "MAJOR",
+    "reason": "Net-new Feature SDS. No prior version exists. Introduces new API contract, schema changes, and full flow definition for client and companion rating."
+  },
+  "acceptanceCriteria": [
+    "Client sees rating screen with both companion photos, star selector, positive tag section, negative tag section, text area, X button, and Submit button.",
+    "X button is disabled until at least 1 tag is selected.",
+    "Once 1 tag is selected, X sends client to home with no API call.",
+    "Submit calls POST /bookings/:id/rating. Client redirected to home after submission.",
+    "Stars can be null — submission succeeds without stars selected.",
+    "Tags array with 0 items is rejected by server with 400.",
+    "Comment longer than 300 chars is rejected by server with 400.",
+    "Companion cannot submit without stars — server rejects null stars from COMPANION callers.",
+    "Duplicate rating submission returns 200 with the existing rating payload (retry-safe; no second row created).",
+    "Rating cannot be submitted for a CONFIRMED or ACTIVE booking. For CANCELLED bookings, rating is allowed only when bookings.startAt <= now() (proxy for cancel-from-ACTIVE).",
+    "Tag values are stored as-is — no server-side enum validation.",
+    "averageRating on companion_profiles is recalculated after a client rating with non-null stars is submitted."
+  ],
+  "constraints": [
+    "No enum changes to booking_rating_type in this scope — CLIENT_RATING_DUO stays as-is",
+    "Tag list is open set — no server-side validation of tag string values",
+    "Stars nullable in DB — NOT NULL constraint must be removed from booking_ratings.stars",
+    "Companion rating mandatory stars enforced at application layer, not DB constraint",
+    "BookingRatings immutable — no update or delete endpoints"
+  ],
+  "conflicts": [],
+  "openQuestions": [
+    "Negative tag starting list is TBD — Feature SDS Agent should mark this section as PLACEHOLDER and note it must be defined before frontend implementation."
+  ],
+  "featureSdsAgentInstructions": [
+    "Create a new Feature SDS file: ratings.feature-sds.md",
+    "Apply the feature_SDS_template.md structure fully.",
+    "Reference booking-and-allocation.feature-sds.md for BookingRating entity context. Do not duplicate entity definitions from core SDS.",
+    "Document client and companion rating flows as separate sections.",
+    "Document tag architecture pattern explicitly — open set, app-config managed, no server enum validation.",
+    "Mark negative tag list as PLACEHOLDER with a note that specific tags are TBD before frontend implementation.",
+    "Document schema changes (stars nullable, comment 300-char constraint) with migration implications.",
+    "Do not invent any business rules not listed in this artifact.",
+    "Do not change booking_rating_type enum — CLIENT_RATING_DUO and COMPANION_RATING_CLIENT are used as-is.",
+    "Stop if any conflict arises with core_sds.md invariants (especially BookingRating immutability) and surface it before proceeding."
+  ],
+  "amendments": {
+    "validationStatusCode": 400,
+    "cancelledEligibility": "Allow rating when booking.status=COMPLETED; allow when booking.status=CANCELLED only if bookings.start_at <= now() (proxy for cancel-from-ACTIVE).",
+    "duplicateSubmissionBehavior": "Retry-safe: on unique constraint violation (booking_id, rating_type, rater_user_id), return 200 with existing rating payload (no update)."
+  }
+}
