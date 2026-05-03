@@ -214,7 +214,7 @@ model BookingParticipantLocation {
   longitude Decimal @db.Decimal(10, 7)
   updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
-  booking Booking @relation(fields: [bookingId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id])
 
   @@id([bookingId, userId])

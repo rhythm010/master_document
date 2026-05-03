@@ -61,56 +61,57 @@ export const matchingService = {
     qrCode?: string;
     pinCode?: string;
   }): Promise<ComMatchVerifyResponseDTO> {
-    const result = await prisma.$transaction(async (tx) => {
-      const [booking] = await matchingRepository.lockBookingById(tx, input.bookingId);
-      if (!booking) {
-        throw matchingErrors.bookingNotFound();
-      }
+    const result: { response: ComMatchVerifyResponseDTO; notifyClient: boolean } =
+      await prisma.$transaction(async (tx) => {
+        const [booking] = await matchingRepository.lockBookingById(tx, input.bookingId);
+        if (!booking) {
+          throw matchingErrors.bookingNotFound();
+        }
 
-      const assignments = await matchingRepository.lockAssignmentsForBooking(tx, booking.id);
-      ensureAssignmentPair(assignments);
+        const assignments = await matchingRepository.lockAssignmentsForBooking(tx, booking.id);
+        ensureAssignmentPair(assignments);
 
-      const callerAssignment = ensureCompanionAssigned(assignments, input.companionId);
-      if (callerAssignment.designation !== "VICE_CAPTAIN") {
-        throw matchingErrors.forbidden();
-      }
+        const callerAssignment = ensureCompanionAssigned(assignments, input.companionId);
+        if (callerAssignment.designation !== "VICE_CAPTAIN") {
+          throw matchingErrors.forbidden();
+        }
 
-      if (!areAllPresent(assignments)) {
-        throw matchingErrors.presenceNotArrived();
-      }
+        if (!areAllPresent(assignments)) {
+          throw matchingErrors.presenceNotArrived();
+        }
 
-      if (areAllSelfMatched(assignments)) {
-        ensureBookingAllowsMatchingContext(booking.status);
-        return { response: { bookingId: booking.id, selfMatchStatus: "MATCHED" }, notifyClient: false };
-      }
+        if (areAllSelfMatched(assignments)) {
+          ensureBookingAllowsMatchingContext(booking.status);
+          return { response: { bookingId: booking.id, selfMatchStatus: "MATCHED" }, notifyClient: false };
+        }
 
-      if (booking.status !== "CONFIRMED") {
-        throw matchingErrors.invalidState();
-      }
+        if (booking.status !== "CONFIRMED") {
+          throw matchingErrors.invalidState();
+        }
 
-      if (
-        !isVerificationValid({
-          method: input.verificationMethod,
-          qrCode: input.qrCode,
-          pinCode: input.pinCode,
-          bookingQr: booking.comMatchQrCode,
-          bookingPin: booking.comMatchPinCode
-        })
-      ) {
-        throw matchingErrors.invalidQrOrPin();
-      }
+        if (
+          !isVerificationValid({
+            method: input.verificationMethod,
+            qrCode: input.qrCode,
+            pinCode: input.pinCode,
+            bookingQr: booking.comMatchQrCode,
+            bookingPin: booking.comMatchPinCode
+          })
+        ) {
+          throw matchingErrors.invalidQrOrPin();
+        }
 
-      const updated = await matchingRepository.updateSelfMatchStatusForBooking(
-        tx,
-        booking.id,
-        "MATCHED"
-      );
-      if ((updated.count ?? 0) !== 2) {
-        throw matchingErrors.internalError("Unexpected self match update count");
-      }
+        const updated = await matchingRepository.updateSelfMatchStatusForBooking(
+          tx,
+          booking.id,
+          "MATCHED"
+        );
+        if ((updated.count ?? 0) !== 2) {
+          throw matchingErrors.internalError("Unexpected self match update count");
+        }
 
-      return { response: { bookingId: booking.id, selfMatchStatus: "MATCHED" }, notifyClient: true };
-    });
+        return { response: { bookingId: booking.id, selfMatchStatus: "MATCHED" }, notifyClient: true };
+      });
 
     if (result.notifyClient) {
       logNotificationDeferred("COM_MATCH_VERIFIED", result.response.bookingId);
@@ -423,15 +424,16 @@ function ensureBookingAllowsMatchingContext(status: string) {
   throw matchingErrors.invalidState();
 }
 
-// Ensure both CAPTAIN and VICE_CAPTAIN assignments exist.
-function ensureAssignmentPair(assignments: AssignmentRow[]) {
+// Ensure both CAPTAIN and VICE_CAPTAIN assignments exist and return the original pair.
+function ensureAssignmentPair(assignments: AssignmentRow[]): AssignmentRow[] {
   const captain = assignments.find((row) => row.designation === "CAPTAIN");
   const viceCaptain = assignments.find((row) => row.designation === "VICE_CAPTAIN");
+
   if (!captain || !viceCaptain || assignments.length !== 2) {
     throw matchingErrors.invalidState();
   }
 
-  return { captain, viceCaptain };
+  return assignments;
 }
 
 // Ensure the companion is assigned to the booking.

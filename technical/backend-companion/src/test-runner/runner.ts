@@ -60,6 +60,22 @@ function resolveBearerToken(step: StepDefinition, context: Record<string, unknow
   }
 
   const actor = String(step.actor ?? "").toLowerCase();
+
+  // Role-specific companion actors used in module tests.
+  // NOTE: check vice-captain first because it contains "captain" as a substring.
+  if (actor.includes("vice")) {
+    const token = context["VICE_CAPTAIN_ACCESS_TOKEN"];
+    if (typeof token === "string" && token.length > 0) {
+      return token;
+    }
+  }
+  if (actor.includes("captain")) {
+    const token = context["CAPTAIN_ACCESS_TOKEN"];
+    if (typeof token === "string" && token.length > 0) {
+      return token;
+    }
+  }
+
   if (actor.includes("client")) {
     const token = context["CLIENT_ACCESS_TOKEN"];
     if (typeof token === "string" && token.length > 0) {
