@@ -291,6 +291,19 @@ export async function applySeedData(
           false
         ]);
 
+        // Mint companion Bearer tokens for test-runner API requests.
+        // (User entity seeding currently mints client tokens only.)
+        const companionAccessToken = signBearerToken({ sub: userId, role: "COMPANION", email: companionEmail });
+        if (context["COMPANION_ACCESS_TOKEN"] === undefined) {
+          context["COMPANION_ACCESS_TOKEN"] = companionAccessToken;
+        }
+        if (designation === "CAPTAIN" && context["CAPTAIN_ACCESS_TOKEN"] === undefined) {
+          context["CAPTAIN_ACCESS_TOKEN"] = companionAccessToken;
+        }
+        if (designation === "VICE_CAPTAIN" && context["VICE_CAPTAIN_ACCESS_TOKEN"] === undefined) {
+          context["VICE_CAPTAIN_ACCESS_TOKEN"] = companionAccessToken;
+        }
+
         const profileId = String(pick(rendered, ["id"]) ?? crypto.randomUUID());
         const isActiveRaw = pick(rendered, ["isActive", "is_active"]);
         const isActive = typeof isActiveRaw === "boolean" ? isActiveRaw : Boolean(seed.isActive ?? true);

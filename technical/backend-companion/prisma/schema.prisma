@@ -72,6 +72,7 @@ model User {
   bookingAssignments          BookingCompanionAssignment[] @relation("BookingCompanionAssignmentCompanion")
   bookingRatings              BookingRating[]              @relation("BookingRatingRater")
   companionVenueAssignments   CompanionVenueAssignment[]   @relation("CompanionVenueAssignmentCompanion")
+  bookingParticipantLocations BookingParticipantLocation[]
 
   @@index([role], map: "idx_users_role")
   @@map("users")
@@ -144,6 +145,7 @@ model Booking {
   rosterSlots RosterSlot[]
   assignments BookingCompanionAssignment[]
   ratings     BookingRating[]
+  participantLocations BookingParticipantLocation[]
 
   @@index([venueId, startAt], map: "idx_bookings_venue_time")
   @@index([clientId, status], map: "idx_bookings_client_status")
@@ -203,4 +205,19 @@ model BookingRating {
 
   @@unique([bookingId, ratingType, raterUserId], map: "uq_booking_ratings_once")
   @@map("booking_ratings")
+}
+
+model BookingParticipantLocation {
+  bookingId String @db.Uuid @map("booking_id")
+  userId    String @db.Uuid @map("user_id")
+  latitude  Decimal @db.Decimal(10, 7)
+  longitude Decimal @db.Decimal(10, 7)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@id([bookingId, userId])
+  @@index([bookingId], map: "idx_booking_participant_locations_booking")
+  @@map("booking_participant_locations")
 }

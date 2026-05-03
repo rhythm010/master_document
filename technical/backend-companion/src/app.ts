@@ -6,6 +6,7 @@ import { identityRouter } from "./modules/identity";
 import { companionProfileRouter } from "./modules/companion-profile";
 import { rosterRouter } from "./modules/roster";
 import { bookingRouter } from "./modules/booking";
+import { matchingRouter } from "./modules/matching";
 import { errorHandler } from "./shared/middleware/errorHandler";
 
 export const app = express();
@@ -26,6 +27,7 @@ app.use(identityRouter);
 app.use(companionProfileRouter);
 app.use(rosterRouter);
 app.use(bookingRouter);
+app.use(matchingRouter);
 
 // Centralized error handling for all routes.
 app.use(errorHandler);

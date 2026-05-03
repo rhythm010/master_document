@@ -1,0 +1,30 @@
+{
+  "runId": "RUN-20260430-134135-MOD-MATCHING-008",
+  "testId": "MOD-MATCHING-008",
+  "status": "FAIL",
+  "startedAt": "2026-04-30T13:41:35.579893Z",
+  "endedAt": "2026-04-30T13:41:35.736555Z",
+  "contextRead": [
+    "/SDS/core_sds.md",
+    "/SDS/feature-sds/identity-and-auth.feature-sds.md"
+  ],
+  "testDataValidation": {
+    "designerDataValid": true,
+    "issuesFound": [],
+    "autoCorrectionsApplied": []
+  },
+  "environmentCheck": {
+    "apiServer": "OK",
+    "database": "OK",
+    "mailpit": "OK"
+  },
+  "serviceHitLog": [],
+  "stepResults": [],
+  "assertionSummary": {},
+  "testDataCreated": [],
+  "cleanup": {},
+  "failures": [
+    "Seed data failed: Unsupported seed entity: user"
+  ],
+  "finalSummary": "Test failed: Seed data failed: Unsupported seed entity: user"
+}
