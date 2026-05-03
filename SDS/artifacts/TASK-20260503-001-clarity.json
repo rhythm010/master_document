@@ -1,0 +1,205 @@
+{
+  "status": "READY_FOR_FEATURE_SDS",
+  "targetAgent": "feature_sds",
+  "requestType": "new_feature",
+  "sdsOperation": "create_new_feature_sds",
+  "duplicateCheck": {
+    "result": "partially_exists",
+    "details": "master-document/1.5_Session_In_Progress_Flow.md and 1.6_End_Session_Flow.md contain narrative descriptions of this phase. No Feature SDS exists for session-in-progress yet. The booking-and-allocation Feature SDS covers booking lifecycle but stops before ACTIVE state behavior. This SDS covers everything from ACTIVE → COMPLETED."
+  },
+  "rawRequestSummary": "Create a Feature SDS for the Session In-Progress phase, covering the UI, APIs, schedulers, schema changes, and deferred items that govern the experience from booking status ACTIVE through COMPLETED.",
+  "approvedRequirement": "When a booking transitions to ACTIVE, both client and companions enter the session-in-progress screen. The client sees a countdown timer (time remaining), static companion info (names/photos, no live map), and can extend the session once (+1 hour), end the session early, or trigger SOS. Companions see a countdown timer, their designation, and have access to a Captain↔ViceCaptain-only HTTP-polled chat. A server-side scheduler auto-ends sessions at endAt and sends a 15-min push+in-app notification before session end. A separate scheduler checks companion GPS against venue coordinates every ~60s and alerts admin + companion if breach > 300m. SOS API is a stub for now (returns 200, no side effects). Schema requires two additions: nearEndNotifiedAt on Booking, and a new BookingMessage table.",
+  "businessGoal": "Define the complete in-progress session experience so it can be built as a coherent feature: timer-driven UI, session controls (extend/end/SOS), companion chat, automated session management jobs, and location breach monitoring.",
+  "owningFeature": {
+    "name": "session-in-progress",
+    "confidence": "high",
+    "reason": "This is a net-new feature SDS. No existing Feature SDS owns the ACTIVE booking state behavior."
+  },
+  "sdsContext": {
+    "sdsRoot": "/Users/rhythmkhanna/Docs/COMPANION/master_document/SDS",
+    "coreSds": "/Users/rhythmkhanna/Docs/COMPANION/master_document/SDS/core_sds.md",
+    "schema": "/Users/rhythmkhanna/Docs/COMPANION/master_document/SDS/data_model/schema.md",
+    "template": "/Users/rhythmkhanna/Docs/COMPANION/master_document/SDS/templates/feature_SDS_template.md",
+    "relevantFeatureSds": [
+      "/Users/rhythmkhanna/Docs/COMPANION/master_document/SDS/feature-sds/booking-and-allocation.feature-sds.md"
+    ],
+    "relevantMasterDocSections": [
+      "/Users/rhythmkhanna/Docs/COMPANION/master_document/master-document/1.5_Session_In_Progress_Flow.md",
+      "/Users/rhythmkhanna/Docs/COMPANION/master_document/master-document/1.6_End_Session_Flow.md",
+      "/Users/rhythmkhanna/Docs/COMPANION/master_document/master-document/1.4_Matching_Flow.md"
+    ]
+  },
+  "featureSdsInputs": {
+    "affectedFlows": [
+      "session-in-progress (client view)",
+      "session-in-progress (companion view)",
+      "session extend",
+      "session auto-end",
+      "15-min pre-end notification",
+      "companion 300m breach monitoring",
+      "companion-companion chat",
+      "SOS (stub)"
+    ],
+    "affectedEntities": [
+      "Booking",
+      "BookingCompanionAssignment",
+      "BookingParticipantLocation",
+      "BookingMessage (new)",
+      "Venue"
+    ],
+    "businessRules": [
+      "Session timer is a countdown from total duration (2h standard, 3h if extended). Updates every second on client.",
+      "Extend: adds exactly +1 hour to Booking.endAt. Sets Booking.extendedAt. Guard: status=ACTIVE, extendedAt IS NULL, caller role=CLIENT. Only one extension per booking.",
+      "End session (client): calls existing POST /bookings/:id/cancel. Works on ACTIVE status. Requires confirmation modal. Redirects to rating page.",
+      "SOS: POST /bookings/:id/sos. Stub — returns 200 with no side effects. Full implementation is deferred.",
+      "15-min notification: fires once when endAt - NOW() <= 15 min AND nearEndNotifiedAt IS NULL AND status=ACTIVE. Sets nearEndNotifiedAt on fire. Delivers push notification to device AND in-app banner if app is foregrounded.",
+      "Session auto-end: scheduler checks ACTIVE bookings where endAt <= NOW(). Transitions Booking status ACTIVE → COMPLETED atomically. Redirects both client and companions to rating page.",
+      "300m monitoring: server job runs every ~60s for ACTIVE bookings. Reads last known GPS from BookingParticipantLocation for each companion. Compares to Venue.latitude/longitude using Haversine formula. If > 300m: record breach, alert admin, send push notification to that companion. Client is NOT notified.",
+      "Companion chat: Captain and Vice Captain only. Client cannot read or send. Scoped strictly to bookingId.",
+      "Companion chat polling: app polls GET /bookings/:id/messages every 3-5 seconds while in-progress screen is active.",
+      "Companions cannot extend or end the session. Only the client has those controls.",
+      "Companion sees their designation (Captain / Vice Captain) on in-progress screen.",
+      "Client sees static companion info (name, photo) — no live map, no GPS pins during in-progress phase.",
+      "Notification tapping Yes triggers extend flow. Tapping No is a no-op."
+    ],
+    "stateTransitions": [
+      "Booking: ACTIVE → COMPLETED (auto-end scheduler or time expiry)",
+      "Booking: ACTIVE → CANCELLED (client ends session early via existing cancel API)",
+      "Booking.extendedAt: NULL → timestamp (on extend, once only)",
+      "Booking.nearEndNotifiedAt: NULL → timestamp (on 15-min notification, once only)"
+    ],
+    "validations": [
+      "Extend: reject if status != ACTIVE",
+      "Extend: reject if extendedAt IS NOT NULL",
+      "Extend: reject if caller is not the booking's clientId",
+      "Chat send: reject if caller is not CAPTAIN or VICE_CAPTAIN assigned to this booking",
+      "Chat read: reject if caller is not CAPTAIN or VICE_CAPTAIN assigned to this booking",
+      "SOS: reject if caller is not the client or an assigned companion of the booking",
+      "300m job: skip check if no GPS entry exists for a companion (treat as no breach)"
+    ],
+    "dependencies": [
+      "booking-and-allocation Feature SDS (Booking lifecycle, cancel API already built)",
+      "matching Feature SDS (BookingParticipantLocation table, location upsert endpoint — reused as-is)",
+      "Haversine formula already implemented in matching.service.ts",
+      "POST /bookings/:id/cancel already built and handles ACTIVE status",
+      "POST /bookings/:id/matching/location already built — reused for in-progress GPS posting"
+    ],
+    "nonGoals": [
+      "SOS full implementation (admin alert, emergency contact display, in-app support chat) — deferred",
+      "Real-time WebSocket/SSE chat — HTTP polling only for MVP",
+      "Client-visible live map during in-progress — removed",
+      "Rating page implementation — covered in 1.6, separate feature SDS scope",
+      "Push notification infrastructure design — assumed available, implementation detail left to infra"
+    ]
+  },
+  "newApis": [
+    {
+      "method": "PATCH",
+      "path": "/bookings/:id/extend",
+      "description": "Extend session by +1 hour. Guards: ACTIVE, extendedAt IS NULL, caller=CLIENT",
+      "status": "new"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/:id/sos",
+      "description": "SOS stub. Returns 200. No side effects. Full impl deferred.",
+      "status": "new-stub"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/:id/messages",
+      "description": "Retrieve chat messages for booking. Companion-only.",
+      "status": "new"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/:id/messages",
+      "description": "Send a chat message. Companion-only. Scoped to booking.",
+      "status": "new"
+    },
+    {
+      "method": "GET",
+      "path": "/bookings/:id/session",
+      "description": "Retrieve session timing/status for in-progress countdown (client + assigned companions).",
+      "status": "new"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/:id/matching/location",
+      "description": "Reused as-is from matching phase for in-progress GPS posting.",
+      "status": "existing-reused"
+    },
+    {
+      "method": "POST",
+      "path": "/bookings/:id/cancel",
+      "description": "Reused as-is. Handles ACTIVE → CANCELLED for client end-session.",
+      "status": "existing-reused"
+    }
+  ],
+  "newSchedulers": [
+    {
+      "name": "session-auto-end",
+      "trigger": "endAt <= NOW() on ACTIVE bookings",
+      "action": "Transition ACTIVE → COMPLETED. Trigger rating page redirect for both parties."
+    },
+    {
+      "name": "near-end-notification",
+      "trigger": "endAt - NOW() <= 15 min AND nearEndNotifiedAt IS NULL AND status=ACTIVE",
+      "action": "Send push + in-app notification. Set nearEndNotifiedAt."
+    },
+    {
+      "name": "companion-300m-breach-check",
+      "trigger": "Every ~60s for all ACTIVE bookings",
+      "action": "Read last GPS from BookingParticipantLocation. Haversine check vs Venue. If > 300m: alert admin + push notify companion."
+    }
+  ],
+  "schemaChanges": [
+    {
+      "entity": "Booking",
+      "change": "Add nearEndNotifiedAt (nullable DateTime). Tracks whether 15-min notification has already fired."
+    },
+    {
+      "entity": "BookingMessage (new table)",
+      "fields": ["id", "bookingId", "senderUserId", "content", "createdAt"],
+      "constraints": "bookingId FK → Booking. senderUserId FK → User. No soft delete needed."
+    }
+  ],
+  "versioningHint": {
+    "recommendedChangeType": "MAJOR",
+    "reason": "Net-new Feature SDS. No prior version exists. New APIs, new schedulers, new schema entities."
+  },
+  "acceptanceCriteria": [
+    "Client sees countdown timer from booking duration. Timer adjusts immediately on extend.",
+    "Client can extend session once. Second attempt is rejected.",
+    "Client can end session early. Confirmation modal shown. Redirects to rating page.",
+    "SOS API returns 200 for valid callers. No other behavior.",
+    "Captain and Vice Captain can send and retrieve messages scoped to their booking. Client cannot.",
+    "Session auto-ends at endAt. Booking transitions to COMPLETED.",
+    "15-min notification fires once per booking. Does not re-fire if already sent.",
+    "300m breach detected within ~60s of companion leaving the venue radius. Admin alerted. Companion notified.",
+    "Companions cannot call extend or end-session APIs.",
+    "nearEndNotifiedAt is set on notification fire and prevents duplicate notifications.",
+    "BookingMessage records are scoped to booking and accessible only to assigned companions."
+  ],
+  "constraints": [
+    "No WebSocket or SSE — HTTP polling only for chat",
+    "No live map on in-progress screen — static companion info only",
+    "SOS is a stub — no admin notification logic in this scope",
+    "Extension limit of once per booking enforced by extendedAt field (core SDS invariant)",
+    "Haversine formula already exists in codebase — reuse, do not rewrite",
+    "Push notification infrastructure assumed available — SDS should not define the infra layer"
+  ],
+  "conflicts": [],
+  "openQuestions": [],
+  "featureSdsAgentInstructions": [
+    "Create a new Feature SDS file: session-in-progress.feature-sds.md",
+    "Apply the feature_SDS_template.md structure fully.",
+    "Reference booking-and-allocation.feature-sds.md for booking lifecycle context. Do not duplicate its content.",
+    "Mark SOS as a deferred side note in the SDS — stub API defined, full behavior out of scope.",
+    "Include both client and companion views as separate sections.",
+    "Capture all three schedulers with trigger conditions and actions.",
+    "Capture schema changes (nearEndNotifiedAt, BookingMessage) with field definitions.",
+    "Do not invent any business rules not listed in this artifact.",
+    "Stop if any conflict arises with core_sds.md invariants and surface it before proceeding."
+  ]
+}

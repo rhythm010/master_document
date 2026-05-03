@@ -1,11 +1,11 @@
 Feature: Booking & Allocation
-Version: 2.0.0
+Version: 3.0.0
 Status: Current
-Previous Version: booking-and-allocation.feature-sds.v1.2.0.md
+Previous Version: booking-and-allocation.feature-sds.v2.0.0.md
 Change Type: MAJOR
-Change Summary: Remove timed companion reveal entirely; update GET /bookings/{id}/details to always return companion public info (2 companions, ordered CAPTAIN then VICE_CAPTAIN) for all booking statuses.
+Change Summary: Breaking auth change for POST /bookings/{id}/cancel in ACTIVE: companions no longer authorized.
 Created At: 2026-04-24T03:10:02Z
-Last Edited At: 2026-04-29T15:16:52Z
+Last Edited At: 2026-05-03T08:15:00Z
 Owner: Booking & Allocation Module
 
 Feature: Booking & Allocation
@@ -180,8 +180,9 @@ Error envelope (per Core SDS):
   - Requires Bearer token
   - Allowed for:
     - client who owns the booking
-    - a companion assigned to the booking
     - admin (admin path/authorization handled in Admin module; not specified here)
+    - companion assigned to the booking ONLY when the booking is `CONFIRMED` (pre-session)
+  - For `ACTIVE` bookings (in-session end-early): companions are explicitly NOT allowed; client-only (+ optional admin).
 - `PATCH /bookings/{id}` (INTERNAL ONLY):
   - Requires internalAuth ONLY using header `X-Internal-Token`.
   - Client Bearer tokens MUST NOT authorize this endpoint (this endpoint is not part of the public Bearer-authenticated surface).
@@ -203,10 +204,9 @@ A. `POST /bookings`
 B. `POST /bookings/{id}/cancel`
 - Authenticated user exists.
 - Booking exists.
-- Caller is authorized:
-  - booking owner client, OR
-  - companion assigned to the booking, OR
-  - admin.
+- Caller authorization depends on current booking status:
+  - If booking status is `ACTIVE`: only booking owner client (or admin) is authorized. Companions are NOT authorized.
+  - If booking status is `CONFIRMED`: booking owner client, assigned companion, or admin is authorized.
 - Cancellation behavior is simple:
   - If status is `CONFIRMED` or `ACTIVE`, cancellation transitions to `CANCELLED`.
   - If status is already `CANCELLED`, return idempotent success.
@@ -306,10 +306,12 @@ Failure path (1.2.1.3.5):
 B. `POST /bookings/{id}/cancel`
 1. Authenticate.
 2. Fetch booking by id.
-3. Authorize:
+3. Authorize (status-aware):
    - if caller role=CLIENT: require `bookings.client_id == caller.userId`
-  - if caller role=COMPANION: require caller is assigned to the booking (`booking_companion_assignments.booking_id == booking.id AND companion_id == caller.userId`)
-  - if caller is admin: allowed (admin auth rules handled elsewhere)
+   - if caller role=COMPANION:
+     - require caller is assigned to the booking (`booking_companion_assignments.booking_id == booking.id AND companion_id == caller.userId`)
+     - AND require booking status is `CONFIRMED` (companions cannot end an in-progress `ACTIVE` session)
+   - if caller is admin: allowed (admin auth rules handled elsewhere)
 4. Simple cancellation logic:
   - If booking status is `CANCELLED`: return 200 `{id, status:'CANCELLED'}` (idempotent success).
   - If booking status is `COMPLETED`: return 400 `INVALID_STATE_TRANSITION`.
