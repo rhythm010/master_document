@@ -1,7 +1,7 @@
 import { app } from "./app";
 import { config } from "./shared/config";
 import { logger } from "./shared/logger";
-import { startSessionInProgressSchedulers } from "./shared/schedulers/sessionInProgress.schedulers";
+import { startSessionInProgressSchedulers } from "./modules/session-in-progress";
 
 // Set timezone to GST (Gulf Standard Time - UTC+4)
 process.env.TZ = process.env.TZ || "Asia/Dubai";

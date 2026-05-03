@@ -1,10 +1,12 @@
 import { Prisma } from "@prisma/client";
 
-import { prisma } from "../db/prisma";
-import { logger } from "../logger";
-import { calculateDistanceMeters } from "../utils/geo";
-import { rosterService } from "../../modules/roster";
-import { bookingRepository } from "../../modules/booking/booking.repository";
+import { prisma } from "../../shared/db/prisma";
+import { logger } from "../../shared/logger";
+import { calculateDistanceMeters } from "../../shared/utils/geo";
+import { rosterService } from "../roster";
+import { bookingRepository } from "../booking/booking.repository";
+
+import { sessionInProgressRepository } from "./session-in-progress.repository";
 
 const JOB_INTERVALS_MS = {
   autoEnd: 30_000,
@@ -92,7 +94,7 @@ async function runSessionAutoEndJob() {
 
   for (const row of due) {
     await prisma.$transaction(async (tx) => {
-      const [booking] = await bookingRepository.lockBookingForExtension(tx, row.id);
+      const [booking] = await sessionInProgressRepository.lockBookingForExtension(tx, row.id);
       if (!booking) {
         return;
       }

@@ -45,24 +45,3 @@ export const internalEditBookingBodySchema = z
     }
   );
 
-export const extendBookingParamsSchema = cancelBookingParamsSchema;
-
-export const sosBookingParamsSchema = cancelBookingParamsSchema;
-
-export const bookingSessionParamsSchema = cancelBookingParamsSchema;
-
-export const bookingMessagesParamsSchema = cancelBookingParamsSchema;
-
-export const createBookingMessageSchema = z
-  .object({
-    content: z.string().min(1),
-    senderUserId: z.any().optional()
-  })
-  .superRefine((data, ctx) => {
-    if (data.senderUserId !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "senderUserId is not allowed"
-      });
-    }
-  });

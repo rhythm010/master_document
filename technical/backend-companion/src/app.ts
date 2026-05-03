@@ -6,6 +6,7 @@ import { identityRouter } from "./modules/identity";
 import { companionProfileRouter } from "./modules/companion-profile";
 import { rosterRouter } from "./modules/roster";
 import { bookingRouter } from "./modules/booking";
+import { sessionInProgressRouter } from "./modules/session-in-progress";
 import { matchingRouter } from "./modules/matching";
 import { errorHandler } from "./shared/middleware/errorHandler";
 
@@ -27,6 +28,7 @@ app.use(identityRouter);
 app.use(companionProfileRouter);
 app.use(rosterRouter);
 app.use(bookingRouter);
+app.use(sessionInProgressRouter);
 app.use(matchingRouter);
 
 // Centralized error handling for all routes.

@@ -35,10 +35,6 @@ jest.mock("../booking.repository", () => ({
     createAssignments: jest.fn(),
     lockBookingById: jest.fn(),
     isCompanionAssignedToBooking: jest.fn(),
-    findCompanionAssignmentForBooking: jest.fn(),
-    findBookingAuthContext: jest.fn(),
-    listBookingMessages: jest.fn(),
-    createBookingMessage: jest.fn(),
     updateBookingStatus: jest.fn(),
     findBookingDetailsById: jest.fn(),
     findBookingCompanionPublicInfoByBookingId: jest.fn()
@@ -421,34 +417,4 @@ describe("bookingService", () => {
     ).rejects.toMatchObject({ code: ErrorCodes.FORBIDDEN, statusCode: 403 });
   });
 
-  test("listBookingMessages forbids non captain/vice companions", async () => {
-    const { bookingRepository } = requireMock("../booking.repository");
-
-    bookingRepository.findBookingAuthContext.mockResolvedValue({
-      id: "booking-1",
-      status: "ACTIVE",
-      clientId: "client-1",
-      assignments: [{ companionId: "companion-1", designation: "OBSERVER" as any }]
-    });
-
-    await expect(
-      bookingService.listBookingMessages({ bookingId: "booking-1", companionId: "companion-1" })
-    ).rejects.toMatchObject({ code: ErrorCodes.FORBIDDEN, statusCode: 403 });
-  });
-
-  test("createBookingMessage forbids non captain/vice companions", async () => {
-    const { bookingRepository } = requireMock("../booking.repository");
-
-    bookingRepository.lockBookingById.mockResolvedValue([
-      { id: "booking-1", status: "ACTIVE", clientId: "client-1" }
-    ]);
-
-    bookingRepository.findCompanionAssignmentForBooking.mockResolvedValue({ designation: "OBSERVER" as any });
-
-    await expect(
-      bookingService.createBookingMessage({ bookingId: "booking-1", companionId: "companion-1", content: "hi" })
-    ).rejects.toMatchObject({ code: ErrorCodes.FORBIDDEN, statusCode: 403 });
-
-    expect(bookingRepository.createBookingMessage).not.toHaveBeenCalled();
-  });
 });
