@@ -13,6 +13,8 @@ import { EmailRateLimiter } from "../../shared/utils/rateLimiter";
 import { sendVerificationEmail } from "../../shared/services/emailService";
 import type { UserRole, CompanionDesignation } from "../../shared/types/enums";
 
+import { rosterService } from "../roster";
+
 import { identityRepository } from "./identity.repository";
 import { identityErrors } from "./identity.errors";
 import type { PublicUserDTO, CompanionProfileDTO } from "./identity.types";
@@ -86,7 +88,6 @@ export const identityService = {
       try {
         const venues = await prisma.venue.findMany({ select: { id: true } });
         if (venues.length > 0) {
-          const { rosterService } = await import("../roster/index.js");
           await rosterService.populateForCompanion({
             companionId: user.id,
             venueIds: venues.map((v) => v.id)

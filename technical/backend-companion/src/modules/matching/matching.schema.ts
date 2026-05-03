@@ -32,6 +32,6 @@ export const clientMatchStartSchema = z.object({
 export const matchingLocationSchema = z.object({
   latitude: z.any().optional(),
   longitude: z.any().optional(),
-  gpsPermissionGranted: z.boolean(),
-  gpsEnabled: z.boolean()
+  gpsPermissionGranted: z.boolean().optional(),
+  gpsEnabled: z.boolean().optional()
 });

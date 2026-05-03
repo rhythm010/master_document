@@ -7,6 +7,7 @@ dotenv.config();
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.string().default("3000"),
+  ENABLE_SCHEDULERS: z.string().optional().default("false"),
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string().min(32),
   INTERNAL_API_TOKEN: z.string().min(1),
@@ -29,6 +30,7 @@ const env = envSchema.parse(process.env);
 export const config = {
   nodeEnv: env.NODE_ENV,
   port: Number(env.PORT),
+  enableSchedulers: env.ENABLE_SCHEDULERS === "true",
   databaseUrl: env.DATABASE_URL,
   jwtSecret: env.JWT_SECRET,
   internalApiToken: env.INTERNAL_API_TOKEN,

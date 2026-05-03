@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../../shared/db/prisma";
 import { logger } from "../../shared/logger";
 import type { UserRole } from "../../shared/types/enums";
+import { calculateDistanceMeters } from "../../shared/utils/geo";
 
 import { matchingErrors } from "./matching.errors";
 import { matchingRepository } from "./matching.repository";
@@ -349,10 +350,9 @@ export const matchingService = {
     caller: { id: string; role: UserRole };
     latitude: unknown;
     longitude: unknown;
-    gpsPermissionGranted: boolean;
-    gpsEnabled: boolean;
+    gpsPermissionGranted?: boolean;
+    gpsEnabled?: boolean;
   }): Promise<MatchingLocationResponseDTO> {
-    ensureGpsPermissions(input);
     const coordinates = parseCoordinates({ latitude: input.latitude, longitude: input.longitude });
 
     const booking = await matchingRepository.findBookingById(prisma, input.bookingId);
@@ -361,6 +361,15 @@ export const matchingService = {
     }
 
     ensureBookingAllowsMatchingContext(booking.status);
+
+    if (booking.status === "CONFIRMED") {
+      ensureGpsPermissions(input);
+    } else if (booking.status === "ACTIVE") {
+      const flagsProvided = input.gpsPermissionGranted !== undefined || input.gpsEnabled !== undefined;
+      if (flagsProvided) {
+        ensureGpsPermissions(input);
+      }
+    }
 
     const assignments = await matchingRepository.findAssignmentsForBooking(prisma, booking.id);
     ensureAssignmentPair(assignments);
@@ -477,7 +486,7 @@ function isVerificationValid(input: {
 }
 
 // Enforce GPS permission flags in the request payload.
-function ensureGpsPermissions(input: { gpsPermissionGranted: boolean; gpsEnabled: boolean }) {
+function ensureGpsPermissions(input: { gpsPermissionGranted?: boolean; gpsEnabled?: boolean }) {
   if (!input.gpsPermissionGranted) {
     throw matchingErrors.gpsPermissionRequired();
   }
@@ -541,26 +550,6 @@ function isWithinVenueRadius(input: {
   return distance <= VENUE_RADIUS_METERS;
 }
 
-// Calculate distance between two GPS points using the Haversine formula.
-function calculateDistanceMeters(input: { lat1: number; lon1: number; lat2: number; lon2: number }) {
-  const earthRadiusMeters = 6_371_000;
-  const lat1Rad = toRadians(input.lat1);
-  const lat2Rad = toRadians(input.lat2);
-  const deltaLat = toRadians(input.lat2 - input.lat1);
-  const deltaLon = toRadians(input.lon2 - input.lon1);
-
-  const sinLat = Math.sin(deltaLat / 2);
-  const sinLon = Math.sin(deltaLon / 2);
-  const a =
-    sinLat * sinLat + Math.cos(lat1Rad) * Math.cos(lat2Rad) * sinLon * sinLon;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadiusMeters * c;
-}
-
-// Convert degrees to radians.
-function toRadians(value: number) {
-  return (value * Math.PI) / 180;
-}
 
 // Map assignment rows to a client-facing companion summary.
 function toCompanionSummary(bookingId: string, assignment: AssignmentRow) {

@@ -6,7 +6,7 @@ export async function checkApiHealth(apiBase: string): Promise<string> {
   try {
     const response = await fetch(`${apiBase}/health`);
     return response.ok ? "OK" : "FAIL";
-  } catch (error) {
+  } catch (_error) {
     return "FAIL";
   }
 }
@@ -16,7 +16,7 @@ export async function checkMailpitHealth(mailpitBase: string): Promise<string> {
   try {
     const response = await fetch(`${mailpitBase}/api/v1/messages`);
     return response.ok ? "OK" : "FAIL";
-  } catch (error) {
+  } catch (_error) {
     return "FAIL";
   }
 }
@@ -68,7 +68,7 @@ export async function executeApiRequest(
   let observed: Record<string, unknown> = {};
   try {
     observed = rawText ? (JSON.parse(rawText) as Record<string, unknown>) : {};
-  } catch (error) {
+  } catch (_error) {
     observed = { raw: rawText };
   }
 

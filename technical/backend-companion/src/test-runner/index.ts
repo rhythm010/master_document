@@ -141,7 +141,7 @@ async function main(): Promise<void> {
         fs.mkdirSync(resultsDir, { recursive: true });
 
         console.log(`  Running: ${path.basename(filePath)}`);
-        const report = await runTestFile(filePath, cleanup, pool, cachedEnvCheck);
+        const report = await runTestFile(filePath, cleanup);
         const fileName = `${path.basename(filePath, ".json")}-result.json`;
         const resultPath = path.join(resultsDir, fileName);
         fs.writeFileSync(resultPath, JSON.stringify(report, null, 2));
@@ -179,7 +179,7 @@ async function main(): Promise<void> {
               fs.mkdirSync(resultsDir, { recursive: true });
 
               console.log(`  Running: ${path.basename(filePath)}`);
-              const report = await runTestFile(filePath, cleanup, pool, cachedEnvCheck);
+              const report = await runTestFile(filePath, cleanup);
               const fileName = `${path.basename(filePath, ".json")}-result.json`;
               const resultPath = path.join(resultsDir, fileName);
               fs.writeFileSync(resultPath, JSON.stringify(report, null, 2));

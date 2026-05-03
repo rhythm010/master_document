@@ -73,6 +73,7 @@ model User {
   bookingRatings              BookingRating[]              @relation("BookingRatingRater")
   companionVenueAssignments   CompanionVenueAssignment[]   @relation("CompanionVenueAssignmentCompanion")
   bookingParticipantLocations BookingParticipantLocation[]
+  bookingMessages             BookingMessage[]
 
   @@index([role], map: "idx_users_role")
   @@map("users")
@@ -137,15 +138,17 @@ model Booking {
   bookingColor    String        @map("booking_color")
   comMatchQrCode  String        @map("com_match_qr_code")
   comMatchPinCode String        @map("com_match_pin_code")
-  extendedAt      DateTime?     @map("extended_at") @db.Timestamptz(6)
-  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  extendedAt         DateTime? @map("extended_at") @db.Timestamptz(6)
+  nearEndNotifiedAt  DateTime? @map("near_end_notified_at") @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   client      User   @relation("BookingClient", fields: [clientId], references: [id])
   venue       Venue  @relation(fields: [venueId], references: [id])
-  rosterSlots RosterSlot[]
-  assignments BookingCompanionAssignment[]
-  ratings     BookingRating[]
-  participantLocations BookingParticipantLocation[]
+  rosterSlots           RosterSlot[]
+  assignments           BookingCompanionAssignment[]
+  ratings               BookingRating[]
+  participantLocations  BookingParticipantLocation[]
+  messages              BookingMessage[]
 
   @@index([venueId, startAt], map: "idx_bookings_venue_time")
   @@index([clientId, status], map: "idx_bookings_client_status")
@@ -220,4 +223,18 @@ model BookingParticipantLocation {
   @@id([bookingId, userId])
   @@index([bookingId], map: "idx_booking_participant_locations_booking")
   @@map("booking_participant_locations")
+}
+
+model BookingMessage {
+  id           String   @id @default(uuid()) @db.Uuid
+  bookingId    String   @db.Uuid @map("booking_id")
+  senderUserId String   @db.Uuid @map("sender_user_id")
+  messageText  String   @map("message_text")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sender  User    @relation(fields: [senderUserId], references: [id])
+
+  @@index([bookingId, createdAt, id], map: "idx_booking_messages_booking_time")
+  @@map("booking_messages")
 }
