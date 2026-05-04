@@ -1,0 +1,106 @@
+{
+  "runId": "RUN-20260503225312747-MOD-RATINGS-009",
+  "testId": "MOD-RATINGS-009",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.747Z",
+  "endedAt": "2026-05-03T22:53:12.806Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/11111111-1111-4111-8111-111111111111/rating",
+      "startedAt": "2026-05-03T22:53:12.793Z",
+      "endedAt": "2026-05-03T22:53:12.805Z",
+      "durationMs": 12,
+      "result": "PASS",
+      "statusCode": 404
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.805Z",
+      "endedAt": "2026-05-03T22:53:12.806Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 404
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "BOOKING_NOT_FOUND",
+        "message": "Booking not found"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client attempts to rate a booking that does not exist",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/11111111-1111-4111-8111-111111111111/rating",
+        "startedAt": "2026-05-03T22:53:12.793Z",
+        "endedAt": "2026-05-03T22:53:12.805Z",
+        "durationMs": 12,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "BOOKING_NOT_FOUND",
+          "message": "Booking not found"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 404,
+            "actual": 404,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "BOOKING_NOT_FOUND",
+            "actual": "BOOKING_NOT_FOUND",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects because booking is missing",
+      "statusCode": 404,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.805Z",
+        "endedAt": "2026-05-03T22:53:12.806Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 404
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

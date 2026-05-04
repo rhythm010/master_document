@@ -1,0 +1,106 @@
+{
+  "runId": "RUN-20260503225312851-MOD-RATINGS-012",
+  "testId": "MOD-RATINGS-012",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.851Z",
+  "endedAt": "2026-05-03T22:53:12.875Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/d445edef-0d8f-474d-be1e-f9a5b2f12d7a/rating",
+      "startedAt": "2026-05-03T22:53:12.870Z",
+      "endedAt": "2026-05-03T22:53:12.875Z",
+      "durationMs": 5,
+      "result": "PASS",
+      "statusCode": 403
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.875Z",
+      "endedAt": "2026-05-03T22:53:12.875Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 403
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "FORBIDDEN",
+        "message": "Forbidden"
+      },
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "layman": "Companion attempts to rate a booking they are not assigned to",
+      "statusCode": 403,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/d445edef-0d8f-474d-be1e-f9a5b2f12d7a/rating",
+        "startedAt": "2026-05-03T22:53:12.870Z",
+        "endedAt": "2026-05-03T22:53:12.875Z",
+        "durationMs": 5,
+        "result": "PASS",
+        "statusCode": 403
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "FORBIDDEN",
+          "message": "Forbidden"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 403,
+            "actual": 403,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "FORBIDDEN",
+            "actual": "FORBIDDEN",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects because caller is not authorized",
+      "statusCode": 403,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.875Z",
+        "endedAt": "2026-05-03T22:53:12.875Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 403
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

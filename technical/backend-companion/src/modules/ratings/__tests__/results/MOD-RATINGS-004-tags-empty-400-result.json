@@ -1,0 +1,106 @@
+{
+  "runId": "RUN-20260503225312745-MOD-RATINGS-004",
+  "testId": "MOD-RATINGS-004",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.745Z",
+  "endedAt": "2026-05-03T22:53:12.827Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/9547e5ca-e6cd-414b-8fa3-901f78669382/rating",
+      "startedAt": "2026-05-03T22:53:12.824Z",
+      "endedAt": "2026-05-03T22:53:12.827Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.827Z",
+      "endedAt": "2026-05-03T22:53:12.827Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid input"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client submits rating with no tags",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/9547e5ca-e6cd-414b-8fa3-901f78669382/rating",
+        "startedAt": "2026-05-03T22:53:12.824Z",
+        "endedAt": "2026-05-03T22:53:12.827Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "VALIDATION_ERROR",
+          "message": "Invalid input"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 400,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "VALIDATION_ERROR",
+            "actual": "VALIDATION_ERROR",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects invalid payload",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.827Z",
+        "endedAt": "2026-05-03T22:53:12.827Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

@@ -1,0 +1,1928 @@
+{
+  "runId": "RUN-20260504030049481-JRN-RATINGS-001",
+  "testId": "JRN-RATINGS-001",
+  "status": "PASS",
+  "startedAt": "2026-05-04T03:00:49.482Z",
+  "endedAt": "2026-05-04T03:00:57.983Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-04T03:00:49.546Z",
+      "endedAt": "2026-05-04T03:00:52.942Z",
+      "durationMs": 3396,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-04T03:00:52.942Z",
+      "endedAt": "2026-05-04T03:00:52.963Z",
+      "durationMs": 21,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MDQxZTViOC0wNWYxLTRkN2ItOTlmNy1iYjUzNjMxNGExY2YiLCJlbWFpbCI6ImNsaWVudC5qcm4ucmF0aW5ncysyMDI2MDUwNDAzMDA0OTQ4MkBqb3VybmV5LnRlc3QiLCJwdXJwb3NlIjoiRU1BSUxfVkVSSUZZIiwiaWF0IjoxNzc3ODYzNjQ5LCJleHAiOjE3Nzc5NTAwNDl9.aprundBc7rz3P_FZtjGSr86JHn_nwM5KxLwtTo4wjB8",
+      "startedAt": "2026-05-04T03:00:52.963Z",
+      "endedAt": "2026-05-04T03:00:53.006Z",
+      "durationMs": 43,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-04T03:00:53.006Z",
+      "endedAt": "2026-05-04T03:00:53.025Z",
+      "durationMs": 19,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-04T03:00:53.025Z",
+      "endedAt": "2026-05-04T03:00:56.023Z",
+      "durationMs": 2998,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 6,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-04T03:00:56.023Z",
+      "endedAt": "2026-05-04T03:00:56.029Z",
+      "durationMs": 6,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNGRkZDFmMC03NWVhLTQ3NDktYTk0MS05OTlmMDc0MTdjMzAiLCJlbWFpbCI6ImNhcHRhaW4uanJuLnJhdGluZ3MrMjAyNjA1MDQwMzAwNDk0ODJAam91cm5leS50ZXN0IiwicHVycG9zZSI6IkVNQUlMX1ZFUklGWSIsImlhdCI6MTc3Nzg2MzY1NiwiZXhwIjoxNzc3OTUwMDU2fQ.-iQVo6wAsxLW33acT5kcsTa0XQNjonHtW3drMxO4A9E",
+      "startedAt": "2026-05-04T03:00:56.029Z",
+      "endedAt": "2026-05-04T03:00:56.032Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-04T03:00:56.032Z",
+      "endedAt": "2026-05-04T03:00:56.036Z",
+      "durationMs": 4,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 9,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-04T03:00:56.036Z",
+      "endedAt": "2026-05-04T03:00:57.835Z",
+      "durationMs": 1799,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 10,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-04T03:00:57.835Z",
+      "endedAt": "2026-05-04T03:00:57.848Z",
+      "durationMs": 13,
+      "result": "PASS"
+    },
+    {
+      "step": 11,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxOGIxNDVkZS1iM2QyLTQ3ZjctYTgwMS05YjE0NjQ5NmQ3ZjYiLCJlbWFpbCI6InZpY2UuanJuLnJhdGluZ3MrMjAyNjA1MDQwMzAwNDk0ODJAam91cm5leS50ZXN0IiwicHVycG9zZSI6IkVNQUlMX1ZFUklGWSIsImlhdCI6MTc3Nzg2MzY1NywiZXhwIjoxNzc3OTUwMDU3fQ.NDxPNfxfu5KpYgcFnHkevs1qE4i2dqmUlgGeIEZ-Qt4",
+      "startedAt": "2026-05-04T03:00:57.848Z",
+      "endedAt": "2026-05-04T03:00:57.851Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 12,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-04T03:00:57.851Z",
+      "endedAt": "2026-05-04T03:00:57.854Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 13,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-05-04T03:00:57.854Z",
+      "endedAt": "2026-05-04T03:00:57.856Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 14,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-05-04T03:00:57.856Z",
+      "endedAt": "2026-05-04T03:00:57.856Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 15,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-05-04T03:00:57.857Z",
+      "endedAt": "2026-05-04T03:00:57.870Z",
+      "durationMs": 13,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 16,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-05-04T03:00:57.870Z",
+      "endedAt": "2026-05-04T03:00:57.882Z",
+      "durationMs": 12,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 17,
+      "target": "GET /availability?venueId=d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01&date=2026-05-04",
+      "startedAt": "2026-05-04T03:00:57.882Z",
+      "endedAt": "2026-05-04T03:00:57.895Z",
+      "durationMs": 13,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 18,
+      "target": "POST /bookings",
+      "startedAt": "2026-05-04T03:00:57.895Z",
+      "endedAt": "2026-05-04T03:00:57.913Z",
+      "durationMs": 18,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 19,
+      "target": "DB booking_companion_assignments query",
+      "startedAt": "2026-05-04T03:00:57.913Z",
+      "endedAt": "2026-05-04T03:00:57.914Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 20,
+      "target": "GET /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/com-match/context",
+      "startedAt": "2026-05-04T03:00:57.914Z",
+      "endedAt": "2026-05-04T03:00:57.918Z",
+      "durationMs": 4,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 21,
+      "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/com-match/verify",
+      "startedAt": "2026-05-04T03:00:57.918Z",
+      "endedAt": "2026-05-04T03:00:57.924Z",
+      "durationMs": 6,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 22,
+      "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/client-match/start",
+      "startedAt": "2026-05-04T03:00:57.924Z",
+      "endedAt": "2026-05-04T03:00:57.930Z",
+      "durationMs": 6,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 23,
+      "target": "GET /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/matching/context",
+      "startedAt": "2026-05-04T03:00:57.930Z",
+      "endedAt": "2026-05-04T03:00:57.933Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 24,
+      "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/client-match/verify",
+      "startedAt": "2026-05-04T03:00:57.933Z",
+      "endedAt": "2026-05-04T03:00:57.937Z",
+      "durationMs": 4,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 25,
+      "target": "DB verify bookings",
+      "startedAt": "2026-05-04T03:00:57.937Z",
+      "endedAt": "2026-05-04T03:00:57.939Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 26,
+      "target": "DB bookings query",
+      "startedAt": "2026-05-04T03:00:57.939Z",
+      "endedAt": "2026-05-04T03:00:57.940Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 27,
+      "target": "POST /roster-slots/release",
+      "startedAt": "2026-05-04T03:00:57.940Z",
+      "endedAt": "2026-05-04T03:00:57.965Z",
+      "durationMs": 25,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 28,
+      "target": "DB verify bookings",
+      "startedAt": "2026-05-04T03:00:57.965Z",
+      "endedAt": "2026-05-04T03:00:57.966Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 29,
+      "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/rating",
+      "startedAt": "2026-05-04T03:00:57.966Z",
+      "endedAt": "2026-05-04T03:00:57.973Z",
+      "durationMs": 7,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 30,
+      "target": "API response validation",
+      "startedAt": "2026-05-04T03:00:57.973Z",
+      "endedAt": "2026-05-04T03:00:57.973Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 31,
+      "target": "DB verify booking_ratings",
+      "startedAt": "2026-05-04T03:00:57.973Z",
+      "endedAt": "2026-05-04T03:00:57.974Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 32,
+      "target": "DB verify companion_profiles",
+      "startedAt": "2026-05-04T03:00:57.974Z",
+      "endedAt": "2026-05-04T03:00:57.975Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 33,
+      "target": "DB verify companion_profiles",
+      "startedAt": "2026-05-04T03:00:57.975Z",
+      "endedAt": "2026-05-04T03:00:57.975Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 34,
+      "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/rating",
+      "startedAt": "2026-05-04T03:00:57.975Z",
+      "endedAt": "2026-05-04T03:00:57.978Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 35,
+      "target": "API response validation",
+      "startedAt": "2026-05-04T03:00:57.978Z",
+      "endedAt": "2026-05-04T03:00:57.978Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 36,
+      "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/rating",
+      "startedAt": "2026-05-04T03:00:57.978Z",
+      "endedAt": "2026-05-04T03:00:57.981Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 37,
+      "target": "API response validation",
+      "startedAt": "2026-05-04T03:00:57.981Z",
+      "endedAt": "2026-05-04T03:00:57.981Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 38,
+      "target": "DB verify booking_ratings",
+      "startedAt": "2026-05-04T03:00:57.981Z",
+      "endedAt": "2026-05-04T03:00:57.982Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 39,
+      "target": "DB verify booking_ratings",
+      "startedAt": "2026-05-04T03:00:57.982Z",
+      "endedAt": "2026-05-04T03:00:57.982Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 40,
+      "target": "DB verify companion_profiles",
+      "startedAt": "2026-05-04T03:00:57.982Z",
+      "endedAt": "2026-05-04T03:00:57.983Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 41,
+      "target": "DB verify companion_profiles",
+      "startedAt": "2026-05-04T03:00:57.983Z",
+      "endedAt": "2026-05-04T03:00:57.983Z",
+      "durationMs": 0,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+        "role": "CLIENT",
+        "name": "Journey Client 20260504030049482",
+        "nickname": "journeyclient-ratings-20260504030049482",
+        "email": "client.jrn.ratings+20260504030049482@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-04T03:00:49.652Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT signs up",
+      "layman": "Create the client account that will create a booking and submit the duo rating.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-04T03:00:49.546Z",
+        "endedAt": "2026-05-04T03:00:52.942Z",
+        "durationMs": 3396,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract CLIENT verification token from Mailpit",
+      "layman": "Grab the email verification token so the client can log in.",
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-04T03:00:52.942Z",
+        "endedAt": "2026-05-04T03:00:52.963Z",
+        "durationMs": 21,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify CLIENT email",
+      "layman": "Verify the client email address.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MDQxZTViOC0wNWYxLTRkN2ItOTlmNy1iYjUzNjMxNGExY2YiLCJlbWFpbCI6ImNsaWVudC5qcm4ucmF0aW5ncysyMDI2MDUwNDAzMDA0OTQ4MkBqb3VybmV5LnRlc3QiLCJwdXJwb3NlIjoiRU1BSUxfVkVSSUZZIiwiaWF0IjoxNzc3ODYzNjQ5LCJleHAiOjE3Nzc5NTAwNDl9.aprundBc7rz3P_FZtjGSr86JHn_nwM5KxLwtTo4wjB8",
+        "startedAt": "2026-05-04T03:00:52.963Z",
+        "endedAt": "2026-05-04T03:00:53.006Z",
+        "durationMs": 43,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MDQxZTViOC0wNWYxLTRkN2ItOTlmNy1iYjUzNjMxNGExY2YiLCJyb2xlIjoiQ0xJRU5UIiwiZW1haWwiOiJjbGllbnQuanJuLnJhdGluZ3MrMjAyNjA1MDQwMzAwNDk0ODJAam91cm5leS50ZXN0IiwiaWF0IjoxNzc3ODYzNjUzLCJleHAiOjE3Nzc4NjcyNTN9.NfrJsSd-eeSMbv0adMpJcvkBirVpgJ7GU1EXb3twUVI",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+          "role": "CLIENT",
+          "name": "Journey Client 20260504030049482",
+          "nickname": "journeyclient-ratings-20260504030049482",
+          "email": "client.jrn.ratings+20260504030049482@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-05-04T03:00:49.652Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Login CLIENT",
+      "layman": "Log the client in and store their Bearer token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-04T03:00:53.006Z",
+        "endedAt": "2026-05-04T03:00:53.025Z",
+        "durationMs": 19,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "id": "14ddd1f0-75ea-4749-a941-999f07417c30",
+        "role": "COMPANION",
+        "name": "Journey Captain 20260504030049482",
+        "nickname": "journeycaptain-ratings-20260504030049482",
+        "email": "captain.jrn.ratings+20260504030049482@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-04T03:00:53.075Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION A signs up (intended CAPTAIN)",
+      "layman": "Create the companion that we will force to be the CAPTAIN for deterministic matching steps.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 5,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-04T03:00:53.025Z",
+        "endedAt": "2026-05-04T03:00:56.023Z",
+        "durationMs": 2998,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract COMPANION A verification token from Mailpit",
+      "layman": "Grab companion A's verification token so they can log in.",
+      "serviceHit": {
+        "step": 6,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-04T03:00:56.023Z",
+        "endedAt": "2026-05-04T03:00:56.029Z",
+        "durationMs": 6,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify COMPANION A email",
+      "layman": "Verify companion A's email address.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 7,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNGRkZDFmMC03NWVhLTQ3NDktYTk0MS05OTlmMDc0MTdjMzAiLCJlbWFpbCI6ImNhcHRhaW4uanJuLnJhdGluZ3MrMjAyNjA1MDQwMzAwNDk0ODJAam91cm5leS50ZXN0IiwicHVycG9zZSI6IkVNQUlMX1ZFUklGWSIsImlhdCI6MTc3Nzg2MzY1NiwiZXhwIjoxNzc3OTUwMDU2fQ.-iQVo6wAsxLW33acT5kcsTa0XQNjonHtW3drMxO4A9E",
+        "startedAt": "2026-05-04T03:00:56.029Z",
+        "endedAt": "2026-05-04T03:00:56.032Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNGRkZDFmMC03NWVhLTQ3NDktYTk0MS05OTlmMDc0MTdjMzAiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJjYXB0YWluLmpybi5yYXRpbmdzKzIwMjYwNTA0MDMwMDQ5NDgyQGpvdXJuZXkudGVzdCIsImlhdCI6MTc3Nzg2MzY1NiwiZXhwIjoxNzc3ODY3MjU2fQ.-8FWxcoQmIgc8Lr5U55AI5oyhnxVhulTJu0gtPVnMT0",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "14ddd1f0-75ea-4749-a941-999f07417c30",
+          "role": "COMPANION",
+          "name": "Journey Captain 20260504030049482",
+          "nickname": "journeycaptain-ratings-20260504030049482",
+          "email": "captain.jrn.ratings+20260504030049482@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-05-04T03:00:53.075Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Login COMPANION A",
+      "layman": "Log companion A in and store their Bearer token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 8,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-04T03:00:56.032Z",
+        "endedAt": "2026-05-04T03:00:56.036Z",
+        "durationMs": 4,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 9,
+      "result": "PASS",
+      "observed": {
+        "id": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+        "role": "COMPANION",
+        "name": "Journey Vice 20260504030049482",
+        "nickname": "journeyvice-ratings-20260504030049482",
+        "email": "vice.jrn.ratings+20260504030049482@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-04T03:00:56.041Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION B signs up (intended VICE_CAPTAIN)",
+      "layman": "Create the companion that we will force to be the VICE_CAPTAIN for deterministic matching steps.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 9,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-04T03:00:56.036Z",
+        "endedAt": "2026-05-04T03:00:57.835Z",
+        "durationMs": 1799,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract COMPANION B verification token from Mailpit",
+      "layman": "Grab companion B's verification token so they can log in.",
+      "serviceHit": {
+        "step": 10,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-04T03:00:57.835Z",
+        "endedAt": "2026-05-04T03:00:57.848Z",
+        "durationMs": 13,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 11,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify COMPANION B email",
+      "layman": "Verify companion B's email address.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 11,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxOGIxNDVkZS1iM2QyLTQ3ZjctYTgwMS05YjE0NjQ5NmQ3ZjYiLCJlbWFpbCI6InZpY2UuanJuLnJhdGluZ3MrMjAyNjA1MDQwMzAwNDk0ODJAam91cm5leS50ZXN0IiwicHVycG9zZSI6IkVNQUlMX1ZFUklGWSIsImlhdCI6MTc3Nzg2MzY1NywiZXhwIjoxNzc3OTUwMDU3fQ.NDxPNfxfu5KpYgcFnHkevs1qE4i2dqmUlgGeIEZ-Qt4",
+        "startedAt": "2026-05-04T03:00:57.848Z",
+        "endedAt": "2026-05-04T03:00:57.851Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 12,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxOGIxNDVkZS1iM2QyLTQ3ZjctYTgwMS05YjE0NjQ5NmQ3ZjYiLCJyb2xlIjoiQ09NUEFOSU9OIiwiZW1haWwiOiJ2aWNlLmpybi5yYXRpbmdzKzIwMjYwNTA0MDMwMDQ5NDgyQGpvdXJuZXkudGVzdCIsImlhdCI6MTc3Nzg2MzY1NywiZXhwIjoxNzc3ODY3MjU3fQ.4SnJBgnTh_dNPIIj4WX_lUV6IKRm1wEOkMR7ZOIX9mU",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+          "role": "COMPANION",
+          "name": "Journey Vice 20260504030049482",
+          "nickname": "journeyvice-ratings-20260504030049482",
+          "email": "vice.jrn.ratings+20260504030049482@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-05-04T03:00:56.041Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Login COMPANION B",
+      "layman": "Log companion B in and store their Bearer token.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 12,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-04T03:00:57.851Z",
+        "endedAt": "2026-05-04T03:00:57.854Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 13,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Force COMPANION A designation to CAPTAIN (test-only determinism)",
+      "layman": "Make companion A the CAPTAIN deterministically so we can use CAPTAIN-only matching endpoints.",
+      "serviceHit": {
+        "step": 13,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-05-04T03:00:57.854Z",
+        "endedAt": "2026-05-04T03:00:57.856Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 14,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Force COMPANION B designation to VICE_CAPTAIN (test-only determinism)",
+      "layman": "Make companion B the VICE_CAPTAIN deterministically so we can use VICE-only com-match verification.",
+      "serviceHit": {
+        "step": 14,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-05-04T03:00:57.856Z",
+        "endedAt": "2026-05-04T03:00:57.856Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 15,
+      "result": "PASS",
+      "observed": {
+        "companionId": "14ddd1f0-75ea-4749-a941-999f07417c30",
+        "slotsCreated": 0
+      },
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "description": "Populate roster for CAPTAIN at Ratings venue",
+      "layman": "Attach the CAPTAIN to the journey venue and generate roster availability slots.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 15,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-05-04T03:00:57.857Z",
+        "endedAt": "2026-05-04T03:00:57.870Z",
+        "durationMs": 13,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 16,
+      "result": "PASS",
+      "observed": {
+        "companionId": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+        "slotsCreated": 0
+      },
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "description": "Populate roster for VICE_CAPTAIN at Ratings venue",
+      "layman": "Attach the VICE_CAPTAIN to the journey venue and generate roster availability slots.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 16,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-05-04T03:00:57.870Z",
+        "endedAt": "2026-05-04T03:00:57.882Z",
+        "durationMs": 12,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 17,
+      "result": "PASS",
+      "observed": {
+        "venueId": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+        "date": "2026-05-04",
+        "durationMinutes": 120,
+        "availableStartTimes": [
+          "2026-05-03T20:00:00.000Z",
+          "2026-05-03T20:30:00.000Z",
+          "2026-05-03T21:00:00.000Z",
+          "2026-05-03T21:30:00.000Z",
+          "2026-05-03T22:00:00.000Z",
+          "2026-05-03T22:30:00.000Z",
+          "2026-05-03T23:00:00.000Z",
+          "2026-05-03T23:30:00.000Z",
+          "2026-05-04T00:00:00.000Z",
+          "2026-05-04T00:30:00.000Z",
+          "2026-05-04T01:00:00.000Z",
+          "2026-05-04T01:30:00.000Z",
+          "2026-05-04T02:00:00.000Z",
+          "2026-05-04T02:30:00.000Z",
+          "2026-05-04T03:00:00.000Z",
+          "2026-05-04T03:30:00.000Z",
+          "2026-05-04T04:00:00.000Z",
+          "2026-05-04T04:30:00.000Z",
+          "2026-05-04T05:00:00.000Z",
+          "2026-05-04T05:30:00.000Z",
+          "2026-05-04T06:00:00.000Z",
+          "2026-05-04T06:30:00.000Z",
+          "2026-05-04T07:00:00.000Z",
+          "2026-05-04T07:30:00.000Z",
+          "2026-05-04T08:00:00.000Z",
+          "2026-05-04T08:30:00.000Z",
+          "2026-05-04T09:00:00.000Z",
+          "2026-05-04T09:30:00.000Z",
+          "2026-05-04T10:00:00.000Z",
+          "2026-05-04T10:30:00.000Z",
+          "2026-05-04T11:00:00.000Z",
+          "2026-05-04T11:30:00.000Z",
+          "2026-05-04T12:00:00.000Z",
+          "2026-05-04T12:30:00.000Z",
+          "2026-05-04T13:00:00.000Z",
+          "2026-05-04T13:30:00.000Z",
+          "2026-05-04T14:00:00.000Z",
+          "2026-05-04T14:30:00.000Z",
+          "2026-05-04T15:00:00.000Z",
+          "2026-05-04T15:30:00.000Z",
+          "2026-05-04T16:00:00.000Z",
+          "2026-05-04T16:30:00.000Z",
+          "2026-05-04T17:00:00.000Z",
+          "2026-05-04T17:30:00.000Z"
+        ]
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "Client fetches availability for Ratings venue (today) and selects first startAt",
+      "layman": "Get a valid, bookable start time so booking creation is deterministic and uses real availability.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 17,
+        "target": "GET /availability?venueId=d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01&date=2026-05-04",
+        "startedAt": "2026-05-04T03:00:57.882Z",
+        "endedAt": "2026-05-04T03:00:57.895Z",
+        "durationMs": 13,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 18,
+      "result": "PASS",
+      "observed": {
+        "id": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "status": "CONFIRMED",
+        "clientId": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+        "venueId": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+        "startAt": "2026-05-03T20:00:00.000Z",
+        "endAt": "2026-05-03T22:00:00.000Z",
+        "createdAt": "2026-05-04T03:00:57.901Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "Client creates booking at first available start time",
+      "layman": "Create a booking that allocates a CAPTAIN+VICE duo at the journey venue.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 18,
+        "target": "POST /bookings",
+        "startedAt": "2026-05-04T03:00:57.895Z",
+        "endedAt": "2026-05-04T03:00:57.913Z",
+        "durationMs": 18,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 19,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 2
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Mark both companions ARRIVED (test-only) to unlock com-match context/verify",
+      "layman": "Simulate both companions arriving at the venue so self-match can proceed (com-match requires ARRIVED for both).",
+      "serviceHit": {
+        "step": 19,
+        "target": "DB booking_companion_assignments query",
+        "startedAt": "2026-05-04T03:00:57.913Z",
+        "endedAt": "2026-05-04T03:00:57.914Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 20,
+      "result": "PASS",
+      "observed": {
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "comMatchQrCode": "3ffd83d2-c426-4f36-9f55-2f42107621ee",
+        "comMatchPinCode": "265149"
+      },
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "description": "CAPTAIN fetches com-match context (QR/PIN for self-match)",
+      "layman": "Retrieve the QR/PIN needed for the VICE_CAPTAIN to verify companion-companion self-match.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 20,
+        "target": "GET /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/com-match/context",
+        "startedAt": "2026-05-04T03:00:57.914Z",
+        "endedAt": "2026-05-04T03:00:57.918Z",
+        "durationMs": 4,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 21,
+      "result": "PASS",
+      "observed": {
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "selfMatchStatus": "MATCHED"
+      },
+      "actor": "ViceCaptain",
+      "actionType": "apiRequest",
+      "description": "VICE_CAPTAIN verifies com-match using CAPTAIN QR",
+      "layman": "Complete companion-companion self-match so client match verification becomes allowed.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 21,
+        "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/com-match/verify",
+        "startedAt": "2026-05-04T03:00:57.918Z",
+        "endedAt": "2026-05-04T03:00:57.924Z",
+        "durationMs": 6,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 22,
+      "result": "PASS",
+      "observed": {
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "clientMatchStarted": true,
+        "locationSharingState": "TWO_WAY"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "CLIENT starts client-match (location sharing) within venue radius",
+      "layman": "Start the client matching flow, proving the client is physically at the venue (within radius).",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 22,
+        "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/client-match/start",
+        "startedAt": "2026-05-04T03:00:57.924Z",
+        "endedAt": "2026-05-04T03:00:57.930Z",
+        "durationMs": 6,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 23,
+      "result": "PASS",
+      "observed": {
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "bookingStatus": "CONFIRMED",
+        "bookingColor": "RED",
+        "companions": [
+          {
+            "id": "14ddd1f0-75ea-4749-a941-999f07417c30",
+            "displayName": "journeycaptain-ratings-20260504030049482",
+            "languages": [],
+            "averageRating": 0,
+            "profilePictureUrl": ""
+          },
+          {
+            "id": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+            "displayName": "journeyvice-ratings-20260504030049482",
+            "languages": [],
+            "averageRating": 0,
+            "profilePictureUrl": ""
+          }
+        ],
+        "companionLocations": [],
+        "qrCode": "c1fbe527-ae40-4a14-9027-f878854bb94d",
+        "pinCode": "698997",
+        "clientMatchStarted": true
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "CLIENT fetches matching context to obtain client QR/PIN",
+      "layman": "Fetch the client QR/PIN that the CAPTAIN will use to verify client match.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 23,
+        "target": "GET /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/matching/context",
+        "startedAt": "2026-05-04T03:00:57.930Z",
+        "endedAt": "2026-05-04T03:00:57.933Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 24,
+      "result": "PASS",
+      "observed": {
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "bookingStatus": "ACTIVE",
+        "clientMatchStatus": "CLIENT_MATCHED"
+      },
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "description": "CAPTAIN verifies client-match using client's QR (booking becomes ACTIVE)",
+      "layman": "Complete client-companion matching and transition the booking into ACTIVE state.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 24,
+        "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/client-match/verify",
+        "startedAt": "2026-05-04T03:00:57.933Z",
+        "endedAt": "2026-05-04T03:00:57.937Z",
+        "durationMs": 4,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 25,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "ad60719b-ff24-4e59-9225-42cc5f745866"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "client_id": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+            "venue_id": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+            "start_at": "2026-05-03T20:00:00.000Z",
+            "end_at": "2026-05-03T22:00:00.000Z",
+            "status": "ACTIVE",
+            "qr_code": "c1fbe527-ae40-4a14-9027-f878854bb94d",
+            "pin_code": "698997",
+            "booking_color": "RED",
+            "com_match_qr_code": "3ffd83d2-c426-4f36-9f55-2f42107621ee",
+            "com_match_pin_code": "265149",
+            "extended_at": null,
+            "created_at": "2026-05-04T03:00:57.901Z",
+            "near_end_notified_at": null
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "ACTIVE",
+            "actual": "ACTIVE",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: booking status is ACTIVE after matching",
+      "layman": "Prove the system transitioned the booking to ACTIVE after client-match verify.",
+      "serviceHit": {
+        "step": 25,
+        "target": "DB verify bookings",
+        "startedAt": "2026-05-04T03:00:57.937Z",
+        "endedAt": "2026-05-04T03:00:57.939Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 26,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Simulate end-of-session completion (test-only)",
+      "layman": "Transition booking into a rating-eligible end state (COMPLETED) in a deterministic way for the journey.",
+      "serviceHit": {
+        "step": 26,
+        "target": "DB bookings query",
+        "startedAt": "2026-05-04T03:00:57.939Z",
+        "endedAt": "2026-05-04T03:00:57.940Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 27,
+      "result": "PASS",
+      "observed": {
+        "released": true,
+        "slotsReleased": 2
+      },
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "description": "Release roster slots for the booking (internal)",
+      "layman": "Mirror the auto-end side effect by releasing booked roster slots.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 27,
+        "target": "POST /roster-slots/release",
+        "startedAt": "2026-05-04T03:00:57.940Z",
+        "endedAt": "2026-05-04T03:00:57.965Z",
+        "durationMs": 25,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 28,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"bookings\" WHERE id = $1 LIMIT 50;",
+        "params": [
+          "ad60719b-ff24-4e59-9225-42cc5f745866"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "client_id": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+            "venue_id": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+            "start_at": "2026-05-04T00:59:57.938Z",
+            "end_at": "2026-05-04T02:59:57.938Z",
+            "status": "COMPLETED",
+            "qr_code": "c1fbe527-ae40-4a14-9027-f878854bb94d",
+            "pin_code": "698997",
+            "booking_color": "RED",
+            "com_match_qr_code": "3ffd83d2-c426-4f36-9f55-2f42107621ee",
+            "com_match_pin_code": "265149",
+            "extended_at": null,
+            "created_at": "2026-05-04T03:00:57.901Z",
+            "near_end_notified_at": null
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "status",
+            "expected": "COMPLETED",
+            "actual": "COMPLETED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: booking status is COMPLETED",
+      "layman": "Prove the booking is now in COMPLETED state, which is eligible for rating submission.",
+      "serviceHit": {
+        "step": 28,
+        "target": "DB verify bookings",
+        "startedAt": "2026-05-04T03:00:57.965Z",
+        "endedAt": "2026-05-04T03:00:57.966Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 29,
+      "result": "PASS",
+      "observed": {
+        "id": "68fb2b22-d90b-4d56-9526-70c1cf96fb14",
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "raterUserId": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+        "ratingType": "CLIENT_RATING_DUO",
+        "stars": 5,
+        "tags": [
+          "Professional"
+        ],
+        "comment": "Great duo 20260504030049482",
+        "createdAt": "2026-05-04T03:00:57.965Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "CLIENT submits CLIENT_RATING_DUO (stars present, tags>=1, comment<=300)",
+      "layman": "Submit the client duo rating with non-null stars to trigger average_rating recomputation.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 29,
+        "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/rating",
+        "startedAt": "2026-05-04T03:00:57.966Z",
+        "endedAt": "2026-05-04T03:00:57.973Z",
+        "durationMs": 7,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 30,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 29,
+        "response": {
+          "id": "68fb2b22-d90b-4d56-9526-70c1cf96fb14",
+          "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+          "raterUserId": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+          "ratingType": "CLIENT_RATING_DUO",
+          "stars": 5,
+          "tags": [
+            "Professional"
+          ],
+          "comment": "Great duo 20260504030049482",
+          "createdAt": "2026-05-04T03:00:57.965Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 201,
+            "actual": 201,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "bookingId",
+            "expected": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "actual": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "raterUserId",
+            "expected": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+            "actual": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "CLIENT_RATING_DUO",
+            "actual": "CLIENT_RATING_DUO",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "stars",
+            "expected": 5,
+            "actual": 5,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "tags.0",
+            "expected": "Professional",
+            "actual": "Professional",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "comment",
+            "expected": "Great duo 20260504030049482",
+            "actual": "Great duo 20260504030049482",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "createdAt",
+            "actual": "2026-05-04T03:00:57.965Z",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "description": "API response validation: client rating created",
+      "layman": "Verify the rating creation response payload matches the expected contract and inferred ratingType.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 30,
+        "target": "API response validation",
+        "startedAt": "2026-05-04T03:00:57.973Z",
+        "endedAt": "2026-05-04T03:00:57.973Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 31,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_ratings\" WHERE booking_id = $1 AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = $2 LIMIT 50;",
+        "params": [
+          "ad60719b-ff24-4e59-9225-42cc5f745866",
+          "5041e5b8-05f1-4d7b-99f7-bb536314a1cf"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "68fb2b22-d90b-4d56-9526-70c1cf96fb14",
+            "booking_id": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "rater_user_id": "5041e5b8-05f1-4d7b-99f7-bb536314a1cf",
+            "rating_type": "CLIENT_RATING_DUO",
+            "stars": 5,
+            "tags": [
+              "Professional"
+            ],
+            "comment": "Great duo 20260504030049482",
+            "created_at": "2026-05-04T03:00:57.965Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "rating_type",
+            "expected": "CLIENT_RATING_DUO",
+            "actual": "CLIENT_RATING_DUO",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "stars",
+            "expected": 5,
+            "actual": 5,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "comment",
+            "expected": "Great duo 20260504030049482",
+            "actual": "Great duo 20260504030049482",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: booking_ratings row exists for CLIENT_RATING_DUO",
+      "layman": "Prove the immutable booking_ratings row was created for the client duo rating.",
+      "serviceHit": {
+        "step": 31,
+        "target": "DB verify booking_ratings",
+        "startedAt": "2026-05-04T03:00:57.973Z",
+        "endedAt": "2026-05-04T03:00:57.974Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 32,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"companion_profiles\" WHERE user_id = $1 LIMIT 50;",
+        "params": [
+          "14ddd1f0-75ea-4749-a941-999f07417c30"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "bc94843f-c7c7-41bf-849e-ed8ac7368f3c",
+            "user_id": "14ddd1f0-75ea-4749-a941-999f07417c30",
+            "designation": "CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "5.00"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "average_rating",
+            "expected": "5.00",
+            "actual": "5.00",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: CAPTAIN average_rating recomputed",
+      "layman": "Verify the CAPTAIN companion profile average_rating was updated based on CLIENT_RATING_DUO with non-null stars.",
+      "serviceHit": {
+        "step": 32,
+        "target": "DB verify companion_profiles",
+        "startedAt": "2026-05-04T03:00:57.974Z",
+        "endedAt": "2026-05-04T03:00:57.975Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 33,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"companion_profiles\" WHERE user_id = $1 LIMIT 50;",
+        "params": [
+          "18b145de-b3d2-47f7-a801-9b146496d7f6"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "92294a57-511a-4f49-b879-193c17d08478",
+            "user_id": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+            "designation": "VICE_CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "5.00"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "average_rating",
+            "expected": "5.00",
+            "actual": "5.00",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: VICE_CAPTAIN average_rating recomputed",
+      "layman": "Verify the VICE_CAPTAIN companion profile average_rating was updated based on the same CLIENT_RATING_DUO.",
+      "serviceHit": {
+        "step": 33,
+        "target": "DB verify companion_profiles",
+        "startedAt": "2026-05-04T03:00:57.975Z",
+        "endedAt": "2026-05-04T03:00:57.975Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 34,
+      "result": "PASS",
+      "observed": {
+        "id": "d757b489-8987-4228-adea-fb4caa2821c6",
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "raterUserId": "14ddd1f0-75ea-4749-a941-999f07417c30",
+        "ratingType": "COMPANION_RATING_CLIENT",
+        "stars": 4,
+        "tags": [
+          "Polite"
+        ],
+        "comment": "Client was polite 20260504030049482",
+        "createdAt": "2026-05-04T03:00:57.975Z"
+      },
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "description": "CAPTAIN submits COMPANION_RATING_CLIENT",
+      "layman": "Exercise multi-role usage of the same endpoint: a companion rates the client (stars mandatory).",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 34,
+        "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/rating",
+        "startedAt": "2026-05-04T03:00:57.975Z",
+        "endedAt": "2026-05-04T03:00:57.978Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 35,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 34,
+        "response": {
+          "id": "d757b489-8987-4228-adea-fb4caa2821c6",
+          "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+          "raterUserId": "14ddd1f0-75ea-4749-a941-999f07417c30",
+          "ratingType": "COMPANION_RATING_CLIENT",
+          "stars": 4,
+          "tags": [
+            "Polite"
+          ],
+          "comment": "Client was polite 20260504030049482",
+          "createdAt": "2026-05-04T03:00:57.975Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 201,
+            "actual": 201,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "bookingId",
+            "expected": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "actual": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "raterUserId",
+            "expected": "14ddd1f0-75ea-4749-a941-999f07417c30",
+            "actual": "14ddd1f0-75ea-4749-a941-999f07417c30",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "COMPANION_RATING_CLIENT",
+            "actual": "COMPANION_RATING_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "stars",
+            "expected": 4,
+            "actual": 4,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "tags.0",
+            "expected": "Polite",
+            "actual": "Polite",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "comment",
+            "expected": "Client was polite 20260504030049482",
+            "actual": "Client was polite 20260504030049482",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "createdAt",
+            "actual": "2026-05-04T03:00:57.975Z",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "description": "API response validation: captain rating created",
+      "layman": "Verify the companion rating response uses COMPANION_RATING_CLIENT and includes the expected fields.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 35,
+        "target": "API response validation",
+        "startedAt": "2026-05-04T03:00:57.978Z",
+        "endedAt": "2026-05-04T03:00:57.978Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 36,
+      "result": "PASS",
+      "observed": {
+        "id": "c2555fdd-9617-4e20-b38d-4a7ddc30a406",
+        "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+        "raterUserId": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+        "ratingType": "COMPANION_RATING_CLIENT",
+        "stars": 5,
+        "tags": [
+          "Attentive"
+        ],
+        "comment": "Great client 20260504030049482",
+        "createdAt": "2026-05-04T03:00:57.978Z"
+      },
+      "actor": "ViceCaptain",
+      "actionType": "apiRequest",
+      "description": "VICE_CAPTAIN submits COMPANION_RATING_CLIENT",
+      "layman": "Confirm a second companion can independently rate the client for the same booking.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 36,
+        "target": "POST /bookings/ad60719b-ff24-4e59-9225-42cc5f745866/rating",
+        "startedAt": "2026-05-04T03:00:57.978Z",
+        "endedAt": "2026-05-04T03:00:57.981Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 37,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 36,
+        "response": {
+          "id": "c2555fdd-9617-4e20-b38d-4a7ddc30a406",
+          "bookingId": "ad60719b-ff24-4e59-9225-42cc5f745866",
+          "raterUserId": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+          "ratingType": "COMPANION_RATING_CLIENT",
+          "stars": 5,
+          "tags": [
+            "Attentive"
+          ],
+          "comment": "Great client 20260504030049482",
+          "createdAt": "2026-05-04T03:00:57.978Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 201,
+            "actual": 201,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "bookingId",
+            "expected": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "actual": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "raterUserId",
+            "expected": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+            "actual": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "COMPANION_RATING_CLIENT",
+            "actual": "COMPANION_RATING_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "stars",
+            "expected": 5,
+            "actual": 5,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "tags.0",
+            "expected": "Attentive",
+            "actual": "Attentive",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "comment",
+            "expected": "Great client 20260504030049482",
+            "actual": "Great client 20260504030049482",
+            "pass": true
+          },
+          {
+            "type": "present",
+            "field": "createdAt",
+            "actual": "2026-05-04T03:00:57.978Z",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "description": "API response validation: vice-captain rating created",
+      "layman": "Verify the vice captain rating is created and returned with the correct inferred ratingType.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 37,
+        "target": "API response validation",
+        "startedAt": "2026-05-04T03:00:57.981Z",
+        "endedAt": "2026-05-04T03:00:57.981Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 38,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_ratings\" WHERE booking_id = $1 AND rating_type = 'COMPANION_RATING_CLIENT' AND rater_user_id = $2 LIMIT 50;",
+        "params": [
+          "ad60719b-ff24-4e59-9225-42cc5f745866",
+          "14ddd1f0-75ea-4749-a941-999f07417c30"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "d757b489-8987-4228-adea-fb4caa2821c6",
+            "booking_id": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "rater_user_id": "14ddd1f0-75ea-4749-a941-999f07417c30",
+            "rating_type": "COMPANION_RATING_CLIENT",
+            "stars": 4,
+            "tags": [
+              "Polite"
+            ],
+            "comment": "Client was polite 20260504030049482",
+            "created_at": "2026-05-04T03:00:57.975Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "rating_type",
+            "expected": "COMPANION_RATING_CLIENT",
+            "actual": "COMPANION_RATING_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "stars",
+            "expected": 4,
+            "actual": 4,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: captain COMPANION_RATING_CLIENT row exists",
+      "layman": "Prove the captain's companion rating row exists in booking_ratings.",
+      "serviceHit": {
+        "step": 38,
+        "target": "DB verify booking_ratings",
+        "startedAt": "2026-05-04T03:00:57.981Z",
+        "endedAt": "2026-05-04T03:00:57.982Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 39,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_ratings\" WHERE booking_id = $1 AND rating_type = 'COMPANION_RATING_CLIENT' AND rater_user_id = $2 LIMIT 50;",
+        "params": [
+          "ad60719b-ff24-4e59-9225-42cc5f745866",
+          "18b145de-b3d2-47f7-a801-9b146496d7f6"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "c2555fdd-9617-4e20-b38d-4a7ddc30a406",
+            "booking_id": "ad60719b-ff24-4e59-9225-42cc5f745866",
+            "rater_user_id": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+            "rating_type": "COMPANION_RATING_CLIENT",
+            "stars": 5,
+            "tags": [
+              "Attentive"
+            ],
+            "comment": "Great client 20260504030049482",
+            "created_at": "2026-05-04T03:00:57.978Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "rating_type",
+            "expected": "COMPANION_RATING_CLIENT",
+            "actual": "COMPANION_RATING_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "stars",
+            "expected": 5,
+            "actual": 5,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: vice-captain COMPANION_RATING_CLIENT row exists",
+      "layman": "Prove the vice captain's companion rating row exists in booking_ratings.",
+      "serviceHit": {
+        "step": 39,
+        "target": "DB verify booking_ratings",
+        "startedAt": "2026-05-04T03:00:57.982Z",
+        "endedAt": "2026-05-04T03:00:57.982Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 40,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"companion_profiles\" WHERE user_id = $1 LIMIT 50;",
+        "params": [
+          "14ddd1f0-75ea-4749-a941-999f07417c30"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "bc94843f-c7c7-41bf-849e-ed8ac7368f3c",
+            "user_id": "14ddd1f0-75ea-4749-a941-999f07417c30",
+            "designation": "CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "5.00"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "average_rating",
+            "expected": "5.00",
+            "actual": "5.00",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: companion average_rating unchanged by companion->client ratings (captain)",
+      "layman": "Verify companion_profiles.average_rating remains driven only by CLIENT_RATING_DUO rows (companion ratings should not affect it).",
+      "serviceHit": {
+        "step": 40,
+        "target": "DB verify companion_profiles",
+        "startedAt": "2026-05-04T03:00:57.982Z",
+        "endedAt": "2026-05-04T03:00:57.983Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 41,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"companion_profiles\" WHERE user_id = $1 LIMIT 50;",
+        "params": [
+          "18b145de-b3d2-47f7-a801-9b146496d7f6"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "92294a57-511a-4f49-b879-193c17d08478",
+            "user_id": "18b145de-b3d2-47f7-a801-9b146496d7f6",
+            "designation": "VICE_CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "5.00"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "average_rating",
+            "expected": "5.00",
+            "actual": "5.00",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: companion average_rating unchanged by companion->client ratings (vice)",
+      "layman": "Verify the vice captain's average_rating also remains unchanged after companion ratings.",
+      "serviceHit": {
+        "step": 41,
+        "target": "DB verify companion_profiles",
+        "startedAt": "2026-05-04T03:00:57.983Z",
+        "endedAt": "2026-05-04T03:00:57.983Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

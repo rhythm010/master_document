@@ -1,0 +1,708 @@
+{
+  "runId": "RUN-20260504030057984-JRN-RATINGS-002",
+  "testId": "JRN-RATINGS-002",
+  "status": "PASS",
+  "startedAt": "2026-05-04T03:00:57.984Z",
+  "endedAt": "2026-05-04T03:01:01.826Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-04T03:00:57.993Z",
+      "endedAt": "2026-05-04T03:00:58.010Z",
+      "durationMs": 17,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-04T03:00:58.010Z",
+      "endedAt": "2026-05-04T03:00:58.013Z",
+      "durationMs": 3,
+      "result": "PASS"
+    },
+    {
+      "step": 3,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ODk5OGE3ZC04MmViLTQyYzItOTJmMC01YTI5ZDU5OTMyOWEiLCJlbWFpbCI6ImNsaWVudC5qcm4ucmF0aW5ncy5uZWcrMjAyNjA1MDQwMzAwNTc5ODRAam91cm5leS50ZXN0IiwicHVycG9zZSI6IkVNQUlMX1ZFUklGWSIsImlhdCI6MTc3Nzg2MzY1NywiZXhwIjoxNzc3OTUwMDU3fQ.KGULge17Gfb7m7zWArxN05ipWl4-ThmDxGqZqoeXQnc",
+      "startedAt": "2026-05-04T03:00:58.013Z",
+      "endedAt": "2026-05-04T03:00:58.015Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 4,
+      "target": "POST /auth/login",
+      "startedAt": "2026-05-04T03:00:58.015Z",
+      "endedAt": "2026-05-04T03:00:58.018Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 5,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-04T03:00:58.018Z",
+      "endedAt": "2026-05-04T03:00:59.923Z",
+      "durationMs": 1905,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 6,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-04T03:00:59.923Z",
+      "endedAt": "2026-05-04T03:00:59.927Z",
+      "durationMs": 4,
+      "result": "PASS"
+    },
+    {
+      "step": 7,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNDJlOWQwNy0xOTBmLTRiZDQtYTdiMC1lOTY4OTE4NmQ3OTgiLCJlbWFpbCI6ImNhcHRhaW4uanJuLnJhdGluZ3MubmVnKzIwMjYwNTA0MDMwMDU3OTg0QGpvdXJuZXkudGVzdCIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc4NjM2NTksImV4cCI6MTc3Nzk1MDA1OX0.q8HZibiMr2vczvjNTf1hAJ_QXJzpEHi90bxZgcp2NKc",
+      "startedAt": "2026-05-04T03:00:59.927Z",
+      "endedAt": "2026-05-04T03:00:59.929Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 8,
+      "target": "POST /auth/signup",
+      "startedAt": "2026-05-04T03:00:59.929Z",
+      "endedAt": "2026-05-04T03:01:01.775Z",
+      "durationMs": 1846,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 9,
+      "target": "http://localhost:8025/api/v1/messages",
+      "startedAt": "2026-05-04T03:01:01.775Z",
+      "endedAt": "2026-05-04T03:01:01.778Z",
+      "durationMs": 3,
+      "result": "PASS"
+    },
+    {
+      "step": 10,
+      "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxOWI1NWI4Yy01YzAxLTQ4ZWUtYTVlNC05OGYwNTIwNTZmNzkiLCJlbWFpbCI6InZpY2UuanJuLnJhdGluZ3MubmVnKzIwMjYwNTA0MDMwMDU3OTg0QGpvdXJuZXkudGVzdCIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc4NjM2NjEsImV4cCI6MTc3Nzk1MDA2MX0.45egmvg5nSUcea0Pexl9gVasJXXjf2EmZuNLZ-TScoA",
+      "startedAt": "2026-05-04T03:01:01.778Z",
+      "endedAt": "2026-05-04T03:01:01.781Z",
+      "durationMs": 3,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 11,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-05-04T03:01:01.781Z",
+      "endedAt": "2026-05-04T03:01:01.783Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 12,
+      "target": "DB companion_profiles query",
+      "startedAt": "2026-05-04T03:01:01.783Z",
+      "endedAt": "2026-05-04T03:01:01.783Z",
+      "durationMs": 0,
+      "result": "PASS"
+    },
+    {
+      "step": 13,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-05-04T03:01:01.783Z",
+      "endedAt": "2026-05-04T03:01:01.796Z",
+      "durationMs": 13,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 14,
+      "target": "POST /roster-slots/populate-for-companion",
+      "startedAt": "2026-05-04T03:01:01.796Z",
+      "endedAt": "2026-05-04T03:01:01.808Z",
+      "durationMs": 12,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 15,
+      "target": "GET /availability?venueId=b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30&date=2026-05-04",
+      "startedAt": "2026-05-04T03:01:01.808Z",
+      "endedAt": "2026-05-04T03:01:01.816Z",
+      "durationMs": 8,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 16,
+      "target": "POST /bookings",
+      "startedAt": "2026-05-04T03:01:01.816Z",
+      "endedAt": "2026-05-04T03:01:01.823Z",
+      "durationMs": 7,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 17,
+      "target": "POST /bookings/e5a523c8-95df-43cd-9bed-3a5ed2bc01d9/rating",
+      "startedAt": "2026-05-04T03:01:01.823Z",
+      "endedAt": "2026-05-04T03:01:01.825Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 18,
+      "target": "API response validation",
+      "startedAt": "2026-05-04T03:01:01.825Z",
+      "endedAt": "2026-05-04T03:01:01.825Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 19,
+      "target": "DB verify booking_ratings",
+      "startedAt": "2026-05-04T03:01:01.825Z",
+      "endedAt": "2026-05-04T03:01:01.826Z",
+      "durationMs": 1,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "58998a7d-82eb-42c2-92f0-5a29d599329a",
+        "role": "CLIENT",
+        "name": "Journey Client Neg 20260504030057984",
+        "nickname": "journeyclient-ratings-neg-20260504030057984",
+        "email": "client.jrn.ratings.neg+20260504030057984@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-04T03:00:57.997Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "CLIENT signs up",
+      "layman": "Create a client account for the negative eligibility check.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-04T03:00:57.993Z",
+        "endedAt": "2026-05-04T03:00:58.010Z",
+        "durationMs": 17,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract CLIENT verification token from Mailpit",
+      "layman": "Verify email so login succeeds.",
+      "serviceHit": {
+        "step": 2,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-04T03:00:58.010Z",
+        "endedAt": "2026-05-04T03:00:58.013Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify CLIENT email",
+      "layman": "Verify the client email address.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 3,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ODk5OGE3ZC04MmViLTQyYzItOTJmMC01YTI5ZDU5OTMyOWEiLCJlbWFpbCI6ImNsaWVudC5qcm4ucmF0aW5ncy5uZWcrMjAyNjA1MDQwMzAwNTc5ODRAam91cm5leS50ZXN0IiwicHVycG9zZSI6IkVNQUlMX1ZFUklGWSIsImlhdCI6MTc3Nzg2MzY1NywiZXhwIjoxNzc3OTUwMDU3fQ.KGULge17Gfb7m7zWArxN05ipWl4-ThmDxGqZqoeXQnc",
+        "startedAt": "2026-05-04T03:00:58.013Z",
+        "endedAt": "2026-05-04T03:00:58.015Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ODk5OGE3ZC04MmViLTQyYzItOTJmMC01YTI5ZDU5OTMyOWEiLCJyb2xlIjoiQ0xJRU5UIiwiZW1haWwiOiJjbGllbnQuanJuLnJhdGluZ3MubmVnKzIwMjYwNTA0MDMwMDU3OTg0QGpvdXJuZXkudGVzdCIsImlhdCI6MTc3Nzg2MzY1OCwiZXhwIjoxNzc3ODY3MjU4fQ.F5Vns1Cc0f0XygfnNnIFdB3O6mNBlCkuH6_sIFGZCkk",
+        "tokenType": "Bearer",
+        "expiresInSeconds": 3600,
+        "user": {
+          "id": "58998a7d-82eb-42c2-92f0-5a29d599329a",
+          "role": "CLIENT",
+          "name": "Journey Client Neg 20260504030057984",
+          "nickname": "journeyclient-ratings-neg-20260504030057984",
+          "email": "client.jrn.ratings.neg+20260504030057984@journey.test",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-05-04T03:00:57.997Z"
+        }
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Login CLIENT",
+      "layman": "Log in and obtain Bearer token for rating attempt.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 4,
+        "target": "POST /auth/login",
+        "startedAt": "2026-05-04T03:00:58.015Z",
+        "endedAt": "2026-05-04T03:00:58.018Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "id": "d42e9d07-190f-4bd4-a7b0-e9689186d798",
+        "role": "COMPANION",
+        "name": "Journey Captain Neg 20260504030057984",
+        "nickname": "journeycaptain-ratings-neg-20260504030057984",
+        "email": "captain.jrn.ratings.neg+20260504030057984@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-04T03:00:58.023Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION A signs up",
+      "layman": "Create first companion so roster can form a duo.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 5,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-04T03:00:58.018Z",
+        "endedAt": "2026-05-04T03:00:59.923Z",
+        "durationMs": 1905,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract COMPANION A verification token",
+      "layman": "Verify companion A email.",
+      "serviceHit": {
+        "step": 6,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-04T03:00:59.923Z",
+        "endedAt": "2026-05-04T03:00:59.927Z",
+        "durationMs": 4,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify COMPANION A email",
+      "layman": "Verify companion A email so they are fully provisioned.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 7,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNDJlOWQwNy0xOTBmLTRiZDQtYTdiMC1lOTY4OTE4NmQ3OTgiLCJlbWFpbCI6ImNhcHRhaW4uanJuLnJhdGluZ3MubmVnKzIwMjYwNTA0MDMwMDU3OTg0QGpvdXJuZXkudGVzdCIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc4NjM2NTksImV4cCI6MTc3Nzk1MDA1OX0.q8HZibiMr2vczvjNTf1hAJ_QXJzpEHi90bxZgcp2NKc",
+        "startedAt": "2026-05-04T03:00:59.927Z",
+        "endedAt": "2026-05-04T03:00:59.929Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "id": "19b55b8c-5c01-48ee-a5e4-98f052056f79",
+        "role": "COMPANION",
+        "name": "Journey Vice Neg 20260504030057984",
+        "nickname": "journeyvice-ratings-neg-20260504030057984",
+        "email": "vice.jrn.ratings.neg+20260504030057984@journey.test",
+        "emailVerified": false,
+        "biometricAuthEnabled": false,
+        "createdAt": "2026-05-04T03:00:59.933Z"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "COMPANION B signs up",
+      "layman": "Create second companion so roster can form CAPTAIN+VICE availability.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 8,
+        "target": "POST /auth/signup",
+        "startedAt": "2026-05-04T03:00:59.929Z",
+        "endedAt": "2026-05-04T03:01:01.775Z",
+        "durationMs": 1846,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 9,
+      "result": "PASS",
+      "observed": {
+        "emailFound": true,
+        "tokenExtracted": true
+      },
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "description": "Extract COMPANION B verification token",
+      "layman": "Verify companion B email.",
+      "serviceHit": {
+        "step": 9,
+        "target": "http://localhost:8025/api/v1/messages",
+        "startedAt": "2026-05-04T03:01:01.775Z",
+        "endedAt": "2026-05-04T03:01:01.778Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 10,
+      "result": "PASS",
+      "observed": {
+        "status": "VERIFIED"
+      },
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "description": "Verify COMPANION B email",
+      "layman": "Verify companion B email so they are fully provisioned.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 10,
+        "target": "GET /auth/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxOWI1NWI4Yy01YzAxLTQ4ZWUtYTVlNC05OGYwNTIwNTZmNzkiLCJlbWFpbCI6InZpY2UuanJuLnJhdGluZ3MubmVnKzIwMjYwNTA0MDMwMDU3OTg0QGpvdXJuZXkudGVzdCIsInB1cnBvc2UiOiJFTUFJTF9WRVJJRlkiLCJpYXQiOjE3Nzc4NjM2NjEsImV4cCI6MTc3Nzk1MDA2MX0.45egmvg5nSUcea0Pexl9gVasJXXjf2EmZuNLZ-TScoA",
+        "startedAt": "2026-05-04T03:01:01.778Z",
+        "endedAt": "2026-05-04T03:01:01.781Z",
+        "durationMs": 3,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 11,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Force COMPANION A designation CAPTAIN (determinism)",
+      "layman": "Ensure we have at least one CAPTAIN for booking allocation.",
+      "serviceHit": {
+        "step": 11,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-05-04T03:01:01.781Z",
+        "endedAt": "2026-05-04T03:01:01.783Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 12,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 1
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "description": "Force COMPANION B designation VICE_CAPTAIN (determinism)",
+      "layman": "Ensure we have at least one VICE_CAPTAIN for booking allocation.",
+      "serviceHit": {
+        "step": 12,
+        "target": "DB companion_profiles query",
+        "startedAt": "2026-05-04T03:01:01.783Z",
+        "endedAt": "2026-05-04T03:01:01.783Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 13,
+      "result": "PASS",
+      "observed": {
+        "companionId": "d42e9d07-190f-4bd4-a7b0-e9689186d798",
+        "slotsCreated": 0
+      },
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "description": "Populate roster for CAPTAIN at negative venue",
+      "layman": "Generate roster slots so a booking can be created.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 13,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-05-04T03:01:01.783Z",
+        "endedAt": "2026-05-04T03:01:01.796Z",
+        "durationMs": 13,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 14,
+      "result": "PASS",
+      "observed": {
+        "companionId": "19b55b8c-5c01-48ee-a5e4-98f052056f79",
+        "slotsCreated": 0
+      },
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "description": "Populate roster for VICE_CAPTAIN at negative venue",
+      "layman": "Generate roster slots so a booking can be created.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 14,
+        "target": "POST /roster-slots/populate-for-companion",
+        "startedAt": "2026-05-04T03:01:01.796Z",
+        "endedAt": "2026-05-04T03:01:01.808Z",
+        "durationMs": 12,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 15,
+      "result": "PASS",
+      "observed": {
+        "venueId": "b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30",
+        "date": "2026-05-04",
+        "durationMinutes": 120,
+        "availableStartTimes": [
+          "2026-05-03T20:00:00.000Z",
+          "2026-05-03T20:30:00.000Z",
+          "2026-05-03T21:00:00.000Z",
+          "2026-05-03T21:30:00.000Z",
+          "2026-05-03T22:00:00.000Z",
+          "2026-05-03T22:30:00.000Z",
+          "2026-05-03T23:00:00.000Z",
+          "2026-05-03T23:30:00.000Z",
+          "2026-05-04T00:00:00.000Z",
+          "2026-05-04T00:30:00.000Z",
+          "2026-05-04T01:00:00.000Z",
+          "2026-05-04T01:30:00.000Z",
+          "2026-05-04T02:00:00.000Z",
+          "2026-05-04T02:30:00.000Z",
+          "2026-05-04T03:00:00.000Z",
+          "2026-05-04T03:30:00.000Z",
+          "2026-05-04T04:00:00.000Z",
+          "2026-05-04T04:30:00.000Z",
+          "2026-05-04T05:00:00.000Z",
+          "2026-05-04T05:30:00.000Z",
+          "2026-05-04T06:00:00.000Z",
+          "2026-05-04T06:30:00.000Z",
+          "2026-05-04T07:00:00.000Z",
+          "2026-05-04T07:30:00.000Z",
+          "2026-05-04T08:00:00.000Z",
+          "2026-05-04T08:30:00.000Z",
+          "2026-05-04T09:00:00.000Z",
+          "2026-05-04T09:30:00.000Z",
+          "2026-05-04T10:00:00.000Z",
+          "2026-05-04T10:30:00.000Z",
+          "2026-05-04T11:00:00.000Z",
+          "2026-05-04T11:30:00.000Z",
+          "2026-05-04T12:00:00.000Z",
+          "2026-05-04T12:30:00.000Z",
+          "2026-05-04T13:00:00.000Z",
+          "2026-05-04T13:30:00.000Z",
+          "2026-05-04T14:00:00.000Z",
+          "2026-05-04T14:30:00.000Z",
+          "2026-05-04T15:00:00.000Z",
+          "2026-05-04T15:30:00.000Z",
+          "2026-05-04T16:00:00.000Z",
+          "2026-05-04T16:30:00.000Z",
+          "2026-05-04T17:00:00.000Z",
+          "2026-05-04T17:30:00.000Z"
+        ]
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "Get availability (negative venue)",
+      "layman": "Pick a valid startAt for booking creation.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 15,
+        "target": "GET /availability?venueId=b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30&date=2026-05-04",
+        "startedAt": "2026-05-04T03:01:01.808Z",
+        "endedAt": "2026-05-04T03:01:01.816Z",
+        "durationMs": 8,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 16,
+      "result": "PASS",
+      "observed": {
+        "id": "e5a523c8-95df-43cd-9bed-3a5ed2bc01d9",
+        "status": "CONFIRMED",
+        "clientId": "58998a7d-82eb-42c2-92f0-5a29d599329a",
+        "venueId": "b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30",
+        "startAt": "2026-05-03T20:00:00.000Z",
+        "endAt": "2026-05-03T22:00:00.000Z",
+        "createdAt": "2026-05-04T03:01:01.818Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "Create booking (status remains CONFIRMED)",
+      "layman": "Create a booking but do not complete it; rating should be blocked in CONFIRMED state.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 16,
+        "target": "POST /bookings",
+        "startedAt": "2026-05-04T03:01:01.816Z",
+        "endedAt": "2026-05-04T03:01:01.823Z",
+        "durationMs": 7,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 17,
+      "result": "PASS",
+      "observed": {
+        "code": "INVALID_STATE_TRANSITION",
+        "message": "Invalid state transition"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "description": "Attempt to rate before booking is COMPLETED/CANCELLED-eligible",
+      "layman": "Prove the endpoint rejects rating submission when booking status is not eligible.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 17,
+        "target": "POST /bookings/e5a523c8-95df-43cd-9bed-3a5ed2bc01d9/rating",
+        "startedAt": "2026-05-04T03:01:01.823Z",
+        "endedAt": "2026-05-04T03:01:01.825Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 18,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 17,
+        "response": {
+          "code": "INVALID_STATE_TRANSITION",
+          "message": "Invalid state transition"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 400,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "INVALID_STATE_TRANSITION",
+            "actual": "INVALID_STATE_TRANSITION",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "description": "API response validation: INVALID_STATE_TRANSITION",
+      "layman": "Verify server returns 400 INVALID_STATE_TRANSITION for rating attempts on CONFIRMED bookings.",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 18,
+        "target": "API response validation",
+        "startedAt": "2026-05-04T03:01:01.825Z",
+        "endedAt": "2026-05-04T03:01:01.825Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 19,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_ratings\" WHERE booking_id = $1 AND rater_user_id = $2 LIMIT 50;",
+        "params": [
+          "e5a523c8-95df-43cd-9bed-3a5ed2bc01d9",
+          "58998a7d-82eb-42c2-92f0-5a29d599329a"
+        ],
+        "rowCount": 0,
+        "rows": [],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 0,
+            "actualRows": 0,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "description": "DB check: no booking_ratings row created",
+      "layman": "Ensure the failed request had no side effects in booking_ratings.",
+      "serviceHit": {
+        "step": 19,
+        "target": "DB verify booking_ratings",
+        "startedAt": "2026-05-04T03:01:01.825Z",
+        "endedAt": "2026-05-04T03:01:01.826Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

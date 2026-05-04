@@ -1,0 +1,464 @@
+{
+  "runId": "RUN-20260503225312746-MOD-RATINGS-008",
+  "testId": "MOD-RATINGS-008",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.746Z",
+  "endedAt": "2026-05-03T22:53:12.845Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/bc192fae-63e6-44ba-af0e-535696d58ab9/rating",
+      "startedAt": "2026-05-03T22:53:12.819Z",
+      "endedAt": "2026-05-03T22:53:12.833Z",
+      "durationMs": 14,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.833Z",
+      "endedAt": "2026-05-03T22:53:12.833Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 3,
+      "target": "DB verify booking_ratings",
+      "startedAt": "2026-05-03T22:53:12.833Z",
+      "endedAt": "2026-05-03T22:53:12.835Z",
+      "durationMs": 2,
+      "result": "PASS"
+    },
+    {
+      "step": 4,
+      "target": "DB verify companion_profiles",
+      "startedAt": "2026-05-03T22:53:12.835Z",
+      "endedAt": "2026-05-03T22:53:12.836Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 5,
+      "target": "POST /bookings/bc192fae-63e6-44ba-af0e-535696d58ab9/rating",
+      "startedAt": "2026-05-03T22:53:12.836Z",
+      "endedAt": "2026-05-03T22:53:12.842Z",
+      "durationMs": 6,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 6,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.842Z",
+      "endedAt": "2026-05-03T22:53:12.842Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 7,
+      "target": "DB verify booking_ratings",
+      "startedAt": "2026-05-03T22:53:12.842Z",
+      "endedAt": "2026-05-03T22:53:12.843Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 8,
+      "target": "DB verify companion_profiles",
+      "startedAt": "2026-05-03T22:53:12.843Z",
+      "endedAt": "2026-05-03T22:53:12.845Z",
+      "durationMs": 2,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "3932067e-eb8d-4450-85ac-aea8e4121bb8",
+        "bookingId": "bc192fae-63e6-44ba-af0e-535696d58ab9",
+        "raterUserId": "9acfd9b6-7338-4751-afd1-f7bc73ff875e",
+        "ratingType": "CLIENT_RATING_DUO",
+        "stars": 5,
+        "tags": [
+          "Professional"
+        ],
+        "comment": "first",
+        "createdAt": "2026-05-03T22:53:12.820Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "First submit creates rating",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/bc192fae-63e6-44ba-af0e-535696d58ab9/rating",
+        "startedAt": "2026-05-03T22:53:12.819Z",
+        "endedAt": "2026-05-03T22:53:12.833Z",
+        "durationMs": 14,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "id": "3932067e-eb8d-4450-85ac-aea8e4121bb8",
+          "bookingId": "bc192fae-63e6-44ba-af0e-535696d58ab9",
+          "raterUserId": "9acfd9b6-7338-4751-afd1-f7bc73ff875e",
+          "ratingType": "CLIENT_RATING_DUO",
+          "stars": 5,
+          "tags": [
+            "Professional"
+          ],
+          "comment": "first",
+          "createdAt": "2026-05-03T22:53:12.820Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 201,
+            "actual": 201,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "CLIENT_RATING_DUO",
+            "actual": "CLIENT_RATING_DUO",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "stars",
+            "expected": 5,
+            "actual": 5,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "comment",
+            "expected": "first",
+            "actual": "first",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "Rating created",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.833Z",
+        "endedAt": "2026-05-03T22:53:12.833Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_ratings\" WHERE booking_id = $1 AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = $2 LIMIT 50;",
+        "params": [
+          "bc192fae-63e6-44ba-af0e-535696d58ab9",
+          "9acfd9b6-7338-4751-afd1-f7bc73ff875e"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "3932067e-eb8d-4450-85ac-aea8e4121bb8",
+            "booking_id": "bc192fae-63e6-44ba-af0e-535696d58ab9",
+            "rater_user_id": "9acfd9b6-7338-4751-afd1-f7bc73ff875e",
+            "rating_type": "CLIENT_RATING_DUO",
+            "stars": 5,
+            "tags": [
+              "Professional"
+            ],
+            "comment": "first",
+            "created_at": "2026-05-03T22:53:12.820Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Only one rating row exists",
+      "serviceHit": {
+        "step": 3,
+        "target": "DB verify booking_ratings",
+        "startedAt": "2026-05-03T22:53:12.833Z",
+        "endedAt": "2026-05-03T22:53:12.835Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"companion_profiles\" WHERE user_id = $1 LIMIT 50;",
+        "params": [
+          "82c448b7-557e-4846-8b31-0f05902871fe"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "5d038734-7b43-46d2-912c-192249517482",
+            "user_id": "82c448b7-557e-4846-8b31-0f05902871fe",
+            "designation": "CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "5.00"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "average_rating",
+            "expected": "5.00",
+            "actual": "5.00",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Averages updated after first insert",
+      "serviceHit": {
+        "step": 4,
+        "target": "DB verify companion_profiles",
+        "startedAt": "2026-05-03T22:53:12.835Z",
+        "endedAt": "2026-05-03T22:53:12.836Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "id": "3932067e-eb8d-4450-85ac-aea8e4121bb8",
+        "bookingId": "bc192fae-63e6-44ba-af0e-535696d58ab9",
+        "raterUserId": "9acfd9b6-7338-4751-afd1-f7bc73ff875e",
+        "ratingType": "CLIENT_RATING_DUO",
+        "stars": 5,
+        "tags": [
+          "Professional"
+        ],
+        "comment": "first",
+        "createdAt": "2026-05-03T22:53:12.820Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Second submit retries with different payload",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 5,
+        "target": "POST /bookings/bc192fae-63e6-44ba-af0e-535696d58ab9/rating",
+        "startedAt": "2026-05-03T22:53:12.836Z",
+        "endedAt": "2026-05-03T22:53:12.842Z",
+        "durationMs": 6,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 5,
+        "response": {
+          "id": "3932067e-eb8d-4450-85ac-aea8e4121bb8",
+          "bookingId": "bc192fae-63e6-44ba-af0e-535696d58ab9",
+          "raterUserId": "9acfd9b6-7338-4751-afd1-f7bc73ff875e",
+          "ratingType": "CLIENT_RATING_DUO",
+          "stars": 5,
+          "tags": [
+            "Professional"
+          ],
+          "comment": "first",
+          "createdAt": "2026-05-03T22:53:12.820Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "CLIENT_RATING_DUO",
+            "actual": "CLIENT_RATING_DUO",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "stars",
+            "expected": 5,
+            "actual": 5,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "comment",
+            "expected": "first",
+            "actual": "first",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns the existing immutable rating",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 6,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.842Z",
+        "endedAt": "2026-05-03T22:53:12.842Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_ratings\" WHERE booking_id = $1 AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = $2 LIMIT 50;",
+        "params": [
+          "bc192fae-63e6-44ba-af0e-535696d58ab9",
+          "9acfd9b6-7338-4751-afd1-f7bc73ff875e"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "3932067e-eb8d-4450-85ac-aea8e4121bb8",
+            "booking_id": "bc192fae-63e6-44ba-af0e-535696d58ab9",
+            "rater_user_id": "9acfd9b6-7338-4751-afd1-f7bc73ff875e",
+            "rating_type": "CLIENT_RATING_DUO",
+            "stars": 5,
+            "tags": [
+              "Professional"
+            ],
+            "comment": "first",
+            "created_at": "2026-05-03T22:53:12.820Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Still only one rating row exists",
+      "serviceHit": {
+        "step": 7,
+        "target": "DB verify booking_ratings",
+        "startedAt": "2026-05-03T22:53:12.842Z",
+        "endedAt": "2026-05-03T22:53:12.843Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 8,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"companion_profiles\" WHERE user_id = $1 LIMIT 50;",
+        "params": [
+          "82c448b7-557e-4846-8b31-0f05902871fe"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "5d038734-7b43-46d2-912c-192249517482",
+            "user_id": "82c448b7-557e-4846-8b31-0f05902871fe",
+            "designation": "CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "5.00"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "average_rating",
+            "expected": "5.00",
+            "actual": "5.00",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Average rating unchanged after retry",
+      "serviceHit": {
+        "step": 8,
+        "target": "DB verify companion_profiles",
+        "startedAt": "2026-05-03T22:53:12.843Z",
+        "endedAt": "2026-05-03T22:53:12.845Z",
+        "durationMs": 2,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

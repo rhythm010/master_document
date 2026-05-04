@@ -1,0 +1,106 @@
+{
+  "runId": "RUN-20260503225312747-MOD-RATINGS-010",
+  "testId": "MOD-RATINGS-010",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.747Z",
+  "endedAt": "2026-05-03T22:53:12.844Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/cbd26eac-de79-47eb-9a2a-0f9dfdd7a998/rating",
+      "startedAt": "2026-05-03T22:53:12.814Z",
+      "endedAt": "2026-05-03T22:53:12.844Z",
+      "durationMs": 30,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.844Z",
+      "endedAt": "2026-05-03T22:53:12.844Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "INVALID_STATE_TRANSITION",
+        "message": "Invalid state transition"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client attempts to rate a CANCELLED booking that has not started yet",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/cbd26eac-de79-47eb-9a2a-0f9dfdd7a998/rating",
+        "startedAt": "2026-05-03T22:53:12.814Z",
+        "endedAt": "2026-05-03T22:53:12.844Z",
+        "durationMs": 30,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "INVALID_STATE_TRANSITION",
+          "message": "Invalid state transition"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 400,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "INVALID_STATE_TRANSITION",
+            "actual": "INVALID_STATE_TRANSITION",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects because CANCELLED bookings are only eligible when startAt <= now()",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.844Z",
+        "endedAt": "2026-05-03T22:53:12.844Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

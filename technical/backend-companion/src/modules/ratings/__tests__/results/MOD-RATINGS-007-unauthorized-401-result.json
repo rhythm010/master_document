@@ -1,0 +1,106 @@
+{
+  "runId": "RUN-20260503225312746-MOD-RATINGS-007",
+  "testId": "MOD-RATINGS-007",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.746Z",
+  "endedAt": "2026-05-03T22:53:12.822Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/bfa732f7-b81c-4704-9ddb-c00b5648e5e0/rating",
+      "startedAt": "2026-05-03T22:53:12.820Z",
+      "endedAt": "2026-05-03T22:53:12.822Z",
+      "durationMs": 2,
+      "result": "PASS",
+      "statusCode": 401
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.822Z",
+      "endedAt": "2026-05-03T22:53:12.822Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 401
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "UNAUTHORIZED",
+        "message": "Missing authorization"
+      },
+      "actor": "Anonymous",
+      "actionType": "apiRequest",
+      "layman": "Anonymous caller attempts to rate",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/bfa732f7-b81c-4704-9ddb-c00b5648e5e0/rating",
+        "startedAt": "2026-05-03T22:53:12.820Z",
+        "endedAt": "2026-05-03T22:53:12.822Z",
+        "durationMs": 2,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "UNAUTHORIZED",
+          "message": "Missing authorization"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 401,
+            "actual": 401,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "UNAUTHORIZED",
+            "actual": "UNAUTHORIZED",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects missing authorization",
+      "statusCode": 401,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.822Z",
+        "endedAt": "2026-05-03T22:53:12.822Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 401
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

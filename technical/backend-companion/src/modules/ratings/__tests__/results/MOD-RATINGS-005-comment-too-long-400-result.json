@@ -1,0 +1,106 @@
+{
+  "runId": "RUN-20260503225312745-MOD-RATINGS-005",
+  "testId": "MOD-RATINGS-005",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.745Z",
+  "endedAt": "2026-05-03T22:53:12.843Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/3b919f00-2bb1-4910-b0a0-d7b3e7f2020e/rating",
+      "startedAt": "2026-05-03T22:53:12.817Z",
+      "endedAt": "2026-05-03T22:53:12.843Z",
+      "durationMs": 26,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.843Z",
+      "endedAt": "2026-05-03T22:53:12.843Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "VALIDATION_ERROR",
+        "message": "comment must be at most 300 characters"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client submits a comment longer than 300 chars",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/3b919f00-2bb1-4910-b0a0-d7b3e7f2020e/rating",
+        "startedAt": "2026-05-03T22:53:12.817Z",
+        "endedAt": "2026-05-03T22:53:12.843Z",
+        "durationMs": 26,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "VALIDATION_ERROR",
+          "message": "comment must be at most 300 characters"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 400,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "VALIDATION_ERROR",
+            "actual": "VALIDATION_ERROR",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects long comment",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.843Z",
+        "endedAt": "2026-05-03T22:53:12.843Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

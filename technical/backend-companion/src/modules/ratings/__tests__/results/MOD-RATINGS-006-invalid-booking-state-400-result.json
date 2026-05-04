@@ -1,0 +1,106 @@
+{
+  "runId": "RUN-20260503225312746-MOD-RATINGS-006",
+  "testId": "MOD-RATINGS-006",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.746Z",
+  "endedAt": "2026-05-03T22:53:12.849Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/db6ba41a-aa5d-41da-b278-bbbc47f296cc/rating",
+      "startedAt": "2026-05-03T22:53:12.821Z",
+      "endedAt": "2026-05-03T22:53:12.849Z",
+      "durationMs": 28,
+      "result": "PASS",
+      "statusCode": 400
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.849Z",
+      "endedAt": "2026-05-03T22:53:12.849Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 400
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "code": "INVALID_STATE_TRANSITION",
+        "message": "Invalid state transition"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client attempts to rate an ACTIVE booking",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/db6ba41a-aa5d-41da-b278-bbbc47f296cc/rating",
+        "startedAt": "2026-05-03T22:53:12.821Z",
+        "endedAt": "2026-05-03T22:53:12.849Z",
+        "durationMs": 28,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "code": "INVALID_STATE_TRANSITION",
+          "message": "Invalid state transition"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 400,
+            "actual": 400,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "code",
+            "expected": "INVALID_STATE_TRANSITION",
+            "actual": "INVALID_STATE_TRANSITION",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System rejects because booking is not eligible for rating",
+      "statusCode": 400,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.849Z",
+        "endedAt": "2026-05-03T22:53:12.849Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 400
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "runId": "RUN-20260503225312744-MOD-RATINGS-003",
+  "testId": "MOD-RATINGS-003",
+  "status": "PASS",
+  "startedAt": "2026-05-03T22:53:12.744Z",
+  "endedAt": "2026-05-03T22:53:12.847Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "POST /bookings/62ad6337-8e37-4236-8ef2-e6dbc19c819c/rating",
+      "startedAt": "2026-05-03T22:53:12.820Z",
+      "endedAt": "2026-05-03T22:53:12.847Z",
+      "durationMs": 27,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-03T22:53:12.847Z",
+      "endedAt": "2026-05-03T22:53:12.847Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 3,
+      "target": "DB verify companion_profiles",
+      "startedAt": "2026-05-03T22:53:12.847Z",
+      "endedAt": "2026-05-03T22:53:12.847Z",
+      "durationMs": 0,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "id": "ef92d8f7-b15e-46a7-b5dc-9da3ed70a4ca",
+        "bookingId": "62ad6337-8e37-4236-8ef2-e6dbc19c819c",
+        "raterUserId": "ad44ec83-8734-42f7-9a46-ab80cb0a971e",
+        "ratingType": "COMPANION_RATING_CLIENT",
+        "stars": 4,
+        "tags": [
+          "Attentive"
+        ],
+        "comment": "",
+        "createdAt": "2026-05-03T22:53:12.836Z"
+      },
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "layman": "Captain submits rating of client",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 1,
+        "target": "POST /bookings/62ad6337-8e37-4236-8ef2-e6dbc19c819c/rating",
+        "startedAt": "2026-05-03T22:53:12.820Z",
+        "endedAt": "2026-05-03T22:53:12.847Z",
+        "durationMs": 27,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "id": "ef92d8f7-b15e-46a7-b5dc-9da3ed70a4ca",
+          "bookingId": "62ad6337-8e37-4236-8ef2-e6dbc19c819c",
+          "raterUserId": "ad44ec83-8734-42f7-9a46-ab80cb0a971e",
+          "ratingType": "COMPANION_RATING_CLIENT",
+          "stars": 4,
+          "tags": [
+            "Attentive"
+          ],
+          "comment": "",
+          "createdAt": "2026-05-03T22:53:12.836Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 201,
+            "actual": 201,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "bookingId",
+            "expected": "62ad6337-8e37-4236-8ef2-e6dbc19c819c",
+            "actual": "62ad6337-8e37-4236-8ef2-e6dbc19c819c",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "raterUserId",
+            "expected": "ad44ec83-8734-42f7-9a46-ab80cb0a971e",
+            "actual": "ad44ec83-8734-42f7-9a46-ab80cb0a971e",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "COMPANION_RATING_CLIENT",
+            "actual": "COMPANION_RATING_CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "stars",
+            "expected": 4,
+            "actual": 4,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "comment",
+            "expected": "",
+            "actual": "",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "Companion rating is created",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-03T22:53:12.847Z",
+        "endedAt": "2026-05-03T22:53:12.847Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"companion_profiles\" WHERE user_id = $1 LIMIT 50;",
+        "params": [
+          "ad44ec83-8734-42f7-9a46-ab80cb0a971e"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "5f750cdf-0a70-43a5-acb6-4cdff9c06ed3",
+            "user_id": "ad44ec83-8734-42f7-9a46-ab80cb0a971e",
+            "designation": "CAPTAIN",
+            "is_active": true,
+            "languages": [],
+            "profile_picture_url": "",
+            "average_rating": "0.00"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "average_rating",
+            "expected": "0.00",
+            "actual": "0.00",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Companion average rating not recomputed for companion->client ratings",
+      "serviceHit": {
+        "step": 3,
+        "target": "DB verify companion_profiles",
+        "startedAt": "2026-05-03T22:53:12.847Z",
+        "endedAt": "2026-05-03T22:53:12.847Z",
+        "durationMs": 0,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
