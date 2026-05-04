@@ -1,0 +1,45 @@
+{
+  "testId": "MOD-RATINGS-006",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Invalid booking state returns 400 INVALID_STATE_TRANSITION",
+  "flowType": "sad",
+  "linkedRequirement": "ratings/eligibility",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-006-invalid-booking-state-400.json",
+  "executionMode": "api+db+auth",
+  "objective": "Reject rating submission when booking.status is ACTIVE or CONFIRMED",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "ACTIVE", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 5,
+        "tags": ["Professional"],
+        "comment": "ok"
+      },
+      "layman": "Client attempts to rate an ACTIVE booking"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 400,
+      "expectedResponseFields": ["code=INVALID_STATE_TRANSITION"],
+      "layman": "System rejects because booking is not eligible for rating"
+    }
+  ],
+  "openQuestions": []
+}

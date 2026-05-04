@@ -1,0 +1,43 @@
+{
+  "testId": "MOD-RATINGS-012",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Non-participant companion returns 403 FORBIDDEN",
+  "flowType": "sad",
+  "linkedRequirement": "ratings/authorization",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-012-forbidden-non-participant-403.json",
+  "executionMode": "api+db+auth",
+  "objective": "Reject rating submission when caller is a companion but not assigned to the booking",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 4,
+        "tags": ["Attentive"],
+        "comment": "ok"
+      },
+      "layman": "Companion attempts to rate a booking they are not assigned to"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 403,
+      "expectedResponseFields": ["code=FORBIDDEN"],
+      "layman": "System rejects because caller is not authorized"
+    }
+  ],
+  "openQuestions": []
+}

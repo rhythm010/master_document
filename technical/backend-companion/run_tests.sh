@@ -26,7 +26,8 @@ echo ""
 
 # Check if Docker containers are running
 echo "[1/3] Checking Docker containers..."
-if docker compose ps | grep -q "db.*running"; then
+# Prefer machine-readable service status over parsing human output (varies by Docker/Compose version)
+if docker compose ps --services --filter status=running 2>/dev/null | grep -q "^db$"; then
     echo "  ✓ Database container is running"
 else
     echo "  ✗ Database container is NOT running"

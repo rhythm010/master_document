@@ -1,0 +1,401 @@
+{
+  "testId": "JRN-RATINGS-002",
+  "type": "journey",
+  "priority": "P1",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Negative path: client cannot rate a CONFIRMED booking (INVALID_STATE_TRANSITION)",
+  "flowType": "negative",
+  "linkedRequirements": [
+    "identity/signup",
+    "identity/verify-email",
+    "identity/login",
+    "roster/populate-for-companion",
+    "roster/get-availability",
+    "booking/create",
+    "ratings/create",
+    "ratings/booking-status-eligibility"
+  ],
+  "filePath": "technical/backend-companion/qa/JRN-RATINGS-002-client-cannot-rate-until-completed.json",
+  "executionMode": "api+db+external",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Validate the rating endpoint enforces booking status eligibility: submitting a client rating while booking is still CONFIRMED returns 400 INVALID_STATE_TRANSITION and no booking_ratings row is created.",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Mailpit running on localhost:8025",
+    "DATABASE_URL set for the test runner and points to the test database",
+    "INTERNAL_API_TOKEN exported in the shell running the test runner",
+    "No existing users with the generated RUN_ID-suffixed emails"
+  ],
+  "seedData": [
+    {
+      "entity": "venue",
+      "values": {
+        "id": "b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30",
+        "name": "Journey Venue - Ratings Negative",
+        "address": "701 Ratings Road, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.2048,
+        "longitude": 55.2708,
+        "operatingHoursStart": "00:00:00",
+        "operatingHoursEnd": "23:59:59"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 60,
+    "pollEveryMs": 500,
+    "retryCount": 120
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "CLIENT",
+        "name": "Journey Client Neg {{RUN_ID}}",
+        "nickname": "journeyclient-ratings-neg-{{RUN_ID}}",
+        "email": "client.jrn.ratings.neg+{{RUN_ID}}@journey.test",
+        "password": "ClientNegPass!{{RUN_ID}}",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "clientUserId",
+      "description": "CLIENT signs up",
+      "layman": "Create a client account for the negative eligibility check."
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "client.jrn.ratings.neg+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "clientVerificationToken",
+      "description": "Extract CLIENT verification token from Mailpit",
+      "layman": "Verify email so login succeeds."
+    },
+    {
+      "step": 3,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{clientVerificationToken}}"
+      },
+      "description": "Verify CLIENT email",
+      "layman": "Verify the client email address."
+    },
+    {
+      "step": 4,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "client.jrn.ratings.neg+{{RUN_ID}}@journey.test",
+        "password": "ClientNegPass!{{RUN_ID}}"
+      },
+      "storeResponseFields": [
+        "accessToken"
+      ],
+      "storeAs": "clientAccessToken",
+      "description": "Login CLIENT",
+      "layman": "Log in and obtain Bearer token for rating attempt."
+    },
+    {
+      "step": 5,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "COMPANION",
+        "name": "Journey Captain Neg {{RUN_ID}}",
+        "nickname": "journeycaptain-ratings-neg-{{RUN_ID}}",
+        "email": "captain.jrn.ratings.neg+{{RUN_ID}}@journey.test",
+        "password": "CaptainNegPass!{{RUN_ID}}",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "companionAUserId",
+      "description": "COMPANION A signs up",
+      "layman": "Create first companion so roster can form a duo."
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "captain.jrn.ratings.neg+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "companionAVerificationToken",
+      "description": "Extract COMPANION A verification token",
+      "layman": "Verify companion A email."
+    },
+    {
+      "step": 7,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companionAVerificationToken}}"
+      },
+      "description": "Verify COMPANION A email",
+      "layman": "Verify companion A email so they are fully provisioned."
+    },
+    {
+      "step": 8,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "COMPANION",
+        "name": "Journey Vice Neg {{RUN_ID}}",
+        "nickname": "journeyvice-ratings-neg-{{RUN_ID}}",
+        "email": "vice.jrn.ratings.neg+{{RUN_ID}}@journey.test",
+        "password": "ViceNegPass!{{RUN_ID}}",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "companionBUserId",
+      "description": "COMPANION B signs up",
+      "layman": "Create second companion so roster can form CAPTAIN+VICE availability."
+    },
+    {
+      "step": 9,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "vice.jrn.ratings.neg+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "companionBVerificationToken",
+      "description": "Extract COMPANION B verification token",
+      "layman": "Verify companion B email."
+    },
+    {
+      "step": 10,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companionBVerificationToken}}"
+      },
+      "description": "Verify COMPANION B email",
+      "layman": "Verify companion B email so they are fully provisioned."
+    },
+    {
+      "step": 11,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "query": "UPDATE companion_profiles SET designation = 'CAPTAIN' WHERE user_id = '{{companionAUserId}}';",
+      "description": "Force COMPANION A designation CAPTAIN (determinism)",
+      "layman": "Ensure we have at least one CAPTAIN for booking allocation."
+    },
+    {
+      "step": 12,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "query": "UPDATE companion_profiles SET designation = 'VICE_CAPTAIN' WHERE user_id = '{{companionBUserId}}';",
+      "description": "Force COMPANION B designation VICE_CAPTAIN (determinism)",
+      "layman": "Ensure we have at least one VICE_CAPTAIN for booking allocation."
+    },
+    {
+      "step": 13,
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "companionId": "{{companionAUserId}}",
+        "venueIds": [
+          "b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30"
+        ]
+      },
+      "description": "Populate roster for CAPTAIN at negative venue",
+      "layman": "Generate roster slots so a booking can be created."
+    },
+    {
+      "step": 14,
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "companionId": "{{companionBUserId}}",
+        "venueIds": [
+          "b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30"
+        ]
+      },
+      "description": "Populate roster for VICE_CAPTAIN at negative venue",
+      "layman": "Generate roster slots so a booking can be created."
+    },
+    {
+      "step": 15,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/availability",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "queryParams": {
+        "venueId": "b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30",
+        "date": "{{TODAY_DATE_YMD}}"
+      },
+      "storeResponseFields": [
+        "availableStartTimes.0"
+      ],
+      "storeAs": "selectedStartAt",
+      "description": "Get availability (negative venue)",
+      "layman": "Pick a valid startAt for booking creation."
+    },
+    {
+      "step": 16,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "payload": {
+        "venueId": "b84fca7a-0d8e-4f1a-95f0-4f7b8c6e1f30",
+        "startAt": "{{selectedStartAt}}"
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "bookingId",
+      "description": "Create booking (status remains CONFIRMED)",
+      "layman": "Create a booking but do not complete it; rating should be blocked in CONFIRMED state."
+    },
+    {
+      "step": 17,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/rating",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "payload": {
+        "stars": 5,
+        "tags": [
+          "Professional"
+        ],
+        "comment": "Too early {{RUN_ID}}"
+      },
+      "description": "Attempt to rate before booking is COMPLETED/CANCELLED-eligible",
+      "layman": "Prove the endpoint rejects rating submission when booking status is not eligible."
+    },
+    {
+      "step": 18,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 400,
+      "expectedResponseFields": [
+        "code=INVALID_STATE_TRANSITION"
+      ],
+      "description": "API response validation: INVALID_STATE_TRANSITION",
+      "layman": "Verify server returns 400 INVALID_STATE_TRANSITION for rating attempts on CONFIRMED bookings."
+    },
+    {
+      "step": 19,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{bookingId}} AND rater_user_id = {{clientUserId}}",
+      "expectedRows": 0,
+      "description": "DB check: no booking_ratings row created",
+      "layman": "Ensure the failed request had no side effects in booking_ratings."
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 16,
+        "statusCode": 201,
+        "requiredKeys": [
+          "id",
+          "status",
+          "clientId",
+          "venueId",
+          "startAt",
+          "endAt",
+          "createdAt"
+        ],
+        "bodyFields": {
+          "status": "CONFIRMED"
+        }
+      },
+      {
+        "step": 17,
+        "statusCode": 400,
+        "requiredKeys": [
+          "code",
+          "message"
+        ],
+        "bodyFields": {
+          "code": "INVALID_STATE_TRANSITION"
+        }
+      }
+    ],
+    "external": [
+      {
+        "step": 2,
+        "description": "CLIENT verification email received",
+        "checks": [
+          "email exists",
+          "token extracted"
+        ]
+      },
+      {
+        "step": 6,
+        "description": "COMPANION A verification email received",
+        "checks": [
+          "email exists",
+          "token extracted"
+        ]
+      },
+      {
+        "step": 9,
+        "description": "COMPANION B verification email received",
+        "checks": [
+          "email exists",
+          "token extracted"
+        ]
+      }
+    ],
+    "db": [],
+    "mustNotOccur": [
+      "booking_ratings row created on invalid booking status"
+    ]
+  }
+}

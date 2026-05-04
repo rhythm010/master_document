@@ -1,0 +1,831 @@
+{
+  "testId": "JRN-RATINGS-001",
+  "type": "journey",
+  "priority": "P1",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Happy path: CLIENT + CAPTAIN + VICE signup -> roster -> booking -> matching -> complete -> client rates duo -> companions rate client",
+  "flowType": "happy",
+  "linkedRequirements": [
+    "identity/signup",
+    "identity/verify-email",
+    "identity/login",
+    "roster/populate-for-companion",
+    "roster/get-availability",
+    "booking/create",
+    "matching-flow/com-match-context",
+    "matching-flow/com-match-verify",
+    "matching-flow/client-match-start",
+    "matching-flow/matching-context-client",
+    "matching-flow/client-match-verify",
+    "session-in-progress/complete",
+    "ratings/create",
+    "ratings/average_rating_recompute"
+  ],
+  "filePath": "technical/backend-companion/qa/JRN-RATINGS-001-client-rates-duo.json",
+  "executionMode": "api+db+external",
+  "environmentRequirements": {
+    "server": "local-running",
+    "database": "test_db",
+    "queue": false,
+    "eventListener": false,
+    "mailpit": true
+  },
+  "objective": "Validate the full end-to-end Ratings flow: client creates booking and completes matching; booking transitions to COMPLETED; client submits CLIENT_RATING_DUO with stars+tags+comment; DB booking_ratings row exists; both companions' average_rating is recomputed. Optionally extend coverage by having each companion submit COMPANION_RATING_CLIENT without affecting companion averages.",
+  "preconditions": [
+    "Server running on localhost:3000",
+    "Mailpit running on localhost:8025",
+    "DATABASE_URL set for the test runner and points to the test database",
+    "INTERNAL_API_TOKEN exported in the shell running the test runner (used for internal roster endpoints)",
+    "No existing users with the generated RUN_ID-suffixed emails"
+  ],
+  "testData": {
+    "runIdPlaceholder": "{{RUN_ID}}",
+    "venue": {
+      "venueId": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+      "name": "Journey Venue - Ratings",
+      "operatingHoursStart": "00:00:00",
+      "operatingHoursEnd": "23:59:59",
+      "latitude": 25.2048,
+      "longitude": 55.2708
+    },
+    "emails": {
+      "clientEmail": "client.jrn.ratings+{{RUN_ID}}@journey.test",
+      "captainEmail": "captain.jrn.ratings+{{RUN_ID}}@journey.test",
+      "viceEmail": "vice.jrn.ratings+{{RUN_ID}}@journey.test"
+    }
+  },
+  "seedData": [
+    {
+      "entity": "venue",
+      "values": {
+        "id": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+        "name": "Journey Venue - Ratings",
+        "address": "700 Ratings Road, Dubai",
+        "venueType": "MALL",
+        "latitude": 25.2048,
+        "longitude": 55.2708,
+        "operatingHoursStart": "00:00:00",
+        "operatingHoursEnd": "23:59:59"
+      }
+    }
+  ],
+  "waitPolicy": {
+    "maxSeconds": 60,
+    "pollEveryMs": 500,
+    "retryCount": 120
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "CLIENT",
+        "name": "Journey Client {{RUN_ID}}",
+        "nickname": "journeyclient-ratings-{{RUN_ID}}",
+        "email": "client.jrn.ratings+{{RUN_ID}}@journey.test",
+        "password": "ClientPass!{{RUN_ID}}",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "clientUserId",
+      "description": "CLIENT signs up",
+      "layman": "Create the client account that will create a booking and submit the duo rating."
+    },
+    {
+      "step": 2,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "client.jrn.ratings+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "clientVerificationToken",
+      "description": "Extract CLIENT verification token from Mailpit",
+      "layman": "Grab the email verification token so the client can log in."
+    },
+    {
+      "step": 3,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{clientVerificationToken}}"
+      },
+      "description": "Verify CLIENT email",
+      "layman": "Verify the client email address."
+    },
+    {
+      "step": 4,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "client.jrn.ratings+{{RUN_ID}}@journey.test",
+        "password": "ClientPass!{{RUN_ID}}"
+      },
+      "storeResponseFields": [
+        "accessToken"
+      ],
+      "storeAs": "clientAccessToken",
+      "description": "Login CLIENT",
+      "layman": "Log the client in and store their Bearer token."
+    },
+    {
+      "step": 5,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "COMPANION",
+        "name": "Journey Captain {{RUN_ID}}",
+        "nickname": "journeycaptain-ratings-{{RUN_ID}}",
+        "email": "captain.jrn.ratings+{{RUN_ID}}@journey.test",
+        "password": "CaptainPass!{{RUN_ID}}",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "companionAUserId",
+      "description": "COMPANION A signs up (intended CAPTAIN)",
+      "layman": "Create the companion that we will force to be the CAPTAIN for deterministic matching steps."
+    },
+    {
+      "step": 6,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "captain.jrn.ratings+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "companionAVerificationToken",
+      "description": "Extract COMPANION A verification token from Mailpit",
+      "layman": "Grab companion A's verification token so they can log in."
+    },
+    {
+      "step": 7,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companionAVerificationToken}}"
+      },
+      "description": "Verify COMPANION A email",
+      "layman": "Verify companion A's email address."
+    },
+    {
+      "step": 8,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "captain.jrn.ratings+{{RUN_ID}}@journey.test",
+        "password": "CaptainPass!{{RUN_ID}}"
+      },
+      "storeResponseFields": [
+        "accessToken"
+      ],
+      "storeAs": "companionAAccessToken",
+      "description": "Login COMPANION A",
+      "layman": "Log companion A in and store their Bearer token."
+    },
+    {
+      "step": 9,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "payload": {
+        "role": "COMPANION",
+        "name": "Journey Vice {{RUN_ID}}",
+        "nickname": "journeyvice-ratings-{{RUN_ID}}",
+        "email": "vice.jrn.ratings+{{RUN_ID}}@journey.test",
+        "password": "VicePass!{{RUN_ID}}",
+        "biometricAuthEnabled": false
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "companionBUserId",
+      "description": "COMPANION B signs up (intended VICE_CAPTAIN)",
+      "layman": "Create the companion that we will force to be the VICE_CAPTAIN for deterministic matching steps."
+    },
+    {
+      "step": 10,
+      "actor": "TestExecutor",
+      "actionType": "externalCheck",
+      "endpoint": "http://localhost:8025/api/v1/messages",
+      "validateEmailTo": "vice.jrn.ratings+{{RUN_ID}}@journey.test",
+      "extractTokenFromEmail": true,
+      "storeAs": "companionBVerificationToken",
+      "description": "Extract COMPANION B verification token from Mailpit",
+      "layman": "Grab companion B's verification token so they can log in."
+    },
+    {
+      "step": 11,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/auth/verify-email",
+      "queryParams": {
+        "token": "{{companionBVerificationToken}}"
+      },
+      "description": "Verify COMPANION B email",
+      "layman": "Verify companion B's email address."
+    },
+    {
+      "step": 12,
+      "actor": "APIClient",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "payload": {
+        "email": "vice.jrn.ratings+{{RUN_ID}}@journey.test",
+        "password": "VicePass!{{RUN_ID}}"
+      },
+      "storeResponseFields": [
+        "accessToken"
+      ],
+      "storeAs": "companionBAccessToken",
+      "description": "Login COMPANION B",
+      "layman": "Log companion B in and store their Bearer token."
+    },
+    {
+      "step": 13,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "query": "UPDATE companion_profiles SET designation = 'CAPTAIN' WHERE user_id = '{{companionAUserId}}';",
+      "description": "Force COMPANION A designation to CAPTAIN (test-only determinism)",
+      "layman": "Make companion A the CAPTAIN deterministically so we can use CAPTAIN-only matching endpoints."
+    },
+    {
+      "step": 14,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "companion_profiles",
+      "query": "UPDATE companion_profiles SET designation = 'VICE_CAPTAIN' WHERE user_id = '{{companionBUserId}}';",
+      "description": "Force COMPANION B designation to VICE_CAPTAIN (test-only determinism)",
+      "layman": "Make companion B the VICE_CAPTAIN deterministically so we can use VICE-only com-match verification."
+    },
+    {
+      "step": 15,
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "companionId": "{{companionAUserId}}",
+        "venueIds": [
+          "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01"
+        ]
+      },
+      "description": "Populate roster for CAPTAIN at Ratings venue",
+      "layman": "Attach the CAPTAIN to the journey venue and generate roster availability slots."
+    },
+    {
+      "step": 16,
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/populate-for-companion",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "companionId": "{{companionBUserId}}",
+        "venueIds": [
+          "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01"
+        ]
+      },
+      "description": "Populate roster for VICE_CAPTAIN at Ratings venue",
+      "layman": "Attach the VICE_CAPTAIN to the journey venue and generate roster availability slots."
+    },
+    {
+      "step": 17,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/availability",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "queryParams": {
+        "venueId": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+        "date": "{{TODAY_DATE_YMD}}"
+      },
+      "storeResponseFields": [
+        "availableStartTimes.0"
+      ],
+      "storeAs": "selectedStartAt",
+      "description": "Client fetches availability for Ratings venue (today) and selects first startAt",
+      "layman": "Get a valid, bookable start time so booking creation is deterministic and uses real availability."
+    },
+    {
+      "step": 18,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "payload": {
+        "venueId": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01",
+        "startAt": "{{selectedStartAt}}"
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "bookingId",
+      "description": "Client creates booking at first available start time",
+      "layman": "Create a booking that allocates a CAPTAIN+VICE duo at the journey venue."
+    },
+    {
+      "step": 19,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "booking_companion_assignments",
+      "query": "UPDATE booking_companion_assignments SET presence_status = 'ARRIVED' WHERE booking_id = '{{bookingId}}';",
+      "description": "Mark both companions ARRIVED (test-only) to unlock com-match context/verify",
+      "layman": "Simulate both companions arriving at the venue so self-match can proceed (com-match requires ARRIVED for both)."
+    },
+    {
+      "step": 20,
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/{{bookingId}}/com-match/context",
+      "headers": {
+        "Authorization": "Bearer {{companionAAccessToken}}"
+      },
+      "storeResponseFields": [
+        "comMatchQrCode",
+        "comMatchPinCode"
+      ],
+      "description": "CAPTAIN fetches com-match context (QR/PIN for self-match)",
+      "layman": "Retrieve the QR/PIN needed for the VICE_CAPTAIN to verify companion-companion self-match."
+    },
+    {
+      "step": 21,
+      "actor": "ViceCaptain",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/com-match/verify",
+      "headers": {
+        "Authorization": "Bearer {{companionBAccessToken}}"
+      },
+      "payload": {
+        "verificationMethod": "QR",
+        "qrCode": "{{step20_comMatchQrCode}}"
+      },
+      "description": "VICE_CAPTAIN verifies com-match using CAPTAIN QR",
+      "layman": "Complete companion-companion self-match so client match verification becomes allowed."
+    },
+    {
+      "step": 22,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/client-match/start",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "payload": {
+        "latitude": 25.2048,
+        "longitude": 55.2708,
+        "gpsPermissionGranted": true,
+        "gpsEnabled": true
+      },
+      "description": "CLIENT starts client-match (location sharing) within venue radius",
+      "layman": "Start the client matching flow, proving the client is physically at the venue (within radius)."
+    },
+    {
+      "step": 23,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/{{bookingId}}/matching/context",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "storeResponseFields": [
+        "qrCode",
+        "pinCode"
+      ],
+      "description": "CLIENT fetches matching context to obtain client QR/PIN",
+      "layman": "Fetch the client QR/PIN that the CAPTAIN will use to verify client match."
+    },
+    {
+      "step": 24,
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/client-match/verify",
+      "headers": {
+        "Authorization": "Bearer {{companionAAccessToken}}"
+      },
+      "payload": {
+        "verificationMethod": "QR",
+        "qrCode": "{{step23_qrCode}}"
+      },
+      "description": "CAPTAIN verifies client-match using client's QR (booking becomes ACTIVE)",
+      "layman": "Complete client-companion matching and transition the booking into ACTIVE state."
+    },
+    {
+      "step": 25,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "query": "WHERE id = {{bookingId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "status": "ACTIVE"
+      },
+      "description": "DB check: booking status is ACTIVE after matching",
+      "layman": "Prove the system transitioned the booking to ACTIVE after client-match verify."
+    },
+    {
+      "step": 26,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "bookings",
+      "query": "UPDATE bookings SET status = 'COMPLETED', start_at = now() - interval '121 minutes', end_at = now() - interval '1 minute' WHERE id = '{{bookingId}}';",
+      "description": "Simulate end-of-session completion (test-only)",
+      "layman": "Transition booking into a rating-eligible end state (COMPLETED) in a deterministic way for the journey."
+    },
+    {
+      "step": 27,
+      "actor": "InternalAPI",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/roster-slots/release",
+      "headers": {
+        "X-Internal-Token": "{{INTERNAL_API_TOKEN}}"
+      },
+      "payload": {
+        "bookingId": "{{bookingId}}"
+      },
+      "description": "Release roster slots for the booking (internal)",
+      "layman": "Mirror the auto-end side effect by releasing booked roster slots."
+    },
+    {
+      "step": 28,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "bookings",
+      "query": "WHERE id = {{bookingId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "status": "COMPLETED"
+      },
+      "description": "DB check: booking status is COMPLETED",
+      "layman": "Prove the booking is now in COMPLETED state, which is eligible for rating submission."
+    },
+    {
+      "step": 29,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/rating",
+      "headers": {
+        "Authorization": "Bearer {{clientAccessToken}}"
+      },
+      "payload": {
+        "stars": 5,
+        "tags": [
+          "Professional"
+        ],
+        "comment": "Great duo {{RUN_ID}}"
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "clientDuoRatingId",
+      "description": "CLIENT submits CLIENT_RATING_DUO (stars present, tags>=1, comment<=300)",
+      "layman": "Submit the client duo rating with non-null stars to trigger average_rating recomputation."
+    },
+    {
+      "step": 30,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "bookingId={{bookingId}}",
+        "raterUserId={{clientUserId}}",
+        "ratingType=CLIENT_RATING_DUO",
+        "stars=5",
+        "tags.0=Professional",
+        "comment=Great duo {{RUN_ID}}",
+        "createdAt"
+      ],
+      "description": "API response validation: client rating created",
+      "layman": "Verify the rating creation response payload matches the expected contract and inferred ratingType."
+    },
+    {
+      "step": 31,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{bookingId}} AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = {{clientUserId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "rating_type": "CLIENT_RATING_DUO",
+        "stars": 5,
+        "comment": "Great duo {{RUN_ID}}"
+      },
+      "description": "DB check: booking_ratings row exists for CLIENT_RATING_DUO",
+      "layman": "Prove the immutable booking_ratings row was created for the client duo rating."
+    },
+    {
+      "step": 32,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{companionAUserId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "average_rating": "5.00"
+      },
+      "description": "DB check: CAPTAIN average_rating recomputed",
+      "layman": "Verify the CAPTAIN companion profile average_rating was updated based on CLIENT_RATING_DUO with non-null stars."
+    },
+    {
+      "step": 33,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{companionBUserId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "average_rating": "5.00"
+      },
+      "description": "DB check: VICE_CAPTAIN average_rating recomputed",
+      "layman": "Verify the VICE_CAPTAIN companion profile average_rating was updated based on the same CLIENT_RATING_DUO."
+    },
+    {
+      "step": 34,
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/rating",
+      "headers": {
+        "Authorization": "Bearer {{companionAAccessToken}}"
+      },
+      "payload": {
+        "stars": 4,
+        "tags": [
+          "Polite"
+        ],
+        "comment": "Client was polite {{RUN_ID}}"
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "captainClientRatingId",
+      "description": "CAPTAIN submits COMPANION_RATING_CLIENT",
+      "layman": "Exercise multi-role usage of the same endpoint: a companion rates the client (stars mandatory)."
+    },
+    {
+      "step": 35,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "bookingId={{bookingId}}",
+        "raterUserId={{companionAUserId}}",
+        "ratingType=COMPANION_RATING_CLIENT",
+        "stars=4",
+        "tags.0=Polite",
+        "comment=Client was polite {{RUN_ID}}",
+        "createdAt"
+      ],
+      "description": "API response validation: captain rating created",
+      "layman": "Verify the companion rating response uses COMPANION_RATING_CLIENT and includes the expected fields."
+    },
+    {
+      "step": 36,
+      "actor": "ViceCaptain",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/{{bookingId}}/rating",
+      "headers": {
+        "Authorization": "Bearer {{companionBAccessToken}}"
+      },
+      "payload": {
+        "stars": 5,
+        "tags": [
+          "Attentive"
+        ],
+        "comment": "Great client {{RUN_ID}}"
+      },
+      "storeResponseFields": [
+        "id"
+      ],
+      "storeAs": "viceClientRatingId",
+      "description": "VICE_CAPTAIN submits COMPANION_RATING_CLIENT",
+      "layman": "Confirm a second companion can independently rate the client for the same booking."
+    },
+    {
+      "step": 37,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "bookingId={{bookingId}}",
+        "raterUserId={{companionBUserId}}",
+        "ratingType=COMPANION_RATING_CLIENT",
+        "stars=5",
+        "tags.0=Attentive",
+        "comment=Great client {{RUN_ID}}",
+        "createdAt"
+      ],
+      "description": "API response validation: vice-captain rating created",
+      "layman": "Verify the vice captain rating is created and returned with the correct inferred ratingType."
+    },
+    {
+      "step": 38,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{bookingId}} AND rating_type = 'COMPANION_RATING_CLIENT' AND rater_user_id = {{companionAUserId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "rating_type": "COMPANION_RATING_CLIENT",
+        "stars": 4
+      },
+      "description": "DB check: captain COMPANION_RATING_CLIENT row exists",
+      "layman": "Prove the captain's companion rating row exists in booking_ratings."
+    },
+    {
+      "step": 39,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{bookingId}} AND rating_type = 'COMPANION_RATING_CLIENT' AND rater_user_id = {{companionBUserId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "rating_type": "COMPANION_RATING_CLIENT",
+        "stars": 5
+      },
+      "description": "DB check: vice-captain COMPANION_RATING_CLIENT row exists",
+      "layman": "Prove the vice captain's companion rating row exists in booking_ratings."
+    },
+    {
+      "step": 40,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{companionAUserId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "average_rating": "5.00"
+      },
+      "description": "DB check: companion average_rating unchanged by companion->client ratings (captain)",
+      "layman": "Verify companion_profiles.average_rating remains driven only by CLIENT_RATING_DUO rows (companion ratings should not affect it)."
+    },
+    {
+      "step": 41,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{companionBUserId}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "average_rating": "5.00"
+      },
+      "description": "DB check: companion average_rating unchanged by companion->client ratings (vice)",
+      "layman": "Verify the vice captain's average_rating also remains unchanged after companion ratings."
+    }
+  ],
+  "assertions": {
+    "api": [
+      {
+        "step": 18,
+        "statusCode": 201,
+        "requiredKeys": [
+          "id",
+          "status",
+          "clientId",
+          "venueId",
+          "startAt",
+          "endAt",
+          "createdAt"
+        ],
+        "bodyFields": {
+          "status": "CONFIRMED",
+          "venueId": "d6b2f0f1-4f6e-4d67-8c4d-2b35d8f8df01"
+        }
+      },
+      {
+        "step": 24,
+        "statusCode": 200,
+        "requiredKeys": [
+          "bookingId",
+          "bookingStatus",
+          "clientMatchStatus"
+        ],
+        "bodyFields": {
+          "bookingStatus": "ACTIVE",
+          "clientMatchStatus": "CLIENT_MATCHED"
+        }
+      },
+      {
+        "step": 29,
+        "statusCode": 201,
+        "requiredKeys": [
+          "id",
+          "bookingId",
+          "raterUserId",
+          "ratingType",
+          "stars",
+          "tags",
+          "comment",
+          "createdAt"
+        ],
+        "bodyFields": {
+          "ratingType": "CLIENT_RATING_DUO",
+          "stars": 5
+        }
+      },
+      {
+        "step": 34,
+        "statusCode": 201,
+        "requiredKeys": [
+          "id",
+          "bookingId",
+          "raterUserId",
+          "ratingType",
+          "stars",
+          "tags",
+          "comment",
+          "createdAt"
+        ],
+        "bodyFields": {
+          "ratingType": "COMPANION_RATING_CLIENT",
+          "stars": 4
+        }
+      },
+      {
+        "step": 36,
+        "statusCode": 201,
+        "requiredKeys": [
+          "id",
+          "bookingId",
+          "raterUserId",
+          "ratingType",
+          "stars",
+          "tags",
+          "comment",
+          "createdAt"
+        ],
+        "bodyFields": {
+          "ratingType": "COMPANION_RATING_CLIENT",
+          "stars": 5
+        }
+      }
+    ],
+    "db": [],
+    "external": [
+      {
+        "step": 2,
+        "description": "CLIENT verification email received",
+        "checks": [
+          "email exists",
+          "token extracted"
+        ]
+      },
+      {
+        "step": 6,
+        "description": "CAPTAIN verification email received",
+        "checks": [
+          "email exists",
+          "token extracted"
+        ]
+      },
+      {
+        "step": 10,
+        "description": "VICE_CAPTAIN verification email received",
+        "checks": [
+          "email exists",
+          "token extracted"
+        ]
+      }
+    ],
+    "mustNotOccur": [
+      "Client rating accepted while booking is not COMPLETED/CANCELLED-eligible",
+      "Second CLIENT_RATING_DUO row created for same booking+rater (uniqueness breach)"
+    ]
+  }
+}

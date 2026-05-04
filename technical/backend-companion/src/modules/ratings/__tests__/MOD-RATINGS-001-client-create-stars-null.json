@@ -1,0 +1,84 @@
+{
+  "testId": "MOD-RATINGS-001",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Client rating with stars null stores comment '' and does not recompute averages",
+  "flowType": "happy",
+  "linkedRequirement": "ratings/create",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-001-client-create-stars-null.json",
+  "executionMode": "api+db+auth",
+  "objective": "Client can submit CLIENT_RATING_DUO with nullable stars; comment is normalized to empty string; companion averages remain unchanged.",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": null,
+        "tags": ["Professional"]
+      },
+      "layman": "Client submits rating with stars null and no comment"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "bookingId={{BOOKING_ID}}",
+        "raterUserId={{CLIENT_ID}}",
+        "ratingType=CLIENT_RATING_DUO",
+        "stars=null",
+        "comment=",
+        "tags"
+      ],
+      "layman": "Rating is created and returned"
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{BOOKING_ID}} AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = {{CLIENT_ID}}",
+      "expectedRows": 1,
+      "expectedFields": {
+        "stars": null,
+        "comment": ""
+      },
+      "layman": "Verify stars stored as NULL and comment stored as empty string"
+    },
+    {
+      "step": 4,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{CAPTAIN_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "average_rating": "0.00" },
+      "layman": "Captain average rating remains unchanged"
+    },
+    {
+      "step": 5,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{VICE_CAPTAIN_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "average_rating": "0.00" },
+      "layman": "Vice-captain average rating remains unchanged"
+    }
+  ],
+  "openQuestions": []
+}

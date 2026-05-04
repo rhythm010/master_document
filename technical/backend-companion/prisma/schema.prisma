@@ -198,7 +198,7 @@ model BookingRating {
   bookingId  String            @db.Uuid @map("booking_id")
   raterUserId String           @db.Uuid @map("rater_user_id")
   ratingType BookingRatingType @map("rating_type")
-  stars      Int
+  stars      Int?
   tags       String[]          @default([]) @db.Text
   comment    String            @default("")
   createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)

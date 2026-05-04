@@ -32,7 +32,7 @@ CREATE TYPE presence_status AS ENUM ('ASSIGNED', 'ARRIVED');
 CREATE TYPE self_match_status AS ENUM ('NOT_MATCHED', 'MATCHED');
 CREATE TYPE client_match_status AS ENUM ('WAITING_FOR_CLIENT', 'CLIENT_MATCHED');
 
-CREATE TYPE booking_rating_type AS ENUM ('CLIENT_RATING_DUO', 'COMPANION_RATING_CLIENT');
+CREATE TYPE "BookingRatingType" AS ENUM ('CLIENT_RATING_DUO', 'COMPANION_RATING_CLIENT');
 ```
 
 ---
@@ -251,15 +251,16 @@ CREATE TABLE booking_ratings (
 	id uuid PRIMARY KEY,
 	booking_id uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
 	rater_user_id uuid NOT NULL REFERENCES users(id),
-	rating_type booking_rating_type NOT NULL,
+	rating_type "BookingRatingType" NOT NULL,
 
-	stars smallint NOT NULL,
+	stars smallint NULL,
 	tags text[] NOT NULL DEFAULT '{}',
 	comment text NOT NULL DEFAULT '',
 
 	created_at timestamptz NOT NULL DEFAULT now(),
 
-	CONSTRAINT chk_booking_ratings_stars CHECK (stars BETWEEN 1 AND 5),
+	CONSTRAINT chk_booking_ratings_stars CHECK (stars IS NULL OR (stars BETWEEN 1 AND 5)),
+	CONSTRAINT chk_booking_ratings_comment_length CHECK (char_length(comment) <= 300),
 	CONSTRAINT uq_booking_ratings_once UNIQUE (booking_id, rating_type, rater_user_id)
 );
 

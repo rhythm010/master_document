@@ -1,0 +1,61 @@
+{
+  "testId": "MOD-RATINGS-003",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Companion rating requires stars and creates COMPANION_RATING_CLIENT",
+  "flowType": "happy",
+  "linkedRequirement": "ratings/create",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-003-companion-create-stars-required.json",
+  "executionMode": "api+db+auth",
+  "objective": "Assigned companion submits COMPANION_RATING_CLIENT with required stars.",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 4,
+        "tags": ["Attentive"],
+        "comment": null
+      },
+      "layman": "Captain submits rating of client"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "bookingId={{BOOKING_ID}}",
+        "raterUserId={{CAPTAIN_ID}}",
+        "ratingType=COMPANION_RATING_CLIENT",
+        "stars=4",
+        "comment="
+      ],
+      "layman": "Companion rating is created"
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{CAPTAIN_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "average_rating": "0.00" },
+      "layman": "Companion average rating not recomputed for companion->client ratings"
+    }
+  ],
+  "openQuestions": []
+}

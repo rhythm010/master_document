@@ -1,0 +1,45 @@
+{
+  "testId": "MOD-RATINGS-010",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "CANCELLED booking with future startAt returns 400 INVALID_STATE_TRANSITION",
+  "flowType": "sad",
+  "linkedRequirement": "ratings/eligibility",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-010-cancelled-future-startat-400.json",
+  "executionMode": "api+db+auth",
+  "objective": "Reject rating submission when booking.status is CANCELLED but bookings.start_at is in the future",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "CANCELLED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 5,
+        "tags": ["Professional"],
+        "comment": "ok"
+      },
+      "layman": "Client attempts to rate a CANCELLED booking that has not started yet"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 400,
+      "expectedResponseFields": ["code=INVALID_STATE_TRANSITION"],
+      "layman": "System rejects because CANCELLED bookings are only eligible when startAt <= now()"
+    }
+  ],
+  "openQuestions": []
+}

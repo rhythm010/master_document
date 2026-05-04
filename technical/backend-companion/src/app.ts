@@ -8,6 +8,7 @@ import { rosterRouter } from "./modules/roster";
 import { bookingRouter } from "./modules/booking";
 import { sessionInProgressRouter } from "./modules/session-in-progress";
 import { matchingRouter } from "./modules/matching";
+import { ratingsRouter } from "./modules/ratings";
 import { errorHandler } from "./shared/middleware/errorHandler";
 
 export const app = express();
@@ -30,6 +31,7 @@ app.use(rosterRouter);
 app.use(bookingRouter);
 app.use(sessionInProgressRouter);
 app.use(matchingRouter);
+app.use(ratingsRouter);
 
 // Centralized error handling for all routes.
 app.use(errorHandler);

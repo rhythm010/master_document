@@ -1,0 +1,44 @@
+{
+  "testId": "MOD-RATINGS-004",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Tags empty returns 400",
+  "flowType": "sad",
+  "linkedRequirement": "ratings/validation",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-004-tags-empty-400.json",
+  "executionMode": "api+db+auth",
+  "objective": "Reject rating submissions with tags=[]",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": null,
+        "tags": []
+      },
+      "layman": "Client submits rating with no tags"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 400,
+      "expectedResponseFields": ["code=VALIDATION_ERROR"],
+      "layman": "System rejects invalid payload"
+    }
+  ],
+  "openQuestions": []
+}

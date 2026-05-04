@@ -1,0 +1,69 @@
+{
+  "testId": "MOD-RATINGS-002",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Client rating with stars recomputes companion averages",
+  "flowType": "happy",
+  "linkedRequirement": "ratings/create",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-002-client-create-stars-present-recompute.json",
+  "executionMode": "api+db+auth",
+  "objective": "Client submits CLIENT_RATING_DUO with non-null stars; companion_profiles.average_rating is recomputed for both assigned companions.",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 5,
+        "tags": ["Punctual"],
+        "comment": "Great service"
+      },
+      "layman": "Client submits rating with 5 stars"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "ratingType=CLIENT_RATING_DUO",
+        "stars=5",
+        "comment=Great service"
+      ],
+      "layman": "Rating is created"
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{CAPTAIN_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "average_rating": "5.00" },
+      "layman": "Captain average rating updated to 5.00"
+    },
+    {
+      "step": 4,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{VICE_CAPTAIN_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "average_rating": "5.00" },
+      "layman": "Vice-captain average rating updated to 5.00"
+    }
+  ],
+  "openQuestions": []
+}

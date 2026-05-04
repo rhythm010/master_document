@@ -1,0 +1,114 @@
+{
+  "testId": "MOD-RATINGS-008",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Duplicate submission returns 200 with existing row and does not recompute",
+  "flowType": "mixed",
+  "linkedRequirement": "ratings/idempotency",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-008-duplicate-idempotent-200.json",
+  "executionMode": "api+db+auth",
+  "objective": "First submission returns 201; second retry returns 200 with original immutable payload; no second row; average_rating not recomputed on retry.",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 5,
+        "tags": ["Professional"],
+        "comment": "first"
+      },
+      "layman": "First submit creates rating"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": [
+        "ratingType=CLIENT_RATING_DUO",
+        "stars=5",
+        "comment=first"
+      ],
+      "layman": "Rating created"
+    },
+    {
+      "step": 3,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{BOOKING_ID}} AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = {{CLIENT_ID}}",
+      "expectedRows": 1,
+      "layman": "Only one rating row exists"
+    },
+    {
+      "step": 4,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{CAPTAIN_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "average_rating": "5.00" },
+      "layman": "Averages updated after first insert"
+    },
+    {
+      "step": 5,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 1,
+        "tags": ["Different"],
+        "comment": "second"
+      },
+      "layman": "Second submit retries with different payload"
+    },
+    {
+      "step": 6,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "ratingType=CLIENT_RATING_DUO",
+        "stars=5",
+        "comment=first"
+      ],
+      "layman": "System returns the existing immutable rating"
+    },
+    {
+      "step": 7,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{BOOKING_ID}} AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = {{CLIENT_ID}}",
+      "expectedRows": 1,
+      "layman": "Still only one rating row exists"
+    },
+    {
+      "step": 8,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "companion_profiles",
+      "query": "WHERE user_id = {{CAPTAIN_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "average_rating": "5.00" },
+      "layman": "Average rating unchanged after retry"
+    }
+  ],
+  "openQuestions": []
+}

@@ -1,0 +1,44 @@
+{
+  "testId": "MOD-RATINGS-007",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Unauthorized returns 401",
+  "flowType": "sad",
+  "linkedRequirement": "ratings/auth",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-007-unauthorized-401.json",
+  "executionMode": "api+db",
+  "objective": "Reject rating submission when Authorization header is missing",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Anonymous",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": {
+        "stars": 5,
+        "tags": ["Professional"],
+        "comment": "ok"
+      },
+      "layman": "Anonymous caller attempts to rate"
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 401,
+      "expectedResponseFields": ["code=UNAUTHORIZED"],
+      "layman": "System rejects missing authorization"
+    }
+  ],
+  "openQuestions": []
+}
