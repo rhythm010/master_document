@@ -168,6 +168,22 @@ All these agenents files are present inside: /Users/rhythmkhanna/.copilot/agents
 
 ---
 
+# PROJECT CONTEXT MCP (LOCAL-ONLY)
+
+When you need **project context** (endpoints/auth rules, Feature SDS rules, Prisma schema fields, invariants, spec-vs-code support), prefer calling the **project-context-mcp** tools instead of repeatedly reading raw files.
+
+Tool preference order (for context retrieval):
+1. `project-context-mcp-get_module_contract(module)`
+2. `project-context-mcp-get_feature_sds(feature)` (latest/current SDS only)
+3. `project-context-mcp-get_schema_entity(entity)`
+4. `project-context-mcp-get_invariants()`
+5. `project-context-mcp-get_business_rules(topic)`
+6. `project-context-mcp-get_feature_support_matrix()`
+
+Fallback to direct file reads only when MCP output is missing the needed detail.
+
+---
+
 # CORE RESPONSIBILITY
 
 For every task:

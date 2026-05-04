@@ -9,6 +9,16 @@
       "env": {
         "NODE_ENV": "test"
       }
+    },
+    "project-context-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/mcp/project-context-mcp/dist/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
     }
   }
 }
