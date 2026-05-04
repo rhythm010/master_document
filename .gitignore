@@ -12,5 +12,8 @@ dist/
 # Logs
 *.log
 
+# MCP servers
+mcp/**/node_modules/
+
 # macOS
 .DS_Store
