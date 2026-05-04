@@ -8,6 +8,10 @@ dist/
 !mcp/test-runner-mcp/dist/
 !mcp/test-runner-mcp/dist/index.js
 
+# Allow committing Project Context MCP dist (stdio entrypoint + imports)
+!mcp/project-context-mcp/dist/
+!mcp/project-context-mcp/dist/**
+
 # Environment files
 .env
 .env.local
