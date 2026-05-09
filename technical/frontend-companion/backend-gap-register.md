@@ -112,7 +112,7 @@ Leave empty until resolved. When resolved, include PR/commit/file references if 
 
 Created at: 2026-05-09T11:21:28Z
 
-Status: Open
+Status: Resolved
 
 Severity: Needed Soon
 
@@ -135,6 +135,7 @@ Acceptance criteria for resolution:
 The frontend environment config points to the agreed backend API base path, and health/auth/venues/bookings calls work consistently in local and staging.
 
 Resolution notes:
+Resolved in current workspace as of 2026-05-09. Backend API routes are intentionally root-mounted (no `/api/v1` prefix). Frontend should set its API base URL without adding a versioned base-path.
 
 ### FE-BE-GAP-002: Browser/Web CORS Support For Expo Web
 
@@ -182,16 +183,21 @@ Found in milestone: Milestone 1: Core App Foundation
 Frontend area: Email verification infrastructure, environment setup
 
 Gap:
-The backend supports SMTP configuration and sends verification emails, but staging email provider/configuration is not confirmed. Local Mailpit can be used, but staging needs a safe real provider or test provider.
+The backend supports SMTP configuration and sends verification emails, but staging email provider/configuration is not confirmed.
+
+To keep Milestone 1 staging verification visibly unresolved, the backend now supports an `APP_ENV` + `EMAIL_DELIVERY_MODE` switch and defaults to **not sending real email in staging** unless explicitly enabled.
 
 Expected backend support:
-Staging-safe SMTP configuration, sender address, and verification URL/deep-link settings.
+- Staging-safe SMTP configuration + credentials (provider decision), sender address, and verification URL/deep-link settings.
+- A clear and observable staging delivery mode so we can tell when staging is still blocked.
 
 Current frontend workaround:
-Use local Mailpit for local testing and treat staging verification as blocked until SMTP/env config is ready.
+- Use local Mailpit for local testing.
+- Treat staging verification as blocked by default: when `APP_ENV=staging`, `EMAIL_DELIVERY_MODE` defaults to `log_only` (no send) unless overridden.
+- Use `GET /health` metadata (e.g., `emailDeliveryMode`) to confirm the current behavior.
 
 Acceptance criteria for resolution:
-Signup in staging sends a verification email, the link verifies the user, and login is allowed after verification.
+Signup in staging sends a verification email (with `EMAIL_DELIVERY_MODE=smtp` and provider configured), the link verifies the user, and login is allowed after verification.
 
 Resolution notes:
 
@@ -199,7 +205,7 @@ Resolution notes:
 
 Created at: 2026-05-09T11:28:42Z
 
-Status: Open
+Status: Resolved
 
 Severity: Needed Soon
 
@@ -210,18 +216,27 @@ Found in milestone: Milestone 1: Core App Foundation
 Frontend area: Email verification, deep links, local/staging/prod config
 
 Gap:
-The backend currently builds email verification deep links with the fixed scheme `companion://auth/verify-email?token=...`. The mobile app may need environment-specific schemes/hosts for local, staging, and production builds.
+The backend previously built email verification deep links with a fixed scheme `companion://auth/verify-email?token=...`, which does not support distinct app builds per environment.
 
 Expected backend support:
-Configurable app verification deep link per environment, or confirmation that one `companion://` scheme is the final V1 scheme for all environments.
+Configurable app verification deep link scheme per environment, with a safe override for custom builds.
 
 Current frontend workaround:
-Use the fixed `companion://` scheme in local development and document any staging/prod differences later.
+None required after resolution. Frontend should register the appropriate scheme(s) for its environment builds.
 
 Acceptance criteria for resolution:
 Verification links generated from local/staging/prod emails open the intended app build or verification path.
 
 Resolution notes:
+Resolved in current workspace as of 2026-05-09.
+- Backend now exposes `APP_ENV` and computes a default `mobileDeepLinkScheme` mapping:
+  - local/dev => `companion-dev://`
+  - staging => `companion-staging://`
+  - production => `companion://`
+- Optional override: `MOBILE_DEEPLINK_SCHEME`.
+- Implemented in:
+  - `technical/backend-companion/src/shared/config/index.ts`
+  - `technical/backend-companion/src/shared/utils/urls.ts`
 
 ## Milestone 2: Identity Flow With Minimum UI
 
