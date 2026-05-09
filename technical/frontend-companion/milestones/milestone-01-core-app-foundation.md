@@ -63,6 +63,22 @@ Staging email can be configured later, but the gap must remain visible until it 
 - Backend error format
 - Local SMTP or local inbox setup
 
+## Backend Integration Rules (Milestone 1)
+
+- **API base path:** backend routes are root-mounted (e.g., `/health`, `/auth/login`). Do **not** prepend `/api/v1` in the mobile API client.
+- **Verification deep-link scheme matrix (backend-generated):**
+
+  | APP_ENV | verificationDeepLinkScheme |
+  |--------|----------------------------|
+  | local  | `companion-dev://` |
+  | dev    | `companion-dev://` |
+  | staging | `companion-staging://` |
+  | production | `companion://` |
+
+  Optional override: `MOBILE_DEEPLINK_SCHEME`.
+
+- **Staging verification is intentionally blocked for Milestone 1:** when `APP_ENV=staging`, backend `EMAIL_DELIVERY_MODE` defaults to `log_only` (no real sending) unless explicitly set to `smtp`. Confirm current behavior via `GET /health` metadata.
+
 Register gaps if:
 
 - backend routes do not match the mobile API client assumptions

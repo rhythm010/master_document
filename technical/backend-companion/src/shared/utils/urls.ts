@@ -2,8 +2,14 @@ import { config } from "../config";
 
 // Build app and web verification links for email content.
 export function buildVerifyEmailLinks(token: string) {
-  const deepLink = `companion://auth/verify-email?token=${token}`;
-  const webLink = config.webVerifyUrl.replace("{token}", token);
+  const encodedToken = encodeURIComponent(token);
+
+  if (!config.webVerifyUrl.includes("{token}")) {
+    throw new Error("WEB_VERIFY_URL must contain the '{token}' placeholder");
+  }
+
+  const deepLink = `${config.mobileDeepLinkScheme}auth/verify-email?token=${encodedToken}`;
+  const webLink = config.webVerifyUrl.replaceAll("{token}", encodedToken);
   return { deepLink, webLink };
 }
 

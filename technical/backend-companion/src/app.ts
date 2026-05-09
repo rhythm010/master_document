@@ -60,7 +60,12 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Simple health endpoint for uptime checks and local testing.
 app.get("/health", (_req, res) => {
-  res.status(200).json({ status: "ok" });
+  res.status(200).json({
+    status: "ok",
+    appEnv: config.appEnv,
+    verificationDeepLinkScheme: config.mobileDeepLinkScheme,
+    emailDeliveryMode: config.emailDeliveryMode
+  });
 });
 
 // Register feature routers before the error handler.
