@@ -10,6 +10,7 @@ import { sessionInProgressRouter } from "./modules/session-in-progress";
 import { matchingRouter } from "./modules/matching";
 import { ratingsRouter } from "./modules/ratings";
 import { config } from "./shared/config";
+import { logger } from "./shared/logger";
 import { errorHandler } from "./shared/middleware/errorHandler";
 
 export const app = express();
@@ -24,6 +25,27 @@ function isLocalDevOrigin(origin: string): boolean {
     return false;
   }
 }
+
+// Log every incoming request once the response is completed.
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+
+  res.on("finish", () => {
+    logger.info(
+      {
+        method: req.method,
+        path: req.originalUrl,
+        statusCode: res.statusCode,
+        durationMs: Date.now() - startedAt,
+        origin: req.headers.origin ?? null,
+        ip: req.ip,
+      },
+      "http request"
+    );
+  });
+
+  next();
+});
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
