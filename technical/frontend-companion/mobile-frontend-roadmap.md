@@ -2,6 +2,10 @@
 
 This roadmap covers Version 1 of the Companion mobile application.
 
+Detailed milestone task briefs live in `technical/frontend-companion/milestones/`.
+
+Use the main roadmap as the high-level sequence. Use the milestone files when assigning implementation work to agents.
+
 The plan for Version 1 is to build a logic-first mobile application, not a screen-first frontend.
 
 The early app should look plain but behave correctly. Design polish can come after the flows, permissions, services, state, and native integrations are working.
@@ -73,6 +77,8 @@ Rules for agents:
 
 ## Milestone 0: Real Device Placeholder App
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-00-real-device-placeholder-app.md`
+
 Goal:
 
 Create the real Expo app and prove it runs on physical iOS and Android devices.
@@ -105,6 +111,8 @@ Validation:
 - Real iOS and Android devices must validate app launch, backend connectivity over LAN or tunnel, and QR/development-build workflow.
 
 ## Milestone 1: Core App Foundation
+
+Detailed brief: `technical/frontend-companion/milestones/milestone-01-core-app-foundation.md`
 
 Goal:
 
@@ -151,6 +159,8 @@ Validation:
 
 ## Milestone 2: Identity Flow With Minimum UI
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-02-identity-flow-minimum-ui.md`
+
 Goal:
 
 Build the real account access flow using simple forms and minimum UI.
@@ -192,6 +202,8 @@ Validation:
 - Real devices should validate email verification deep links from a real email app, session persistence after closing/reopening, biometric login if added later, and onboarding media behavior if it differs from simulator.
 
 ## Milestone 3: Backend-Driven Home State
+
+Detailed brief: `technical/frontend-companion/milestones/milestone-03-backend-driven-home-state.md`
 
 Goal:
 
@@ -253,6 +265,8 @@ Validation:
 
 ## Milestone 4: Booking Logic Flow
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-04-booking-logic-flow.md`
+
 Goal:
 
 Build the Client booking journey with minimal UI.
@@ -307,6 +321,8 @@ Validation:
 
 ## Milestone 5: Native Capability Foundation
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-05-native-capability-foundation.md`
+
 Goal:
 
 Build and test device-level features before wiring them deeply into matching and session flows.
@@ -352,6 +368,8 @@ Validation:
 
 ## Milestone 6: Matching Flow
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-06-matching-flow.md`
+
 Goal:
 
 Connect native capabilities to the backend matching APIs.
@@ -393,6 +411,8 @@ Validation:
 
 ## Milestone 7: Active Session Logic
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-07-active-session-logic.md`
+
 Goal:
 
 Build the session-in-progress experience with minimum UI.
@@ -433,6 +453,8 @@ Validation:
 
 ## Milestone 8: Ratings Flow
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-08-ratings-flow.md`
+
 Goal:
 
 Build the rating logic after session completion or eligible cancellation.
@@ -470,6 +492,8 @@ Validation:
 
 ## Milestone 9: Environment And Release Hardening
 
+Detailed brief: `technical/frontend-companion/milestones/milestone-09-environment-release-hardening.md`
+
 Goal:
 
 Set up local, staging, and production builds properly through EAS.
@@ -506,6 +530,8 @@ Validation:
 - Real devices must validate EAS development build install, EAS staging build install, production-like build install, iOS bundle identifier behavior, Android package identifier behavior, staging API connectivity, push credentials/delivery, deep links from real apps, and core staging journeys on iOS and Android.
 
 ## Milestone 10: UI Design And Polish
+
+Detailed brief: `technical/frontend-companion/milestones/milestone-10-ui-design-polish.md`
 
 Goal:
 

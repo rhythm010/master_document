@@ -2,7 +2,7 @@
 
 Created at: 2026-05-09T11:21:28Z
 
-Last reviewed at: 2026-05-09T11:28:42Z
+Last reviewed at: 2026-05-09T12:20:00Z
 
 This file tracks backend API, service, data, environment, and contract gaps discovered during Version 1 mobile frontend planning and development.
 
@@ -32,6 +32,19 @@ Reviewed backend code and SDS context:
 - Backend package scripts, seed file, env examples, and Docker config references
 - Current feature SDS files under `SDS/feature-sds/`
 - Core SDS and tech stack SDS
+
+## Validation Notes
+
+Validated against backend code and current SDS on 2026-05-09:
+
+- `FE-BE-GAP-001` remains open: backend routes are currently mounted at root (`/health`, `/auth/login`, `/venues`, `/bookings`) rather than `/api/v1`.
+- `FE-BE-GAP-002` is resolved in the current workspace: `src/app.ts` now sets CORS headers, supports local dev origins outside production, and reads `CORS_ALLOWED_ORIGINS` from config/env.
+- `FE-BE-GAP-003`, `FE-BE-GAP-004`, and `FE-BE-GAP-005` remain open: SMTP is configurable but staging provider/credentials are not established in repo docs, app deep link remains fixed to `companion://...`, and onboarding media ownership is still a product/backend decision.
+- Current SDS-to-code mismatches confirmed: `GET /venues/{venueId}` and `GET /companion-profiles/{companionId}` are required by current SDS but are not registered in the inspected route files.
+- Current booking SDS says booking details always returns companion public info, but `booking.service.ts` still enforces a T-5h/status-based reveal and can return `companions: null`.
+- Current-state/home, assigned-companion current booking lookup, and rating-read/status APIs are not present in inspected routes; the mobile app cannot reconstruct next action from backend alone.
+- Push/in-app notifications remain placeholder/log-only in booking, matching, and session scheduler code; no push token registration endpoint or provider delivery path was found.
+- Prisma seed remains effectively empty; repeatable mobile staging journey data is not available from `prisma/seed.ts`.
 
 ## Status Values
 
@@ -127,7 +140,7 @@ Resolution notes:
 
 Created at: 2026-05-09T11:28:42Z
 
-Status: Open
+Status: Resolved
 
 Severity: Needed Soon
 
@@ -150,6 +163,7 @@ Acceptance criteria for resolution:
 Expo web can call backend health/auth endpoints in local development without browser CORS failures.
 
 Resolution notes:
+Resolved in current workspace as of 2026-05-09 validation. `technical/backend-companion/src/app.ts` includes CORS middleware with local-dev origin handling and `technical/backend-companion/src/shared/config/index.ts` exposes `corsAllowedOrigins` from `CORS_ALLOWED_ORIGINS`.
 
 ## Milestone 1: Core App Foundation
 

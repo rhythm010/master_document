@@ -22,7 +22,8 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   EMAIL_FROM: z.string().default("noreply@companion.app"),
   PUBLIC_BASE_URL: z.string().default("http://localhost:3000"),
-  WEB_VERIFY_URL: z.string().default("https://companion.app/verify-email?token={token}")
+  WEB_VERIFY_URL: z.string().default("https://companion.app/verify-email?token={token}"),
+  CORS_ALLOWED_ORIGINS: z.string().default("http://localhost:8081,http://localhost:19006,http://localhost:3000")
 });
 
 const env = envSchema.parse(process.env);
@@ -45,5 +46,6 @@ export const config = {
   smtpPass: env.SMTP_PASS ?? "",
   emailFrom: env.EMAIL_FROM,
   publicBaseUrl: env.PUBLIC_BASE_URL,
-  webVerifyUrl: env.WEB_VERIFY_URL
+  webVerifyUrl: env.WEB_VERIFY_URL,
+  corsAllowedOrigins: env.CORS_ALLOWED_ORIGINS.split(",").map((origin) => origin.trim()).filter(Boolean)
 };
