@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-VERIFY-002",
+  "title": "Verify email — expired token: expired message shown, email input and Resend button visible, tap Resend → success message",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "verify-email",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(auth)/verify-email.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md",
+    "technical/frontend-companion/frontend-backend-contract.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Backend is running. GET /auth/verify-email returns TOKEN_EXPIRED for expired tokens. POST /auth/resend-verification works."
+    },
+    {
+      "id": "PRE-3",
+      "description": "An expired verification token is available in DATA-1. Obtain by: (1) creating a test account with a very short token TTL in the backend dev config, or (2) using a previously-used/expired token from a prior test run."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "expiredToken",
+      "strategy": "generateFromApi",
+      "description": "An expired email verification token that causes the backend to return TOKEN_EXPIRED.",
+      "example": "expired-token-or-old-jwt"
+    },
+    {
+      "id": "DATA-2",
+      "name": "resendEmail",
+      "strategy": "staticFixture",
+      "value": "user-needing-resend@example.com",
+      "description": "Email address to enter into the resend field on the expired state screen. Does not need to match the original signup email for this UI test."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/verify-email",
+      "queryParams": { "token": "DATA-1" },
+      "description": "Navigate to verify-email with an expired token."
+    },
+    {
+      "step": 2,
+      "action": "waitForNetworkIdle",
+      "description": "Wait for the GET /auth/verify-email call to return TOKEN_EXPIRED."
+    },
+    {
+      "step": 3,
+      "action": "waitForText",
+      "target": { "text": "This verification link has expired." },
+      "description": "Expired state heading is visible."
+    },
+    {
+      "step": 4,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-2",
+      "description": "Enter email address to receive a new verification link."
+    },
+    {
+      "step": 5,
+      "action": "click",
+      "target": { "text": "Resend Verification Email", "role": "button" },
+      "description": "Tap Resend Verification Email button."
+    },
+    {
+      "step": 6,
+      "action": "waitForNetworkIdle",
+      "description": "Wait for POST /auth/resend-verification to complete."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/auth/verify-email",
+      "status": 400,
+      "description": "Backend returns 400 (or 410) with TOKEN_EXPIRED error code."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "target": { "text": "This verification link has expired." },
+      "description": "Expired status heading is rendered."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "target": { "text": "Enter your email address to receive a new verification link." },
+      "description": "Instructional text below heading is visible."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "target": { "placeholder": "Email" },
+      "description": "Email input field is visible in the expired state."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "target": { "text": "Resend Verification Email" },
+      "description": "Resend button is visible in the expired state."
+    },
+    {
+      "assertion": 6,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "target": { "text": "Back to Login" },
+      "description": "Back to Login link is visible as a secondary action."
+    },
+    {
+      "assertion": 7,
+      "afterStep": 5,
+      "type": "networkRequestObserved",
+      "method": "POST",
+      "path": "/auth/resend-verification",
+      "description": "Resend API call is made when button is tapped."
+    },
+    {
+      "assertion": 8,
+      "afterStep": 6,
+      "type": "networkResponseObserved",
+      "method": "POST",
+      "path": "/auth/resend-verification",
+      "status": 200,
+      "description": "Backend confirms resend was queued."
+    },
+    {
+      "assertion": 9,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Verification email sent. Check your inbox." },
+      "description": "resendStatus === 'sent' renders the green success message."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "The expired token must cause the backend to return error code 'TOKEN_EXPIRED'. Any other error code will result in the 'invalid' state, not the 'expired' state.",
+    "If obtaining a genuinely expired token is difficult in CI, consider: (1) backend test utility to create an already-expired token, or (2) mocking the network response in the Playwright spec using page.route() to intercept the GET /auth/verify-email call and return a TOKEN_EXPIRED response.",
+    "Validation note: if DATA-2 (resendEmail) does not correspond to an actual account, the backend may return an error. Use an actual existing account email for DATA-2 to get a 200 response."
+  ]
+}

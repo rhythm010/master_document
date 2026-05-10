@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-VERIFY-003",
+  "title": "Verify email — no token: 'Invalid or missing verification link.' shown with Go to Login button",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "verify-email",
+  "runtimeTargets": ["web"],
+  "requiredBackend": false,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(auth)/verify-email.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    }
+  ],
+  "testData": [],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/verify-email",
+      "description": "Navigate to verify-email without any token query parameter. useLocalSearchParams returns undefined for 'token'."
+    },
+    {
+      "step": 2,
+      "action": "waitForText",
+      "target": { "text": "Invalid or missing verification link." },
+      "description": "No-token state is rendered immediately (no API call is made)."
+    },
+    {
+      "step": 3,
+      "action": "click",
+      "target": { "text": "Go to Login", "role": "button" },
+      "description": "Tap Go to Login button."
+    },
+    {
+      "step": 4,
+      "action": "waitForRoute",
+      "value": "/(auth)/login",
+      "description": "router.replace to login screen."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "uiVisible",
+      "target": { "text": "Invalid or missing verification link." },
+      "description": "The no-token (and invalid) state renders the 'Invalid or missing verification link.' heading."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 2,
+      "type": "uiVisible",
+      "target": { "text": "Go to Login" },
+      "description": "Go to Login button is visible in invalid/no-token state."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 2,
+      "type": "uiNotVisible",
+      "target": { "text": "Verifying your email..." },
+      "description": "No loading state appears — status is set to 'no-token' synchronously on mount without making an API call."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 2,
+      "type": "uiNotVisible",
+      "target": { "placeholder": "Email" },
+      "description": "No email input appears (email input is only shown in 'expired' state, not 'no-token')."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 4,
+      "type": "routeContains",
+      "value": "/(auth)/login",
+      "description": "Tapping Go to Login navigates to login screen."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "This test does not require a running backend — the no-token case is handled entirely on the client side in useEffect: if (!token) { setStatus('no-token'); return; }",
+    "The 'no-token' and 'invalid' states share the same JSX render block and display the same text. This test covers navigation to the route without a token query param.",
+    "requiredBackend is false because no API call is triggered when token is absent."
+  ]
+}

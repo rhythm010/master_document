@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-LOGOUT-001",
+  "title": "Logout — CLIENT: tap Logout on client home navigates to /(auth)/login",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "logout",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(client)/home.tsx",
+    "technical/frontend-companion/companion-app/app/(auth)/login.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    },
+    {
+      "id": "PRE-2",
+      "description": "A verified CLIENT account exists with credentials DATA-1 and DATA-2."
+    },
+    {
+      "id": "PRE-3",
+      "description": "localStorage 'companion_onboarding_complete' is set to 'true' so the layout guard does not redirect to onboarding after login."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "clientEmail",
+      "strategy": "usePreSeedCredentials",
+      "description": "Verified CLIENT account email."
+    },
+    {
+      "id": "DATA-2",
+      "name": "clientPassword",
+      "strategy": "usePreSeedCredentials",
+      "description": "Verified CLIENT account password."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/login",
+      "description": "Open login screen."
+    },
+    {
+      "step": 2,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-1"
+    },
+    {
+      "step": 3,
+      "action": "fill",
+      "target": { "placeholder": "Password" },
+      "valueRef": "DATA-2"
+    },
+    {
+      "step": 4,
+      "action": "click",
+      "target": { "text": "Log In", "role": "button" }
+    },
+    {
+      "step": 5,
+      "action": "waitForRoute",
+      "value": "/(client)/home",
+      "description": "Wait for navigation to CLIENT home."
+    },
+    {
+      "step": 6,
+      "action": "waitForText",
+      "target": { "text": "Client Home — Milestone 2" },
+      "description": "Confirm we are on the CLIENT home screen."
+    },
+    {
+      "step": 7,
+      "action": "click",
+      "target": { "text": "Logout", "role": "button" },
+      "description": "Tap the Logout button."
+    },
+    {
+      "step": 8,
+      "action": "waitForRoute",
+      "value": "/(auth)/login",
+      "description": "After logout(), router.replace navigates to login."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Client Home — Milestone 2" },
+      "description": "CLIENT home screen is visible before logout."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Logout" },
+      "description": "Logout button is visible on CLIENT home screen."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 8,
+      "type": "routeContains",
+      "value": "/(auth)/login",
+      "description": "After logout, app navigates to login screen."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 8,
+      "type": "uiVisible",
+      "target": { "text": "Login" },
+      "description": "Login screen heading is visible after logout."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 8,
+      "type": "storageValueAbsent",
+      "key": "session_token",
+      "description": "Session token is cleared from storage after logout. Key name should be verified against store/session.ts SecureStore implementation."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "The Logout button is a <Pressable> with red background (#f00) and white 'Logout' text. On web it renders as a pressable div.",
+    "The session store's logout() clears the token from SecureStore. On web, SecureStore uses localStorage or AsyncStorage. The storageValueAbsent assertion key must match the exact key used in store/session.ts.",
+    "PRE-3 is important: inject localStorage 'companion_onboarding_complete' = 'true' via page.evaluate() in test setup before navigating to login.",
+    "After logout, attempting to navigate back (browser back button) should not return to the home screen because router.replace() was used (not router.push()). The validator may optionally test this by pressing browser back after assertion 4."
+  ]
+}

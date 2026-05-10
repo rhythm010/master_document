@@ -1,6 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import React from 'react';
 import { useSessionStore } from '@/store/session';
+import { hasCompletedOnboarding } from '@/lib/onboarding-storage';
 
 export default function ClientLayout() {
   const { user, isLoading } = useSessionStore();
@@ -12,6 +13,11 @@ export default function ClientLayout() {
       router.replace('/(auth)/login');
     } else if (user.role !== 'CLIENT') {
       router.replace('/(companion)/home');
+      return;
+    } else {
+      hasCompletedOnboarding().then((done) => {
+        if (!done) router.replace('/(client)/onboarding');
+      });
     }
   }, [router, user, isLoading]);
 
@@ -19,6 +25,7 @@ export default function ClientLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="onboarding" options={{ title: 'Onboarding', headerShown: false }} />
       <Stack.Screen name="home" options={{ title: 'Home' }} />
       <Stack.Screen name="location" options={{ title: 'Location' }} />
       <Stack.Screen name="booking/calendar" options={{ title: 'Calendar' }} />

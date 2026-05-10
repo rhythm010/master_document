@@ -9,16 +9,16 @@ const SLIDES = [
     body: 'Your trusted companion experience starts here.',
   },
   {
-    title: 'Be a Great Companion',
-    body: 'Show up on time, be professional, and make every session count.',
+    title: 'Find Your Companion',
+    body: 'Browse and book companions that match your needs and schedule.',
   },
   {
     title: 'Ready to Begin',
-    body: 'Complete your profile and start accepting bookings.',
+    body: 'Your first session is just a few taps away.',
   },
 ];
 
-export default function CompanionOnboardingScreen() {
+export default function ClientOnboardingScreen() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -31,7 +31,7 @@ export default function CompanionOnboardingScreen() {
       setCurrentSlide((prev) => prev + 1);
     } else {
       await markOnboardingComplete();
-      router.replace('/(companion)/home');
+      router.replace('/(client)/home');
     }
   }
 
