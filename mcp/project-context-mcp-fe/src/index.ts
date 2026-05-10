@@ -21,6 +21,7 @@ const REPO_ROOT = realpathSync(resolve(__dirname, "..", "..", ".."));
 const APP_ROOT = resolve(REPO_ROOT, "technical", "frontend-companion", "companion-app");
 const MCP_USAGE_DIR = join(REPO_ROOT, ".mcp-usage");
 const MCP_USAGE_LOG = join(MCP_USAGE_DIR, "project-context-mcp-fe.jsonl");
+const GST_OFFSET_MS = 4 * 60 * 60 * 1000;
 
 const server = new Server(
   { name: "project-context-mcp-fe", version: "1.0.0" },
@@ -31,12 +32,20 @@ function jsonText(data: unknown) {
   return { type: "text" as const, text: JSON.stringify(data, null, 2) };
 }
 
+function nowGst(): string {
+  return new Date(Date.now() + GST_OFFSET_MS).toISOString().replace("Z", "+04:00");
+}
+
 function log(message: string): void {
-  const timestamp = new Date().toISOString();
-  process.stderr.write(`[project-context-mcp-fe] ${timestamp} ${message}\n`);
+  const timestampUtc = new Date().toISOString();
+  const timestampGst = nowGst();
+  process.stderr.write(`[project-context-mcp-fe] ${timestampGst} ${message}\n`);
   try {
     mkdirSync(MCP_USAGE_DIR, { recursive: true });
-    appendFileSync(MCP_USAGE_LOG, `${JSON.stringify({ timestamp, server: "project-context-mcp-fe", message })}\n`);
+    appendFileSync(
+      MCP_USAGE_LOG,
+      `${JSON.stringify({ timestamp: timestampGst, timestampGst, timestampUtc, server: "project-context-mcp-fe", message })}\n`
+    );
   } catch {
     // Usage logging must never break MCP responses.
   }

@@ -9,6 +9,7 @@ const BACKEND_ROOT = join(new URL(".", import.meta.url).pathname, "../../../tech
 const REPO_ROOT = resolve(join(BACKEND_ROOT, "../.."));
 const MCP_USAGE_DIR = join(REPO_ROOT, ".mcp-usage");
 const MCP_USAGE_LOG = join(MCP_USAGE_DIR, "test-runner-mcp.jsonl");
+const GST_OFFSET_MS = 4 * 60 * 60 * 1000;
 const MODULES_DIR = join(BACKEND_ROOT, "src/modules");
 const QA_DIR = join(BACKEND_ROOT, "qa");
 const RESULTS_DIR = join(BACKEND_ROOT, "results");
@@ -23,12 +24,17 @@ const KNOWN_MODULES = [
     "ratings",
 ];
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+function nowGst() {
+    return new Date(Date.now() + GST_OFFSET_MS).toISOString().replace("Z", "+04:00");
+}
 function log(msg) {
     // MCP stderr — visible in VS Code Output > MCP panel
-    process.stderr.write(`[test-runner-mcp] ${msg}\n`);
+    const timestampUtc = new Date().toISOString();
+    const timestampGst = nowGst();
+    process.stderr.write(`[test-runner-mcp] ${timestampGst} ${msg}\n`);
     try {
         mkdirSync(MCP_USAGE_DIR, { recursive: true });
-        appendFileSync(MCP_USAGE_LOG, `${JSON.stringify({ timestamp: new Date().toISOString(), server: "test-runner-mcp", message: msg })}\n`);
+        appendFileSync(MCP_USAGE_LOG, `${JSON.stringify({ timestamp: timestampGst, timestampGst, timestampUtc, server: "test-runner-mcp", message: msg })}\n`);
     }
     catch {
         // Usage logging must never break MCP responses.
