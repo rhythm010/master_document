@@ -49,12 +49,13 @@ Onboarding may use bundled or downloaded media depending on final asset strategy
 
 ## Backend Dependencies
 
-- Client signup endpoint
-- Companion signup endpoint
+- Signup endpoint (role-based): POST /auth/signup (role = CLIENT | COMPANION)
 - Login endpoint
 - Email verification endpoint
 - Resend verification endpoint
 - Current user profile endpoint
+
+Note: Email verification is via mobile deep link. Web fallback verification is out of scope for this milestone.
 
 Register gaps if:
 
@@ -80,7 +81,7 @@ Simulator or web can validate:
 Real devices should validate:
 
 - email verification deep links from a real email app
-- session persistence after closing/reopening
+- session persistence after closing/reopening (token is persisted securely; session restore works until token expiry; if expired, user must log in again)
 - onboarding media behavior if it differs from simulator
 - biometric login only if added later
 
@@ -91,5 +92,5 @@ Real devices should validate:
 - A Companion can create an account.
 - Both roles can verify email.
 - Both roles can log in.
-- Both roles remain authenticated after closing and reopening the app.
+- Both roles remain authenticated after closing and reopening the app (token is persisted securely; session restore works until token expiry; if expired, user must log in again).
 - The app fetches the logged-in user profile.
