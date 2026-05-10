@@ -120,6 +120,18 @@ Converts/refines draft scenario artifacts into runnable machine-executable test 
 * prior draft tests
 * artifact status `FINALIZED_EXECUTABLE`
 
+## FE Test-Designer Agent
+
+* creates and updates frontend UI test design JSON artifacts under `technical/frontend-companion/companion-app/e2e/designs/`
+* designs UI-only test flows for the current frontend testing framework
+* supports only currently runnable automated targets, currently `web`
+* models real user behavior through numbered clicks, taps, form input, navigation, waits, and visible UI assertions
+* numbers all journey steps and assertions so validator reports can map failures to exact user actions
+* does not implement frontend or backend code
+* does not execute tests
+* does not add unsupported iOS/Android/native runtime targets
+* does not silently replace backend-backed behavior with mocks or static fallbacks
+
 ## Coding Agent
 
 * writes code according to approved scope
