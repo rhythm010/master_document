@@ -165,6 +165,9 @@ Converts/refines draft scenario artifacts into runnable machine-executable test 
 
 * creates and updates frontend UI test design JSON artifacts under `technical/frontend-companion/companion-app/e2e/designs/`
 * designs UI-only test flows for the current frontend testing framework
+* must read the canonical non-implementation milestone brief under `technical/frontend-companion/milestones/` and treat its `## Validation` section as the milestone definition of done for test coverage
+* must not rely only on `technical/frontend-companion/milestones/milestone-implementation/` documents; implementation docs explain how work was built, while non-implementation milestone briefs define acceptance intent and validation coverage
+* must treat milestone `## Validation` coverage as additive; it does not remove or weaken checks against current UI code, E2E patterns, API contract evidence, backend gap status, supported runtime targets, or executable UI reality
 * supports only currently runnable automated targets, currently `web`
 * models real user behavior through numbered clicks, taps, form input, navigation, waits, and visible UI assertions
 * numbers all journey steps and assertions so validator reports can map failures to exact user actions
@@ -701,7 +704,15 @@ After 2 loops:
 
 ## Lead UI Test Design And Validation Loop
 
-After FE Code Validator Agent passes, send the approved plan, final changed frontend code context, and relevant milestone/context docs to FE Test-Designer Agent.
+After FE Code Validator Agent passes, send the approved plan, final changed frontend code context, the relevant canonical milestone brief from `technical/frontend-companion/milestones/`, the milestone implementation document when present, and relevant context docs to FE Test-Designer Agent.
+
+The canonical milestone brief is the non-implementation document, for example:
+
+```text
+technical/frontend-companion/milestones/milestone-02-identity-flow-minimum-ui.md
+```
+
+The FE Test-Designer Agent must extract and cover the canonical brief's `## Validation` section as the definition of done. This is additive to all existing design checks. The implementation document under `milestone-implementation/` may provide executable details, file references, and current build decisions, but it must not replace the canonical validation section as the acceptance source or weaken executable UI reality checks.
 
 FE Test-Designer Agent creates or updates UI test design artifacts only when the change affects user-visible behavior, route flow, auth/session flow, API-backed UI state, or acceptance criteria that should be validated through UI behavior.
 
