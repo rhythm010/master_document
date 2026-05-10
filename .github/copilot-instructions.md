@@ -156,6 +156,19 @@ Converts/refines draft scenario artifacts into runnable machine-executable test 
 * does not modify product code
 * does not redesign business scenarios
 
+## FE Test-Validator Agent
+
+* executes frontend UI test designs created by FE Test-Designer Agent
+* validates web UI behavior through the current Playwright + Expo Web testing framework
+* checks required servers and services are running and healthy before test execution
+* generates reusable Playwright specs under `technical/frontend-companion/companion-app/e2e/generated/`
+* writes reports and evidence under `technical/frontend-companion/companion-app/e2e/results/`
+* maps results to numbered journey steps and numbered assertions
+* returns factual pass/fail results only
+* does not modify frontend or backend production code
+* does not redesign business scenarios
+* does not execute unsupported iOS/Android/native targets
+
 ## Feature SDS Agent
 
 * creates new Feature SDS documents
@@ -189,11 +202,11 @@ All these agenents files are present inside: /Users/rhythmkhanna/.copilot/agents
 
 ---
 
-# PROJECT CONTEXT MCP (LOCAL-ONLY)
+# PROJECT MCP SERVERS (LOCAL-ONLY, USE FIRST)
 
-When you need **project context** (endpoints/auth rules, Feature SDS rules, Prisma schema fields, invariants, spec-vs-code support), prefer calling the **project-context-mcp** tools instead of repeatedly reading raw files.
+This workspace has local stdio MCP servers. Agents must call the relevant MCP tools before scanning broad file trees or reading large raw files. Fall back to raw file reads only when MCP output is missing the detail needed for the task.
 
-Tool preference order (for context retrieval):
+Backend/project context:
 1. `project-context-mcp-get_module_contract(module)`
 2. `project-context-mcp-get_feature_sds(feature)` (latest/current SDS only)
 3. `project-context-mcp-get_schema_entity(entity)`
@@ -201,7 +214,29 @@ Tool preference order (for context retrieval):
 5. `project-context-mcp-get_business_rules(topic)`
 6. `project-context-mcp-get_feature_support_matrix()`
 
-Fallback to direct file reads only when MCP output is missing the needed detail.
+Frontend context:
+1. `project-context-mcp-fe-get_fe_router_config()`
+2. `project-context-mcp-fe-get_fe_component(componentName)`
+3. `project-context-mcp-fe-get_fe_store_slice(sliceName)`
+4. `project-context-mcp-fe-get_fe_api_contract(endpoint_or_tag)`
+5. `project-context-mcp-fe-get_fe_design_tokens(category)`
+6. `project-context-mcp-fe-get_fe_backend_gaps(status?)`
+
+Backend test execution:
+1. `test-runner-mcp-get_environment_status()`
+2. `test-runner-mcp-list_tests(module?)`
+3. `test-runner-mcp-run_module(module)`
+4. `test-runner-mcp-run_tests(files)`
+5. `test-runner-mcp-get_last_result(testId)`
+6. `test-runner-mcp-get_test_summary(module?)`
+
+Every MCP server writes durable usage records to `.mcp-usage/<server>.jsonl`. To quickly check whether agents used MCP, inspect:
+
+```text
+tail -n 20 .mcp-usage/*.jsonl
+```
+
+Agents should mention which MCP tools they used in final reports under `contextSource` or `environmentCheck`.
 
 ---
 

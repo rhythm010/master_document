@@ -5,8 +5,8 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { execFile, spawn } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, basename } from "node:path";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { join, basename, resolve } from "node:path";
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
 
@@ -14,6 +14,9 @@ const BACKEND_ROOT = join(
   new URL(".", import.meta.url).pathname,
   "../../../technical/backend-companion"
 );
+const REPO_ROOT = resolve(join(BACKEND_ROOT, "../.."));
+const MCP_USAGE_DIR = join(REPO_ROOT, ".mcp-usage");
+const MCP_USAGE_LOG = join(MCP_USAGE_DIR, "test-runner-mcp.jsonl");
 
 const MODULES_DIR = join(BACKEND_ROOT, "src/modules");
 const QA_DIR = join(BACKEND_ROOT, "qa");
@@ -38,6 +41,15 @@ type Module = (typeof KNOWN_MODULES)[number];
 function log(msg: string): void {
   // MCP stderr — visible in VS Code Output > MCP panel
   process.stderr.write(`[test-runner-mcp] ${msg}\n`);
+  try {
+    mkdirSync(MCP_USAGE_DIR, { recursive: true });
+    appendFileSync(
+      MCP_USAGE_LOG,
+      `${JSON.stringify({ timestamp: new Date().toISOString(), server: "test-runner-mcp", message: msg })}\n`
+    );
+  } catch {
+    // Usage logging must never break MCP responses.
+  }
 }
 
 function moduleTestsDir(module: Module): string {

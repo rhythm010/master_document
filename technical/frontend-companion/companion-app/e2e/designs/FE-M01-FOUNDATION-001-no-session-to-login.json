@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M01-FOUNDATION-001-no-session-to-login",
+  "title": "Fresh start with no persisted token redirects to login stub screen",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "01",
+  "area": "foundation",
+  "runtimeTargets": ["web"],
+  "requiredBackend": false,
+  "sourceRefs": [
+    "technical/frontend-companion/milestones/milestone-01-core-app-foundation.md",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-01-core-app-foundation.md",
+    "technical/frontend-companion/companion-app/app/index.tsx",
+    "technical/frontend-companion/companion-app/app/(auth)/login.tsx",
+    "technical/frontend-companion/companion-app/store/session.ts"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is served at http://localhost:8081 via npm run web."
+    },
+    {
+      "id": "PRE-2",
+      "description": "No 'auth_token' key is present in localStorage (fresh browser context, no prior session)."
+    }
+  ],
+  "testData": [],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/",
+      "notes": "Opens the app at the session restore splash (app/index.tsx). A loading indicator should appear briefly."
+    },
+    {
+      "step": 2,
+      "action": "waitForRoute",
+      "value": "/login",
+      "timeoutMs": 5000,
+      "notes": "Session restore reads no token from SecureStore and calls router.replace('/(auth)/login'). On web, SecureStore maps to localStorage; key 'auth_token' is absent so redirect fires immediately."
+    },
+    {
+      "step": 3,
+      "action": "waitForText",
+      "target": {
+        "text": "Login"
+      },
+      "timeoutMs": 3000
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "routeContains",
+      "value": "login",
+      "notes": "Route must contain 'login', confirming Expo Router landed on /(auth)/login."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "target": {
+        "text": "Login"
+      },
+      "notes": "The login stub screen renders text containing 'Login'. Milestone 1 stub text is 'Login — Milestone 2'."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 3,
+      "type": "uiNotVisible",
+      "target": {
+        "text": "Client Home"
+      },
+      "notes": "Client home must not be visible — unauthenticated user must not reach the guarded client area."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 3,
+      "type": "uiNotVisible",
+      "target": {
+        "text": "Companion Home"
+      },
+      "notes": "Companion home must not be visible — unauthenticated user must not reach the guarded companion area."
+    }
+  ],
+  "manualValidationRequired": [],
+  "blockedTargets": [],
+  "notes": [
+    "This test uses a fresh browser context so localStorage has no 'auth_token'. Playwright's browser context isolation achieves this by default.",
+    "The loading screen is transient and does not need a separate assertion — the route change to /login is sufficient evidence that session restore ran correctly.",
+    "login.tsx in M01 is a stub rendering static text. The exact text 'Login — Milestone 2' is acceptable as the observable assertion value."
+  ]
+}

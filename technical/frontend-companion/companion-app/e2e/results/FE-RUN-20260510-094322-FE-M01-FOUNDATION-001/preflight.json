@@ -1,0 +1,18 @@
+{
+  "preflight": {
+    "runId": "FE-RUN-20260510-094322-FE-M01-FOUNDATION-001",
+    "timestamp": "2026-05-10T09:43:22Z",
+    "frontendServer": {
+      "url": "http://localhost:8081",
+      "command": "npm run web",
+      "status": "RUNNING",
+      "httpStatus": 200,
+      "reused": true
+    },
+    "backendServer": {
+      "required": false,
+      "status": "SKIPPED"
+    },
+    "overall": "PASS"
+  }
+}

@@ -12,6 +12,10 @@ dist/
 !mcp/project-context-mcp/dist/
 !mcp/project-context-mcp/dist/**
 
+# Allow committing Frontend Project Context MCP dist (stdio entrypoint + imports)
+!mcp/project-context-mcp-fe/dist/
+!mcp/project-context-mcp-fe/dist/**
+
 # Environment files
 .env
 .env.local
@@ -19,6 +23,7 @@ dist/
 
 # Logs
 *.log
+.mcp-usage/
 
 # MCP servers
 mcp/**/node_modules/

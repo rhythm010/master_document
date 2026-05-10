@@ -19,6 +19,16 @@
       "env": {
         "NODE_ENV": "development"
       }
+    },
+    "project-context-mcp-fe": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/mcp/project-context-mcp-fe/dist/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      }
     }
   }
 }

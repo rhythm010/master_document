@@ -1,4 +1,9 @@
-import { resolve } from "node:path";
+import { appendFileSync, mkdirSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+const REPO_ROOT = resolve(join(new URL(".", import.meta.url).pathname, "../../.."));
+const MCP_USAGE_DIR = join(REPO_ROOT, ".mcp-usage");
+const MCP_USAGE_LOG = join(MCP_USAGE_DIR, "project-context-mcp.jsonl");
 
 export function nowIso(): string {
   return new Date().toISOString();
@@ -6,7 +11,14 @@ export function nowIso(): string {
 
 export function log(msg: string): void {
   // MCP servers should log to stderr.
-  process.stderr.write(`[project-context-mcp] ${nowIso()} ${msg}\n`);
+  const timestamp = nowIso();
+  process.stderr.write(`[project-context-mcp] ${timestamp} ${msg}\n`);
+  try {
+    mkdirSync(MCP_USAGE_DIR, { recursive: true });
+    appendFileSync(MCP_USAGE_LOG, `${JSON.stringify({ timestamp, server: "project-context-mcp", message: msg })}\n`);
+  } catch {
+    // Usage logging must never break MCP responses.
+  }
 }
 
 export function jsonText(data: unknown): { type: "text"; text: string } {

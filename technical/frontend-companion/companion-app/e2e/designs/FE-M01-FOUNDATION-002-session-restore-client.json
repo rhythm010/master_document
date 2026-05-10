@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M01-FOUNDATION-002-session-restore-client",
+  "title": "Session restore with valid CLIENT token routes app to client home",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "01",
+  "area": "foundation",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/milestones/milestone-01-core-app-foundation.md",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-01-core-app-foundation.md",
+    "technical/frontend-companion/companion-app/app/index.tsx",
+    "technical/frontend-companion/companion-app/app/(client)/_layout.tsx",
+    "technical/frontend-companion/companion-app/app/(client)/home.tsx",
+    "technical/frontend-companion/companion-app/store/session.ts",
+    "technical/frontend-companion/frontend-backend-contract.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is served at http://localhost:8081 via npm run web."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Before the app loads, localStorage key 'auth_token' is seeded with a mock JWT string via Playwright addInitScript. Confirmed key: store/session.ts uses TOKEN_KEY = 'auth_token'; expo-secure-store on web stores with the raw key in localStorage (no prefix)."
+    },
+    {
+      "id": "PRE-3",
+      "description": "Playwright intercepts GET /users/me and returns HTTP 200 with a CLIENT user body before the page navigates.",
+      "mockResponse": {
+        "method": "GET",
+        "path": "http://localhost:3000/users/me",
+        "playwrightRoutePattern": "http://localhost:3000/users/me",
+        "status": 200,
+        "body": {
+          "id": "test-client-uuid-001",
+          "role": "CLIENT",
+          "name": "Test Client",
+          "nickname": "tclient",
+          "email": "testclient@example.com",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-01-01T00:00:00.000Z"
+        }
+      }
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "mockClientToken",
+      "value": "mock-client-jwt-token-m01",
+      "notes": "Placeholder JWT string. Real value not required — only used as a Bearer token header in the intercepted /users/me call."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/",
+      "notes": "App launches at session restore splash (app/index.tsx). LoadingScreen component is shown while readPersistedToken() and GET /users/me execute."
+    },
+    {
+      "step": 2,
+      "action": "waitForNetworkIdle",
+      "notes": "Wait for the mocked GET /users/me request to complete. This ensures session restore has received the user payload."
+    },
+    {
+      "step": 3,
+      "action": "waitForRoute",
+      "value": "/home",
+      "timeoutMs": 5000,
+      "notes": "After getMe() resolves with CLIENT user, app calls router.replace('/(client)/home'). Expo Router resolves this to a route containing /home."
+    },
+    {
+      "step": 4,
+      "action": "waitForText",
+      "target": {
+        "text": "Client Home"
+      },
+      "timeoutMs": 3000
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "networkRequestObserved",
+      "method": "GET",
+      "path": "http://localhost:3000/users/me",
+      "notes": "Confirm session restore called GET /users/me with the seeded token. Full URL is http://localhost:3000/users/me per EXPO_PUBLIC_API_BASE_URL default in lib/config.ts."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 3,
+      "type": "routeContains",
+      "value": "home",
+      "notes": "Route must contain 'home', confirming /(client)/home was reached."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 4,
+      "type": "uiVisible",
+      "target": {
+        "text": "Client Home"
+      },
+      "notes": "The client home stub renders 'Client Home — Milestone 2'. Partial text 'Client Home' is sufficient."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 4,
+      "type": "uiNotVisible",
+      "target": {
+        "text": "Login"
+      },
+      "notes": "Login stub text must not be visible — the app must not have fallen through to the auth group."
+    }
+  ],
+  "manualValidationRequired": [],
+  "blockedTargets": [],
+  "notes": [
+    "expo-secure-store on web stores items in localStorage with the raw key — no prefix. Confirmed key: 'auth_token' (TOKEN_KEY constant in store/session.ts).",
+    "The Playwright addInitScript approach must seed the token before the app JS runs so readPersistedToken() finds the value on first load.",
+    "The client layout guard (app/(client)/_layout.tsx) checks user.role === 'CLIENT'. If the mocked /users/me returns role=CLIENT, the guard passes and home.tsx renders.",
+    "home.tsx in M01 is a stub. The observable text 'Client Home — Milestone 2' is the expected visible content."
+  ]
+}

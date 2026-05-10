@@ -34,7 +34,11 @@ export const useSessionStore = create<SessionState>((set) => ({
   setLoading: (isLoading) => set({ isLoading }),
 }));
 
-/** Read persisted token from SecureStore. Returns null if absent. */
+/** Read persisted token from SecureStore. Returns null if absent or if SecureStore is unavailable (e.g. web platform). */
 export async function readPersistedToken(): Promise<string | null> {
-  return SecureStore.getItemAsync(TOKEN_KEY);
+  try {
+    return await SecureStore.getItemAsync(TOKEN_KEY);
+  } catch {
+    return null;
+  }
 }

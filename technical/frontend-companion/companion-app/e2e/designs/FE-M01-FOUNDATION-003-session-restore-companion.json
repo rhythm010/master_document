@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M01-FOUNDATION-003-session-restore-companion",
+  "title": "Session restore with valid COMPANION token (onboarding complete) routes to companion home",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "01",
+  "area": "foundation",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/milestones/milestone-01-core-app-foundation.md",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-01-core-app-foundation.md",
+    "technical/frontend-companion/companion-app/app/index.tsx",
+    "technical/frontend-companion/companion-app/app/(companion)/_layout.tsx",
+    "technical/frontend-companion/companion-app/app/(companion)/home.tsx",
+    "technical/frontend-companion/companion-app/lib/onboarding-storage.ts",
+    "technical/frontend-companion/companion-app/store/session.ts",
+    "technical/frontend-companion/frontend-backend-contract.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is served at http://localhost:8081 via npm run web."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Before the app loads, localStorage is seeded via Playwright addInitScript with two keys: (a) 'auth_token' for expo-secure-store (confirmed: TOKEN_KEY constant in store/session.ts; expo-secure-store stores with raw key on web), and (b) 'onboarding_complete' for AsyncStorage (confirmed: lib/onboarding-storage.ts uses AsyncStorage with KEY = 'onboarding_complete'; @react-native-async-storage/async-storage stores with raw key in localStorage on web).",
+      "storageKeys": {
+        "authToken": "'auth_token' (expo-secure-store, localStorage raw key)",
+        "onboardingComplete": "'onboarding_complete' (AsyncStorage, localStorage raw key)"
+      }
+    },
+    {
+      "id": "PRE-3",
+      "description": "Playwright intercepts GET /users/me and returns HTTP 200 with a COMPANION user body before the page navigates.",
+      "mockResponse": {
+        "method": "GET",
+        "path": "http://localhost:3000/users/me",
+        "playwrightRoutePattern": "http://localhost:3000/users/me",
+        "status": 200,
+        "body": {
+          "id": "test-companion-uuid-001",
+          "role": "COMPANION",
+          "name": "Test Companion",
+          "nickname": "tcompanion",
+          "email": "testcompanion@example.com",
+          "emailVerified": true,
+          "biometricAuthEnabled": false,
+          "createdAt": "2026-01-01T00:00:00.000Z"
+        }
+      }
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "mockCompanionToken",
+      "value": "mock-companion-jwt-token-m01",
+      "notes": "Placeholder JWT string for seeding localStorage."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/",
+      "notes": "App launches at session restore splash (app/index.tsx). LoadingScreen is shown while readPersistedToken() and GET /users/me execute."
+    },
+    {
+      "step": 2,
+      "action": "waitForNetworkIdle",
+      "notes": "Wait for the mocked GET /users/me to complete. Session store receives COMPANION user."
+    },
+    {
+      "step": 3,
+      "action": "waitForRoute",
+      "value": "home",
+      "timeoutMs": 5000,
+      "notes": "After getMe() resolves with COMPANION user, app calls router.replace('/(companion)/home'). The companion layout then checks hasCompletedOnboarding() — which returns true from the seeded storage value — so onboarding redirect does not fire."
+    },
+    {
+      "step": 4,
+      "action": "waitForText",
+      "target": {
+        "text": "Companion Home"
+      },
+      "timeoutMs": 3000
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "networkRequestObserved",
+      "method": "GET",
+      "path": "http://localhost:3000/users/me",
+      "notes": "Confirm session restore called GET /users/me. Full URL is http://localhost:3000/users/me per EXPO_PUBLIC_API_BASE_URL default in lib/config.ts."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 3,
+      "type": "routeContains",
+      "value": "home",
+      "notes": "Route must contain 'home', confirming /(companion)/home was reached."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 4,
+      "type": "uiVisible",
+      "target": {
+        "text": "Companion Home"
+      },
+      "notes": "The companion home stub renders 'Companion Home — Milestone 2'. Partial text 'Companion Home' is sufficient."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 4,
+      "type": "uiNotVisible",
+      "target": {
+        "text": "Onboarding"
+      },
+      "notes": "Onboarding text must not be visible — the companion layout's onboarding check must have passed because hasCompletedOnboarding() returned true from the seeded storage."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 4,
+      "type": "uiNotVisible",
+      "target": {
+        "text": "Client Home"
+      },
+      "notes": "Client home must not be visible — COMPANION role must not land in the client group."
+    }
+  ],
+  "manualValidationRequired": [],
+  "blockedTargets": [],
+  "notes": [
+    "Confirmed storage libraries: auth token uses expo-secure-store (TOKEN_KEY='auth_token', raw key in localStorage on web); onboarding flag uses @react-native-async-storage/async-storage (KEY='onboarding_complete', raw key in localStorage on web).",
+    "The companion layout (app/(companion)/_layout.tsx) calls hasCompletedOnboarding() after confirming the COMPANION role. Both storage keys must be seeded before the app JS runs via addInitScript.",
+    "companion/home.tsx in M01 is a stub rendering 'Companion Home — Milestone 2'."
+  ]
+}

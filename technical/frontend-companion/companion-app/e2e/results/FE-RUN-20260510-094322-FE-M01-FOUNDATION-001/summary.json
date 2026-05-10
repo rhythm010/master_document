@@ -1,0 +1,98 @@
+{
+  "runId": "FE-RUN-20260510-094322-FE-M01-FOUNDATION-001",
+  "generatedAt": "2026-05-10T09:43:22Z",
+  "testId": "FE-M01-FOUNDATION-001-no-session-to-login",
+  "designFile": "technical/frontend-companion/companion-app/e2e/designs/FE-M01-FOUNDATION-001-no-session-to-login.json",
+  "generatedSpec": "technical/frontend-companion/companion-app/e2e/generated/FE-M01-FOUNDATION-001-no-session-to-login.spec.ts",
+  "status": "FAIL",
+  "preflight": {
+    "status": "PASS",
+    "frontendServer": {
+      "url": "http://localhost:8081",
+      "httpStatus": 200,
+      "note": "Expo web server already running; reused by Playwright."
+    },
+    "backendServer": {
+      "required": false,
+      "status": "SKIPPED"
+    }
+  },
+  "stepResults": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "status": "PASS",
+      "notes": "page.goto('/') succeeded; domcontentloaded fired."
+    },
+    {
+      "step": 2,
+      "action": "waitForRoute",
+      "expectedValue": "/login",
+      "status": "FAIL",
+      "actualUrl": "http://localhost:8081/",
+      "errorMessage": "expect(page).toHaveURL(/login/) failed after 5000ms. URL remained http://localhost:8081/ — no redirect occurred.",
+      "rootCause": "Uncaught runtime error in store/session.ts:39 — 'ExpoSecureStore.default.getValueWithKeyAsync is not a function'. The readPersistedToken() call crashes before the router.replace('/(auth)/login') can execute.",
+      "failureOwner": "frontend"
+    },
+    {
+      "step": 3,
+      "action": "waitForText",
+      "status": "NOT_REACHED"
+    }
+  ],
+  "assertionResults": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "routeContains",
+      "expected": "login",
+      "status": "FAIL",
+      "actual": "http://localhost:8081/",
+      "failureOwner": "frontend"
+    },
+    {
+      "assertion": 2,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "status": "NOT_REACHED"
+    },
+    {
+      "assertion": 3,
+      "afterStep": 3,
+      "type": "uiNotVisible",
+      "status": "NOT_REACHED"
+    },
+    {
+      "assertion": 4,
+      "afterStep": 3,
+      "type": "uiNotVisible",
+      "status": "NOT_REACHED"
+    }
+  ],
+  "stepSummary": {
+    "passed": 1,
+    "failed": 1,
+    "notReached": 1
+  },
+  "assertionSummary": {
+    "passed": 0,
+    "failed": 1,
+    "notReached": 3
+  },
+  "failingStep": 2,
+  "failingAssertion": 1,
+  "failureOwner": "frontend",
+  "evidence": [
+    "Screenshot: test-results/FE-M01-FOUNDATION-001-no-s-8ed60-irects-to-login-stub-screen-chromium/test-failed-1.png",
+    "Error on screen: 'ExpoSecureStore.default.getValueWithKeyAsync is not a function'",
+    "Source traced to: store/session.ts:39 — SecureStore.getItemAsync(TOKEN_KEY)",
+    "Call stack: readPersistedToken → restore (app/index.tsx:15) → React.useEffect"
+  ],
+  "diagnosis": {
+    "bugDescription": "expo-secure-store's getItemAsync internally calls getValueWithKeyAsync which does not exist in the web platform build. The error is uncaught and crashes the session restore flow before it can redirect to /login.",
+    "affectedFile": "technical/frontend-companion/companion-app/store/session.ts",
+    "line": 39,
+    "suggestedFix": "Wrap SecureStore.getItemAsync in a try/catch in readPersistedToken, or add a web-safe polyfill that falls back to localStorage directly when expo-secure-store is unavailable on the web platform.",
+    "owner": "Coding Agent"
+  }
+}
