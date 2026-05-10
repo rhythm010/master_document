@@ -98,7 +98,7 @@ test.describe('Milestone 0: Real Device Placeholder App', () => {
     for (const route of expectedRoutes) {
       const link = page.locator(`a:has-text("Go to ${route}")`);
       const isVisible = await link.isVisible();
-      expect(isVisible).toBeTruthy(`Route "${route}" should be visible`);
+      expect(isVisible, `Route "${route}" should be visible`).toBeTruthy();
     }
   });
 
