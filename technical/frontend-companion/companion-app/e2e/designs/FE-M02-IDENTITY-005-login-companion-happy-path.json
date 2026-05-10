@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-IDENTITY-005",
+  "title": "Login — COMPANION happy path: valid credentials navigate to /(companion)/home",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "identity",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(auth)/login.tsx",
+    "technical/frontend-companion/companion-app/app/(companion)/home.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md",
+    "technical/frontend-companion/frontend-backend-contract.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Backend is running with a working POST /auth/login endpoint."
+    },
+    {
+      "id": "PRE-3",
+      "description": "A verified COMPANION account exists with email DATA-1 and password DATA-2."
+    },
+    {
+      "id": "PRE-4",
+      "description": "The COMPANION user has completed onboarding OR onboarding localStorage key is pre-set to skip the redirect.",
+      "note": "The /(companion)/_layout.tsx may or may not guard onboarding. Confirm layout behavior. If it does, set 'companion_onboarding_complete' = 'true' in localStorage before test."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "companionEmail",
+      "strategy": "usePreSeedCredentials",
+      "description": "Email of a pre-verified COMPANION account.",
+      "example": "verified-companion@example.com"
+    },
+    {
+      "id": "DATA-2",
+      "name": "companionPassword",
+      "strategy": "usePreSeedCredentials",
+      "description": "Password of the pre-verified COMPANION account.",
+      "example": "Password123!"
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/login",
+      "description": "Open the login screen directly."
+    },
+    {
+      "step": 2,
+      "action": "waitForText",
+      "target": { "text": "Login" },
+      "description": "Confirm login screen heading is visible."
+    },
+    {
+      "step": 3,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-1",
+      "description": "Enter verified COMPANION email."
+    },
+    {
+      "step": 4,
+      "action": "fill",
+      "target": { "placeholder": "Password" },
+      "valueRef": "DATA-2",
+      "description": "Enter correct password."
+    },
+    {
+      "step": 5,
+      "action": "click",
+      "target": { "text": "Log In", "role": "button" },
+      "description": "Submit login form."
+    },
+    {
+      "step": 6,
+      "action": "waitForNetworkIdle",
+      "description": "Wait for POST /auth/login to complete."
+    },
+    {
+      "step": 7,
+      "action": "waitForRoute",
+      "value": "/(companion)/home",
+      "description": "Wait for navigation to companion home."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "uiVisible",
+      "target": { "text": "Login" },
+      "description": "Login screen heading is visible."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 5,
+      "type": "networkRequestObserved",
+      "method": "POST",
+      "path": "/auth/login",
+      "description": "Login API call is made."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 6,
+      "type": "networkResponseObserved",
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200,
+      "description": "Backend returns 200 with access token and role=COMPANION."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 7,
+      "type": "routeContains",
+      "value": "/(companion)/home",
+      "description": "App navigates to COMPANION home screen."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 7,
+      "type": "uiVisible",
+      "target": { "text": "Companion Home — Milestone 2" },
+      "description": "COMPANION home screen content is visible."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "The login.tsx routes to '/(companion)/home' when response.user.role === 'COMPANION'. This is driven by the backend response, not a client-side toggle.",
+    "If /(companion)/_layout.tsx adds an onboarding guard in a future milestone, this test may need localStorage injection. Currently only /(client)/_layout.tsx has the guard (as of M02 implementation).",
+    "The validator should inject localStorage 'companion_onboarding_complete' = 'true' proactively for safety."
+  ]
+}

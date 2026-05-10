@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-VERIFY-001",
+  "title": "Verify email — valid token: loading state then 'Email verified!' and Go to Login button",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "verify-email",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(auth)/verify-email.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md",
+    "technical/frontend-companion/frontend-backend-contract.md",
+    "technical/frontend-companion/backend-gap-register.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Backend is running with a working GET /auth/verify-email endpoint."
+    },
+    {
+      "id": "PRE-3",
+      "description": "A valid, unexpired verification token must be available in DATA-1. Obtain by: (1) creating a new account via POST /auth/signup, (2) retrieving the token from Mailpit at http://localhost:8025, or (3) obtaining the token directly from the backend DB for local testing."
+    },
+    {
+      "id": "PRE-4",
+      "description": "FE-BE-GAP-028: Ensure MOBILE_DEEPLINK_SCHEME=companion:// is set in .env so backend generates correct scheme. For web tests, the token is passed as a URL query param, not a deep link."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "validToken",
+      "strategy": "generateFromApi",
+      "description": "A valid unexpired email verification token. Must be obtained from the backend (e.g., via Mailpit or DB query) as part of test setup. Cannot be generated client-side.",
+      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/verify-email",
+      "queryParams": { "token": "DATA-1" },
+      "description": "Navigate to verify-email screen with a valid token query parameter. On web, Expo Router reads the token from the URL via useLocalSearchParams."
+    },
+    {
+      "step": 2,
+      "action": "waitForText",
+      "target": { "text": "Verifying your email..." },
+      "description": "Loading state is shown while the API call is in flight."
+    },
+    {
+      "step": 3,
+      "action": "waitForNetworkIdle",
+      "description": "Wait for GET /auth/verify-email?token=... to complete."
+    },
+    {
+      "step": 4,
+      "action": "waitForText",
+      "target": { "text": "Email verified! You can now log in." },
+      "description": "Success state text appears after API call succeeds."
+    },
+    {
+      "step": 5,
+      "action": "click",
+      "target": { "text": "Go to Login", "role": "button" },
+      "description": "Tap Go to Login button."
+    },
+    {
+      "step": 6,
+      "action": "waitForRoute",
+      "value": "/(auth)/login",
+      "description": "router.replace to login after tapping Go to Login."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "uiVisible",
+      "target": { "text": "Verifying your email..." },
+      "description": "Loading state is visible while API call is pending."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 3,
+      "type": "networkRequestObserved",
+      "method": "GET",
+      "path": "/auth/verify-email",
+      "description": "Verify email API call is made on mount."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 3,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/auth/verify-email",
+      "status": 200,
+      "description": "Backend returns 200 for valid token."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 4,
+      "type": "uiVisible",
+      "target": { "text": "Email verified! You can now log in." },
+      "description": "Success status renders the verified message."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 4,
+      "type": "uiVisible",
+      "target": { "text": "Go to Login" },
+      "description": "Go to Login button is visible in success state."
+    },
+    {
+      "assertion": 6,
+      "afterStep": 6,
+      "type": "routeContains",
+      "value": "/(auth)/login",
+      "description": "Tapping Go to Login navigates to login screen."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-simulator-deep-link",
+      "reason": "Simulator deep link testing (xcrun simctl openurl) is a manual step described in the milestone implementation doc. Not automated in the current web test framework."
+    },
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "The token must be obtained from the backend before running this test. Options: (1) retrieve from Mailpit at http://localhost:8025 after signup, (2) query the database directly, (3) use a backend admin endpoint to generate a token.",
+    "On web, the token is passed as a URL query param: /(auth)/verify-email?token=<value>. Expo Router's useLocalSearchParams reads it from the URL.",
+    "FE-BE-GAP-028 affects deep link scheme on native devices only. Web URL routing is unaffected.",
+    "The loading state ('Verifying your email...') may be very brief. If the API is fast, the validator may need to observe it via a fast network intercept rather than timing-based assertion."
+  ]
+}

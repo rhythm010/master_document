@@ -1,0 +1,256 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-ONBOARDING-001",
+  "title": "Onboarding — CLIENT complete flow: 3 slides, Back hidden on slide 1, Get Started on last slide, navigate to home, re-open skips onboarding",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "onboarding",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(client)/onboarding.tsx",
+    "technical/frontend-companion/companion-app/app/(client)/_layout.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    },
+    {
+      "id": "PRE-2",
+      "description": "A verified CLIENT account exists and credentials are available (DATA-1, DATA-2)."
+    },
+    {
+      "id": "PRE-3",
+      "description": "localStorage does NOT contain 'companion_onboarding_complete' (or is cleared before this test). The /(client)/_layout.tsx guard must redirect to onboarding."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "clientEmail",
+      "strategy": "usePreSeedCredentials",
+      "description": "Verified CLIENT account email."
+    },
+    {
+      "id": "DATA-2",
+      "name": "clientPassword",
+      "strategy": "usePreSeedCredentials",
+      "description": "Verified CLIENT account password."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/login",
+      "description": "Open login screen with a fresh browser context (no localStorage)."
+    },
+    {
+      "step": 2,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-1"
+    },
+    {
+      "step": 3,
+      "action": "fill",
+      "target": { "placeholder": "Password" },
+      "valueRef": "DATA-2"
+    },
+    {
+      "step": 4,
+      "action": "click",
+      "target": { "text": "Log In", "role": "button" }
+    },
+    {
+      "step": 5,
+      "action": "waitForRoute",
+      "value": "/(client)/onboarding",
+      "description": "After login, layout guard detects no onboarding completion and redirects to onboarding screen."
+    },
+    {
+      "step": 6,
+      "action": "waitForText",
+      "target": { "text": "Welcome to Companion" },
+      "description": "Slide 1 title is visible."
+    },
+    {
+      "step": 7,
+      "action": "waitForText",
+      "target": { "text": "Next" },
+      "description": "Next button is visible on slide 1."
+    },
+    {
+      "step": 8,
+      "action": "click",
+      "target": { "text": "Next" },
+      "description": "Advance to slide 2."
+    },
+    {
+      "step": 9,
+      "action": "waitForText",
+      "target": { "text": "Find Your Companion" },
+      "description": "Slide 2 title is visible."
+    },
+    {
+      "step": 10,
+      "action": "click",
+      "target": { "text": "Back" },
+      "description": "Navigate back to slide 1 using Back button."
+    },
+    {
+      "step": 11,
+      "action": "waitForText",
+      "target": { "text": "Welcome to Companion" },
+      "description": "Confirm we are back on slide 1."
+    },
+    {
+      "step": 12,
+      "action": "click",
+      "target": { "text": "Next" },
+      "description": "Advance to slide 2 again."
+    },
+    {
+      "step": 13,
+      "action": "click",
+      "target": { "text": "Next" },
+      "description": "Advance to slide 3 (last slide)."
+    },
+    {
+      "step": 14,
+      "action": "waitForText",
+      "target": { "text": "Ready to Begin" },
+      "description": "Slide 3 title is visible."
+    },
+    {
+      "step": 15,
+      "action": "click",
+      "target": { "text": "Get Started" },
+      "description": "Tap Get Started on the last slide to complete onboarding."
+    },
+    {
+      "step": 16,
+      "action": "waitForRoute",
+      "value": "/(client)/home",
+      "description": "markOnboardingComplete() is called, then router.replace to /(client)/home."
+    },
+    {
+      "step": 17,
+      "action": "reload",
+      "description": "Reload the page to simulate re-opening the app and test onboarding skip."
+    },
+    {
+      "step": 18,
+      "action": "waitForRoute",
+      "value": "/(client)/home",
+      "description": "After reload, session is restored and onboarding is marked complete — layout guard skips onboarding."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 5,
+      "type": "routeContains",
+      "value": "/(client)/onboarding",
+      "description": "Fresh CLIENT user is redirected to onboarding."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Welcome to Companion" },
+      "description": "Slide 1 title visible."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 6,
+      "type": "uiNotVisible",
+      "target": { "text": "Back" },
+      "description": "Back button is NOT visible on slide 1 (currentSlide === 0 hides Back)."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Your trusted companion experience starts here." },
+      "description": "Slide 1 body text is visible."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 9,
+      "type": "uiVisible",
+      "target": { "text": "Find Your Companion" },
+      "description": "Slide 2 title visible after Next."
+    },
+    {
+      "assertion": 6,
+      "afterStep": 9,
+      "type": "uiVisible",
+      "target": { "text": "Back" },
+      "description": "Back button IS visible on slide 2 (currentSlide > 0)."
+    },
+    {
+      "assertion": 7,
+      "afterStep": 14,
+      "type": "uiVisible",
+      "target": { "text": "Ready to Begin" },
+      "description": "Slide 3 title visible."
+    },
+    {
+      "assertion": 8,
+      "afterStep": 14,
+      "type": "uiVisible",
+      "target": { "text": "Get Started" },
+      "description": "Button label changes to 'Get Started' on the last slide."
+    },
+    {
+      "assertion": 9,
+      "afterStep": 14,
+      "type": "uiNotVisible",
+      "target": { "text": "Next" },
+      "description": "Next button is no longer present on the last slide."
+    },
+    {
+      "assertion": 10,
+      "afterStep": 16,
+      "type": "routeContains",
+      "value": "/(client)/home",
+      "description": "After Get Started, navigates to CLIENT home."
+    },
+    {
+      "assertion": 11,
+      "afterStep": 16,
+      "type": "uiVisible",
+      "target": { "text": "Client Home — Milestone 2" },
+      "description": "CLIENT home content is visible."
+    },
+    {
+      "assertion": 12,
+      "afterStep": 18,
+      "type": "routeContains",
+      "value": "/(client)/home",
+      "description": "After reload, layout guard reads onboarding complete from localStorage and routes directly to home — onboarding is skipped."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "This test requires a fresh browser context with no localStorage (use Playwright's browser.newContext() or page.evaluate to clear localStorage before step 1).",
+    "The 'companion_onboarding_complete' key in AsyncStorage on web maps to localStorage. The exact key name should be verified against onboarding-storage.ts.",
+    "Slide progress indicator text (e.g., '1 / 3') is visible in the UI but not asserted to keep test robust against slide count changes.",
+    "The Back button renders conditionally: {currentSlide > 0 && <Pressable>Back</Pressable>}. On slide 1 (index 0) it is not in the DOM at all.",
+    "The slide 3 CLIENT body text is 'Your first session is just a few taps away.' — not asserted here but useful for debugging."
+  ]
+}

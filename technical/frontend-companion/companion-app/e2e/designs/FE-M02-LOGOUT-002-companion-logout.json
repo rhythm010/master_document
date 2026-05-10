@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-LOGOUT-002",
+  "title": "Logout — COMPANION: tap Logout on companion home navigates to /(auth)/login",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "logout",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(companion)/home.tsx",
+    "technical/frontend-companion/companion-app/app/(auth)/login.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    },
+    {
+      "id": "PRE-2",
+      "description": "A verified COMPANION account exists with credentials DATA-1 and DATA-2."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "companionEmail",
+      "strategy": "usePreSeedCredentials",
+      "description": "Verified COMPANION account email."
+    },
+    {
+      "id": "DATA-2",
+      "name": "companionPassword",
+      "strategy": "usePreSeedCredentials",
+      "description": "Verified COMPANION account password."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/login",
+      "description": "Open login screen."
+    },
+    {
+      "step": 2,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-1"
+    },
+    {
+      "step": 3,
+      "action": "fill",
+      "target": { "placeholder": "Password" },
+      "valueRef": "DATA-2"
+    },
+    {
+      "step": 4,
+      "action": "click",
+      "target": { "text": "Log In", "role": "button" }
+    },
+    {
+      "step": 5,
+      "action": "waitForRoute",
+      "value": "/(companion)/home",
+      "description": "Wait for navigation to COMPANION home."
+    },
+    {
+      "step": 6,
+      "action": "waitForText",
+      "target": { "text": "Companion Home — Milestone 2" },
+      "description": "Confirm we are on the COMPANION home screen."
+    },
+    {
+      "step": 7,
+      "action": "click",
+      "target": { "text": "Logout", "role": "button" },
+      "description": "Tap the Logout button on COMPANION home."
+    },
+    {
+      "step": 8,
+      "action": "waitForRoute",
+      "value": "/(auth)/login",
+      "description": "After logout(), router.replace navigates to login."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Companion Home — Milestone 2" },
+      "description": "COMPANION home screen is visible before logout."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Logout" },
+      "description": "Logout button is visible on COMPANION home screen."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 8,
+      "type": "routeContains",
+      "value": "/(auth)/login",
+      "description": "After logout, app navigates to login screen."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 8,
+      "type": "uiVisible",
+      "target": { "text": "Login" },
+      "description": "Login screen heading is visible after logout."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 8,
+      "type": "storageValueAbsent",
+      "key": "session_token",
+      "description": "Session token is cleared from storage after logout."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "The Logout button implementation on companion/home.tsx is identical to client/home.tsx — same style (red background #f00, white bold text) and same logout logic.",
+    "Unlike the CLIENT logout test, no onboarding localStorage injection is needed here because /(companion)/_layout.tsx does not guard onboarding in M02.",
+    "The storageValueAbsent key ('session_token') must be verified against the actual key name used in store/session.ts SecureStore calls."
+  ]
+}

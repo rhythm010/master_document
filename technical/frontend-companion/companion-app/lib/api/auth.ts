@@ -28,3 +28,41 @@ export function getMe() {
 export function resendVerification(email: string) {
   return apiClient.post<{ message: string }>('/auth/resend-verification', { email });
 }
+
+// --- Signup ---
+
+export interface SignupPayload {
+  role: 'CLIENT' | 'COMPANION';
+  name: string;
+  nickname: string;
+  email: string;
+  password: string;
+  biometricAuthEnabled?: boolean;
+}
+
+export interface SignupResponse {
+  id: string;
+  role: 'CLIENT' | 'COMPANION';
+  name: string;
+  nickname: string;
+  email: string;
+  emailVerified: boolean;
+  biometricAuthEnabled: boolean;
+  createdAt: string;
+}
+
+export function signup(payload: SignupPayload) {
+  return apiClient.post<SignupResponse>('/auth/signup', payload);
+}
+
+// --- Email verification ---
+
+export interface VerifyEmailResponse {
+  status: 'VERIFIED';
+}
+
+export function verifyEmail(token: string) {
+  return apiClient.get<VerifyEmailResponse>(
+    `/auth/verify-email?token=${encodeURIComponent(token)}`
+  );
+}

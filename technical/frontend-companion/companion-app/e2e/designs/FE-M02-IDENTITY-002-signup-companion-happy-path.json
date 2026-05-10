@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M02-IDENTITY-002",
+  "title": "Signup — COMPANION happy path: select COMPANION role, fill fields, submit, alert, navigate to login",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "02",
+  "area": "identity",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/(auth)/signup.tsx",
+    "technical/frontend-companion/milestones/milestone-implementation/milestone-02-identity-flow-minimum-ui-impl.md",
+    "technical/frontend-companion/frontend-backend-contract.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Expo web app is running and reachable at the configured base URL."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Backend is running with a working POST /auth/signup endpoint."
+    },
+    {
+      "id": "PRE-3",
+      "description": "The email address used (DATA-1) does not already exist in the database."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "companionEmail",
+      "strategy": "generateUniqueEmail",
+      "example": "test-companion-001+<timestamp>@example.com"
+    },
+    {
+      "id": "DATA-2",
+      "name": "companionName",
+      "strategy": "staticFixture",
+      "value": "Test Companion User"
+    },
+    {
+      "id": "DATA-3",
+      "name": "companionNickname",
+      "strategy": "staticFixture",
+      "value": "TestCompanion"
+    },
+    {
+      "id": "DATA-4",
+      "name": "companionPassword",
+      "strategy": "staticFixture",
+      "value": "Password123!"
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/signup",
+      "description": "Open the signup screen directly."
+    },
+    {
+      "step": 2,
+      "action": "waitForText",
+      "target": { "text": "Create Account" },
+      "description": "Confirm signup screen heading is visible."
+    },
+    {
+      "step": 3,
+      "action": "click",
+      "target": { "text": "Companion" },
+      "description": "Tap the Companion role toggle button to switch from the default CLIENT role."
+    },
+    {
+      "step": 4,
+      "action": "fill",
+      "target": { "placeholder": "Full Name" },
+      "valueRef": "DATA-2",
+      "description": "Enter full name."
+    },
+    {
+      "step": 5,
+      "action": "fill",
+      "target": { "placeholder": "Nickname" },
+      "valueRef": "DATA-3",
+      "description": "Enter nickname."
+    },
+    {
+      "step": 6,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-1",
+      "description": "Enter unique email address."
+    },
+    {
+      "step": 7,
+      "action": "fill",
+      "target": { "placeholder": "Password" },
+      "valueRef": "DATA-4",
+      "description": "Enter password."
+    },
+    {
+      "step": 8,
+      "action": "click",
+      "target": { "text": "Create Account", "role": "button" },
+      "description": "Tap the Create Account submit button."
+    },
+    {
+      "step": 9,
+      "action": "waitForNetworkIdle",
+      "description": "Wait for the POST /auth/signup API call to complete."
+    },
+    {
+      "step": 10,
+      "action": "pressKey",
+      "key": "Enter",
+      "description": "Dismiss the browser alert dialog. Validator spec must register page.once('dialog', d => d.accept()) before step 8."
+    },
+    {
+      "step": 11,
+      "action": "waitForRoute",
+      "value": "/(auth)/login",
+      "description": "After dismissing the alert, router.replace navigates to login."
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "uiVisible",
+      "target": { "text": "Create Account" },
+      "description": "Signup screen heading is visible."
+    },
+    {
+      "assertion": 2,
+      "afterStep": 3,
+      "type": "uiVisible",
+      "target": { "text": "Companion" },
+      "description": "Companion role toggle button is visible and was clicked."
+    },
+    {
+      "assertion": 3,
+      "afterStep": 8,
+      "type": "networkRequestObserved",
+      "method": "POST",
+      "path": "/auth/signup",
+      "description": "Signup API call is made after form submit."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 9,
+      "type": "networkResponseObserved",
+      "method": "POST",
+      "path": "/auth/signup",
+      "status": 201,
+      "description": "Backend returns 201 for successful COMPANION signup."
+    },
+    {
+      "assertion": 5,
+      "afterStep": 11,
+      "type": "routeContains",
+      "value": "/(auth)/login",
+      "description": "App navigates to login screen after alert is dismissed."
+    },
+    {
+      "assertion": 6,
+      "afterStep": 11,
+      "type": "uiVisible",
+      "target": { "text": "Login" },
+      "description": "Login screen heading is visible after redirect."
+    }
+  ],
+  "manualValidationRequired": [
+    {
+      "target": "ios-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    },
+    {
+      "target": "android-real-device",
+      "reason": "No supported native automation runner is currently configured."
+    }
+  ],
+  "blockedTargets": [],
+  "notes": [
+    "Alert.alert on Expo Web maps to window.alert(). The Playwright validator spec must register a dialog handler before triggering step 8.",
+    "The Companion button toggles role to COMPANION; the active state is visually indicated by black background and white text per signup.tsx implementation.",
+    "The signup request body must include role: 'COMPANION' — this is derived from the state set in step 3."
+  ]
+}
