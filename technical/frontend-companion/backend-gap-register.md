@@ -200,6 +200,7 @@ Acceptance criteria for resolution:
 Signup in staging sends a verification email (with `EMAIL_DELIVERY_MODE=smtp` and provider configured), the link verifies the user, and login is allowed after verification.
 
 Resolution notes:
+M02 note (2026-05-10): FE-BE-GAP-003 is effectively a Blocker for M02 staging acceptance sign-off. Local development uses Mailpit successfully. Staging email verification remains blocked until SMTP provider and credentials are configured.
 
 ### FE-BE-GAP-004: Mobile Deep-Link Verification URL Per Environment
 
@@ -265,6 +266,35 @@ Use local bundled assets during early development.
 
 Acceptance criteria for resolution:
 Onboarding media source and cache/download behavior are documented and implemented consistently in local/staging/prod.
+
+Resolution notes:
+
+### FE-BE-GAP-028: Per-Environment Expo Scheme Registration Mismatch
+
+Created at: 2026-05-10T08:30:00Z
+
+Status: Open
+
+Severity: Needed Soon
+
+Type: Contract Mismatch
+
+Found in milestone: Milestone 2: Identity Flow With Minimum UI
+
+Frontend area: Email verification deep link handling; app.json; local and staging verification testing
+
+Gap:
+The backend correctly generates per-environment deep link schemes (companion-dev:// for local, companion-staging:// for staging, companion:// for production) via FE-BE-GAP-004 resolution. However, app.json currently only registers "scheme": "companion" (the production scheme). Local and staging verification deep links will not open the app on device/simulator.
+
+Expected backend support:
+No backend change needed. Frontend must introduce app.config.js dynamic scheme registration (reading EXPO_PUBLIC_APP_ENV) in a future milestone so builds register the correct scheme per environment.
+
+Current frontend workaround:
+Set MOBILE_DEEPLINK_SCHEME=companion:// in local backend .env to force all generated deep links to use companion:// scheme, which matches the currently registered app scheme. Local device verification works with this workaround. Staging end-to-end verification with scheme-correct deep links is blocked until app.config.js is introduced.
+
+Acceptance criteria for resolution:
+1. app.config.js reads EXPO_PUBLIC_APP_ENV and sets scheme to companion-dev, companion-staging, or companion per build profile.
+2. Deep link verification emails in local/dev open the local build; staging emails open the staging build.
 
 Resolution notes:
 
