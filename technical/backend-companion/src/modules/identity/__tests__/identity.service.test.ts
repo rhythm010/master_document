@@ -9,7 +9,8 @@ jest.mock("../../../shared/config", () => ({
     bcryptRounds: 10,
     authAccessTokenTtlSeconds: 3600,
     loginRateLimitMaxAttempts: 5,
-    loginRateLimitWindowMinutes: 15
+    loginRateLimitWindowMinutes: 15,
+    requireEmailVerification: true
   }
 }));
 
@@ -155,6 +156,43 @@ describe("identityService", () => {
     );
   });
 
+  test("signup bypass mode marks emailVerified=true and skips verification email", async () => {
+    const { config } = requireMock("../../../shared/config");
+    const { identityRepository } = requireMock("../identity.repository");
+    const { sendVerificationEmail } = requireMock("../../../shared/services/emailService");
+    const { signEmailVerifyToken } = requireMock("../../../shared/utils/jwt");
+
+    const previous = config.requireEmailVerification;
+    config.requireEmailVerification = false;
+    try {
+      identityRepository.findUserByEmail.mockResolvedValue(null);
+      identityRepository.createUser.mockResolvedValue({
+        ...baseUser,
+        emailVerified: true
+      });
+
+      const result = await identityService.signup({
+        role: "CLIENT",
+        name: "Test User",
+        nickname: "Tester",
+        email: "test@example.com",
+        password: "Passw0rd!"
+      });
+
+      expect(identityRepository.createUser).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          emailVerified: true
+        })
+      );
+      expect(signEmailVerifyToken).not.toHaveBeenCalled();
+      expect(sendVerificationEmail).not.toHaveBeenCalled();
+      expect(result.emailVerified).toBe(true);
+    } finally {
+      config.requireEmailVerification = previous;
+    }
+  });
+
   test("signup creates a companion profile and populates roster when venues exist", async () => {
     const { identityRepository } = requireMock("../identity.repository");
     const { rosterService } = requireMock("../../roster");
@@ -298,6 +336,54 @@ describe("identityService", () => {
         user: expect.objectContaining({ email: "test@example.com" })
       })
     );
+  });
+
+  test("login rejects when email is not verified and verification is required", async () => {
+    const { identityRepository } = requireMock("../identity.repository");
+    const { verifyPassword } = requireMock("../../../shared/utils/password");
+
+    identityRepository.findUserByEmail.mockResolvedValue({
+      ...baseUser,
+      emailVerified: false
+    });
+    verifyPassword.mockResolvedValue(true);
+
+    await expect(
+      identityService.login({
+        email: "test@example.com",
+        password: "Passw0rd!"
+      })
+    ).rejects.toMatchObject({ code: ErrorCodes.EMAIL_NOT_VERIFIED });
+  });
+
+  test("login bypass mode allows unverified user", async () => {
+    const { config } = requireMock("../../../shared/config");
+    const { identityRepository } = requireMock("../identity.repository");
+    const { verifyPassword } = requireMock("../../../shared/utils/password");
+
+    const previous = config.requireEmailVerification;
+    config.requireEmailVerification = false;
+    try {
+      identityRepository.findUserByEmail.mockResolvedValue({
+        ...baseUser,
+        emailVerified: false
+      });
+      verifyPassword.mockResolvedValue(true);
+
+      const result = await identityService.login({
+        email: "test@example.com",
+        password: "Passw0rd!"
+      });
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          accessToken: "access-token",
+          user: expect.objectContaining({ emailVerified: false })
+        })
+      );
+    } finally {
+      config.requireEmailVerification = previous;
+    }
   });
 
   test("getMe includes companion profile when available", async () => {

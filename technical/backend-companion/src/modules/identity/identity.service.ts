@@ -65,7 +65,7 @@ export const identityService = {
         nickname: input.nickname,
         email,
         passwordHash,
-        emailVerified: false,
+        emailVerified: config.requireEmailVerification ? false : true,
         biometricAuthEnabled: input.biometricAuthEnabled ?? false
       });
 
@@ -98,12 +98,14 @@ export const identityService = {
       }
     }
 
-    // Send a verification email; do not fail signup if delivery fails.
-    const token = signEmailVerifyToken({ sub: user.id, email: user.email });
-    try {
-      await sendVerificationEmail({ to: user.email, name: user.name, token });
-    } catch (error) {
-      logger.error({ error, email: user.email }, "verification email failed");
+    if (config.requireEmailVerification) {
+      // Send a verification email; do not fail signup if delivery fails.
+      const token = signEmailVerifyToken({ sub: user.id, email: user.email });
+      try {
+        await sendVerificationEmail({ to: user.email, name: user.name, token });
+      } catch (error) {
+        logger.error({ error, email: user.email }, "verification email failed");
+      }
     }
 
     return toPublicUser(user);
@@ -162,7 +164,7 @@ export const identityService = {
       throw identityErrors.invalidCredentials();
     }
 
-    if (!user.emailVerified) {
+    if (config.requireEmailVerification && !user.emailVerified) {
       throw identityErrors.emailNotVerified();
     }
 
