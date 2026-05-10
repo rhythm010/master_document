@@ -26,7 +26,11 @@ function setRequiredEnv() {
 // Load config fresh after env changes.
 function loadConfig() {
   jest.resetModules();
-  return require("../index").config as { mobileDeepLinkScheme: string; emailDeliveryMode: string };
+  return require("../index").config as {
+    mobileDeepLinkScheme: string;
+    emailDeliveryMode: string;
+    requireEmailVerification: boolean;
+  };
 }
 
 describe("shared/config", () => {
@@ -38,7 +42,8 @@ describe("shared/config", () => {
     "INTERNAL_API_TOKEN",
     "MOBILE_DEEPLINK_SCHEME",
     "WEB_VERIFY_URL",
-    "EMAIL_DELIVERY_MODE"
+    "EMAIL_DELIVERY_MODE",
+    "REQUIRE_EMAIL_VERIFICATION"
   ];
 
   test("fails fast when NODE_ENV=production and APP_ENV is missing", () => {
@@ -122,6 +127,37 @@ describe("shared/config", () => {
       process.env.WEB_VERIFY_URL = "https://example.com/verify-email";
 
       expect(() => loadConfig()).toThrow(/WEB_VERIFY_URL must contain the '\{token\}' placeholder/);
+    } finally {
+      restoreEnv(snapshot);
+    }
+  });
+
+  test("allows REQUIRE_EMAIL_VERIFICATION=false for local/dev/test", () => {
+    const snapshot = snapshotEnv(envKeys);
+    try {
+      setRequiredEnv();
+      process.env.NODE_ENV = "test";
+      delete process.env.APP_ENV;
+      process.env.REQUIRE_EMAIL_VERIFICATION = "false";
+
+      const config = loadConfig();
+      expect(config.requireEmailVerification).toBe(false);
+    } finally {
+      restoreEnv(snapshot);
+    }
+  });
+
+  test("fails fast when APP_ENV is staging and REQUIRE_EMAIL_VERIFICATION=false", () => {
+    const snapshot = snapshotEnv(envKeys);
+    try {
+      setRequiredEnv();
+      process.env.NODE_ENV = "production";
+      process.env.APP_ENV = "staging";
+      process.env.REQUIRE_EMAIL_VERIFICATION = "false";
+
+      expect(() => loadConfig()).toThrow(
+        /REQUIRE_EMAIL_VERIFICATION must not be false when APP_ENV is 'staging' or 'production'/
+      );
     } finally {
       restoreEnv(snapshot);
     }

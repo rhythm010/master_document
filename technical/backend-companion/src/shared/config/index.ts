@@ -42,6 +42,19 @@ const envSchema = z.object({
    */
   EMAIL_DELIVERY_MODE: z.enum(["smtp", "disabled", "log_only"]).optional(),
   /**
+   * Feature flag controlling whether email verification is required.
+   *
+   * Defaults to true.
+   */
+  REQUIRE_EMAIL_VERIFICATION: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") return value;
+      const trimmed = value.trim();
+      return trimmed ? trimmed.toLowerCase() : undefined;
+    },
+    z.enum(["true", "false"]).default("true")
+  ),
+  /**
    * Optional override for the mobile deep-link scheme prefix.
    * Example: "companion-dev://".
    */
@@ -134,9 +147,16 @@ const emailDeliveryMode = resolveEmailDeliveryMode(appEnv, env.EMAIL_DELIVERY_MO
 const mobileDeepLinkScheme = normalizeDeepLinkScheme(
   env.MOBILE_DEEPLINK_SCHEME ?? defaultMobileDeepLinkScheme(appEnv)
 );
+const requireEmailVerification = env.REQUIRE_EMAIL_VERIFICATION === "true";
+
+if ((appEnv === "staging" || appEnv === "production") && !requireEmailVerification) {
+  throw new Error(
+    "REQUIRE_EMAIL_VERIFICATION must not be false when APP_ENV is 'staging' or 'production'"
+  );
+}
 
 /** Shared runtime configuration derived from environment variables. */
-export const config = {
+export const config = Object.freeze({
   nodeEnv: env.NODE_ENV,
   appEnv,
   port: Number(env.PORT),
@@ -155,10 +175,11 @@ export const config = {
   smtpPass: env.SMTP_PASS ?? "",
   emailFrom: env.EMAIL_FROM,
   emailDeliveryMode,
+  requireEmailVerification,
   mobileDeepLinkScheme,
   publicBaseUrl: env.PUBLIC_BASE_URL,
   webVerifyUrl: env.WEB_VERIFY_URL,
   corsAllowedOrigins: env.CORS_ALLOWED_ORIGINS.split(",")
     .map((origin) => origin.trim())
     .filter(Boolean)
-};
+});
