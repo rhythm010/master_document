@@ -537,24 +537,37 @@ This mode prepares a frontend milestone implementation package, but it does not 
 
 ## Purpose
 
-Use this mode to validate backend readiness for a frontend milestone, capture backend gaps clearly, and produce a Lead-Agent-ready handover JSON.
+Use this mode to convert a frontend milestone brief into an implementation-ready milestone document through a backend-gap-aware workflow.
 
-This mode must stop after creating the handover JSON. Do not initiate Lead Agent flow, do not delegate to Planner/Coding/Test agents, and do not start implementation work.
+This mode validates backend readiness, captures user decisions about backend gaps, updates only approved planning documents, creates or updates the milestone implementation document, runs one final Backend Gap Agent verification pass, reports results to the user, and stops before frontend coding begins.
+
+This mode must stop after reporting the final backend verification results to the user. Do not initiate Lead Agent flow, do not delegate to Planner/Coding/Test agents, and do not start frontend or backend implementation work.
 
 ## Required Flow
 
 ```text id="fe_milestone_implementation_flow"
 Receive frontend milestone scope
-→ Backend Gap Agent gap analysis
+→ Backend Gap Agent initial gap analysis
 → Show full gap analysis report to user
-→ Ask user for suggestions, corrections, and approval
-→ Incorporate user suggestions
-→ Update backend gap document after approval
-→ Create Lead Agent handover JSON
+→ Ask user for gap decisions, corrections, and approval
+→ Capture user decisions in a clear decision record
+→ FE Implementation Agent applies approved planning-document updates
+→ FE Implementation Agent creates or updates the milestone implementation document
+→ Backend Gap Agent verifies the implementation document once
+→ Show final verification results to user
 → Stop
 ```
 
-## Backend Gap Agent Step
+## Agent Ownership Boundaries
+
+* Backend Gap Agent owns backend gap analysis and final backend verification.
+* FE Implementation Agent owns milestone implementation document creation/update.
+* Backend gap register updates require explicit user approval.
+* Milestone brief edits require explicit user approval.
+* Frontend/backend production code must not be edited in this mode.
+* Lead Agent handover JSON is not created in this mode unless the user explicitly asks for it separately.
+
+## Initial Backend Gap Agent Step
 
 Delegate to Backend Gap Agent with:
 
@@ -570,9 +583,10 @@ Backend Gap Agent must return the full gap analysis report in its required repor
 After Backend Gap Agent returns the report:
 
 1. Send the full gap analysis report to the user.
-2. Ask for suggestions, corrections, and explicit approval.
+2. Ask for corrections, additions, and explicit gap-handling decisions.
 3. Do not update the backend gap register yet.
-4. Do not create the handover JSON yet.
+4. Do not edit the milestone brief yet.
+5. Do not create or update the milestone implementation document yet.
 
 Use this approval prompt:
 
@@ -581,94 +595,116 @@ Please review the full gap analysis report.
 
 Approval needed:
 1. Do you want any corrections or additions to the gap analysis?
-2. May I update the backend gap document with these gap details?
-3. May I create the Lead Agent handover JSON?
+2. Which gaps should be registered in the backend gap register?
+3. Which gaps should be handled with an approved frontend fallback or workaround?
+4. Which gaps should block the milestone implementation document?
+5. Which gaps should be deferred or marked out of scope?
+6. May the FE Implementation Agent create or update the milestone implementation document using these decisions?
+7. May any proposed backend gap register or milestone brief edits be applied?
 ```
 
 If the user provides suggestions, incorporate them into the gap details and confirm whether approval is now granted before writing files.
 
-## Approved File Updates
+## User Gap Decision Record
 
-After explicit approval only:
+Before handing work to the FE Implementation Agent, summarize the user's approved decisions in this format:
 
-1. Update the backend gap document:
+```md id="fe_milestone_gap_decision_record"
+## User Gap Decisions
 
-```text id="fe_milestone_gap_doc_path"
+Register as backend gap:
+- <gap id or summary>
+
+Proceed with frontend fallback:
+- <gap id or summary + approved fallback>
+
+Block implementation until backend fixed:
+- <gap id or summary>
+
+Deferred / future milestone:
+- <gap id or summary>
+
+Milestone brief edits approved:
+- <edit summary or "None">
+
+Backend gap register edits approved:
+- <edit summary or "None">
+```
+
+This decision record is the source of truth for the FE Implementation Agent during implementation-document creation.
+
+## FE Implementation Agent Step
+
+Delegate to FE Implementation Agent with:
+
+* the milestone name/number and relevant milestone brief path
+* the Backend Gap Agent report
+* the User Gap Decisions record
+* `technical/mobile-frontend-roadmap.md`
+* `technical/frontend-companion/backend-gap-register.md`
+* `technical/frontend-companion/frontend-backend-contract.md`
+* any user-provided implementation goal or constraints
+
+FE Implementation Agent may ask its own focused clarification questions when answers materially affect the implementation document.
+
+FE Implementation Agent may update only these planning documents after explicit approval:
+
+```text id="fe_milestone_approved_planning_update_paths"
 technical/frontend-companion/backend-gap-register.md
+technical/frontend-companion/milestones/<milestone-file>.md
+technical/frontend-companion/milestones/milestone-implementation/<milestone-id>-<slug>-impl.md
 ```
 
-2. Create a Lead Agent handover JSON under:
+The milestone implementation document must live under:
 
-```text id="fe_milestone_handover_dir"
-technical/frontend-companion/milestones/lead-handoffs/
+```text id="fe_milestone_implementation_dir"
+technical/frontend-companion/milestones/milestone-implementation/
 ```
 
-Use filename:
+Use filename pattern:
 
-```text id="fe_milestone_handover_filename"
-fe-milestone-implementation-<milestone-id>-handover-YYYYMMDD.json
+```text id="fe_milestone_implementation_filename"
+milestone-XX-slug-impl.md
 ```
 
-Create the directory if it does not exist.
+Implementation document status must be one of:
 
-## Lead Agent Handover JSON Format
-
-The handover JSON must be valid JSON and understandable without reading the entire gap report.
-
-Use this structure:
-
-```json
-{
-  "mode": "fe-milestone-implementation",
-  "created_at": "YYYY-MM-DDTHH:MM:SSZ",
-  "milestone": {
-    "id": "<milestone-id>",
-    "name": "<milestone-name>",
-    "brief_path": "<path>",
-    "implementation_path": "<path-or-null>",
-    "roadmap_path": "technical/mobile-frontend-roadmap.md"
-  },
-  "user_goal": "<original user request or implementation intent>",
-  "gap_analysis": {
-    "report_path": null,
-    "summary": "<short summary>",
-    "confirmed_gaps": [],
-    "existing_gaps_updated": [],
-    "resolved_gaps": [],
-    "already_supported": [],
-    "conflicts_or_unknowns": []
-  },
-  "backend_gap_register_updates": {
-    "path": "technical/frontend-companion/backend-gap-register.md",
-    "updated": true,
-    "notes": []
-  },
-  "lead_agent_instructions": {
-    "objective": "<what Lead Agent should implement next>",
-    "do_not_reanalyze_gaps_from_scratch": true,
-    "use_gap_register_as_current_backend_dependency_source": true,
-    "recommended_pipeline_size": "<MICRO|SMALL|MEDIUM|LARGE>",
-    "recommended_next_agents": [],
-    "blocked_until_backend_gaps_resolved": [],
-    "frontend_work_allowed_with_workarounds": [],
-    "out_of_scope": [
-      "Do not initiate backend implementation unless separately requested.",
-      "Do not change backend contracts without updating the gap register."
-    ]
-  }
-}
+```text id="fe_milestone_implementation_statuses"
+Implementation Ready
+Ready With Approved Fallbacks
+Blocked By Backend
+Needs User Clarification
+Needs Gap Register Update
 ```
+
+## Final Backend Gap Verification Step
+
+After the FE Implementation Agent creates or updates the implementation document, run Backend Gap Agent one more time against the milestone brief plus the implementation document.
+
+This pass is verification-only:
+
+* verify that the implementation document matches backend reality
+* verify that approved fallbacks and blockers are represented correctly
+* verify that registered gaps match the user decision record
+* report concrete mismatches, missing gap references, or unsafe assumptions
+* do not restart gap discovery from scratch unless a concrete mismatch requires it
+* do not edit files during this verification pass
+
+Maximum one post-implementation-document Backend Gap Agent verification round unless the user explicitly asks for another.
 
 ## Final Response In This Mode
 
-After approved updates, return only:
+After final backend verification, return only:
 
 ```text id="fe_milestone_final_response"
 Mode: fe-milestone-implementation
-Updated gap document: <path>
-Created handover JSON: <path>
+Milestone implementation document: <path>
+Implementation document status: <Implementation Ready | Ready With Approved Fallbacks | Blocked By Backend | Needs User Clarification | Needs Gap Register Update>
+Updated gap document: <path-or-none>
+Updated milestone brief: <path-or-none>
+Final backend verification: <passed | findings>
 Summary: <brief summary>
-Next action: Give the handover JSON to Lead Agent when ready.
+Next action: Give the implementation document to Lead Agent when ready.
 ```
 
 Do not start Lead Agent flow yourself.
