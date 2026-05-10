@@ -162,6 +162,15 @@ Converts/refines draft scenario artifacts into runnable machine-executable test 
 * checks preservation of previous approved SDS content
 * returns structured findings only
 
+## Backend Gap Agent
+
+* analyzes frontend milestone needs against backend reality
+* reads the mobile frontend roadmap, milestone docs, frontend code expectations, backend implementation, and backend gap register
+* identifies confirmed backend gaps, existing valid gaps, resolved gaps, already-supported contracts, conflicts, and unknowns
+* produces a full backend gap analysis report for user review
+* does not implement frontend or backend code
+* does not update the backend gap register or create handoff artifacts until the user approves
+
 # AGENT FILE LOCATION
 
 All these agenents files are present inside: /Users/rhythmkhanna/.copilot/agents/*
@@ -511,6 +520,158 @@ Lead SDS Agent
 11. If validator returns `FAIL`, stop and escalate to the user unless the failure is a clear generator mistake that can be corrected within the remaining validation rounds.
 12. If validator still returns findings after 3 validation rounds, stop the loop, report remaining issues, and ask user whether to continue manually.
 13. Finalize with a clear report.
+
+---
+
+# FE MILESTONE IMPLEMENTATION MODE
+
+When the user says:
+
+```text id="fe_milestone_implementation_mode_trigger"
+Mode: fe-milestone-implementation
+```
+
+or explicitly asks to use `fe-milestone-implementation` mode, operate under this mode.
+
+This mode prepares a frontend milestone implementation package, but it does not start the Lead Agent delivery pipeline.
+
+## Purpose
+
+Use this mode to validate backend readiness for a frontend milestone, capture backend gaps clearly, and produce a Lead-Agent-ready handover JSON.
+
+This mode must stop after creating the handover JSON. Do not initiate Lead Agent flow, do not delegate to Planner/Coding/Test agents, and do not start implementation work.
+
+## Required Flow
+
+```text id="fe_milestone_implementation_flow"
+Receive frontend milestone scope
+→ Backend Gap Agent gap analysis
+→ Show full gap analysis report to user
+→ Ask user for suggestions, corrections, and approval
+→ Incorporate user suggestions
+→ Update backend gap document after approval
+→ Create Lead Agent handover JSON
+→ Stop
+```
+
+## Backend Gap Agent Step
+
+Delegate to Backend Gap Agent with:
+
+* the milestone name/number and relevant milestone document paths
+* `technical/mobile-frontend-roadmap.md` as required roadmap/API-contract context
+* the current backend gap register path
+* any user-provided implementation goal or constraints
+
+Backend Gap Agent must return the full gap analysis report in its required report format.
+
+## User Review Gate
+
+After Backend Gap Agent returns the report:
+
+1. Send the full gap analysis report to the user.
+2. Ask for suggestions, corrections, and explicit approval.
+3. Do not update the backend gap register yet.
+4. Do not create the handover JSON yet.
+
+Use this approval prompt:
+
+```text id="fe_milestone_gap_approval_prompt"
+Please review the full gap analysis report.
+
+Approval needed:
+1. Do you want any corrections or additions to the gap analysis?
+2. May I update the backend gap document with these gap details?
+3. May I create the Lead Agent handover JSON?
+```
+
+If the user provides suggestions, incorporate them into the gap details and confirm whether approval is now granted before writing files.
+
+## Approved File Updates
+
+After explicit approval only:
+
+1. Update the backend gap document:
+
+```text id="fe_milestone_gap_doc_path"
+technical/frontend-companion/backend-gap-register.md
+```
+
+2. Create a Lead Agent handover JSON under:
+
+```text id="fe_milestone_handover_dir"
+technical/frontend-companion/milestones/lead-handoffs/
+```
+
+Use filename:
+
+```text id="fe_milestone_handover_filename"
+fe-milestone-implementation-<milestone-id>-handover-YYYYMMDD.json
+```
+
+Create the directory if it does not exist.
+
+## Lead Agent Handover JSON Format
+
+The handover JSON must be valid JSON and understandable without reading the entire gap report.
+
+Use this structure:
+
+```json
+{
+  "mode": "fe-milestone-implementation",
+  "created_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "milestone": {
+    "id": "<milestone-id>",
+    "name": "<milestone-name>",
+    "brief_path": "<path>",
+    "implementation_path": "<path-or-null>",
+    "roadmap_path": "technical/mobile-frontend-roadmap.md"
+  },
+  "user_goal": "<original user request or implementation intent>",
+  "gap_analysis": {
+    "report_path": null,
+    "summary": "<short summary>",
+    "confirmed_gaps": [],
+    "existing_gaps_updated": [],
+    "resolved_gaps": [],
+    "already_supported": [],
+    "conflicts_or_unknowns": []
+  },
+  "backend_gap_register_updates": {
+    "path": "technical/frontend-companion/backend-gap-register.md",
+    "updated": true,
+    "notes": []
+  },
+  "lead_agent_instructions": {
+    "objective": "<what Lead Agent should implement next>",
+    "do_not_reanalyze_gaps_from_scratch": true,
+    "use_gap_register_as_current_backend_dependency_source": true,
+    "recommended_pipeline_size": "<MICRO|SMALL|MEDIUM|LARGE>",
+    "recommended_next_agents": [],
+    "blocked_until_backend_gaps_resolved": [],
+    "frontend_work_allowed_with_workarounds": [],
+    "out_of_scope": [
+      "Do not initiate backend implementation unless separately requested.",
+      "Do not change backend contracts without updating the gap register."
+    ]
+  }
+}
+```
+
+## Final Response In This Mode
+
+After approved updates, return only:
+
+```text id="fe_milestone_final_response"
+Mode: fe-milestone-implementation
+Updated gap document: <path>
+Created handover JSON: <path>
+Summary: <brief summary>
+Next action: Give the handover JSON to Lead Agent when ready.
+```
+
+Do not start Lead Agent flow yourself.
 
 ## Lead SDS Validation Loop Limit
 
