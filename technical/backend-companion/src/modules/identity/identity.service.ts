@@ -14,10 +14,17 @@ import { sendVerificationEmail } from "../../shared/services/emailService";
 import type { UserRole, CompanionDesignation } from "../../shared/types/enums";
 
 import { rosterService } from "../roster";
+import { bookingRepository } from "../booking/booking.repository";
+import { ratingsRepository } from "../ratings/ratings.repository";
 
 import { identityRepository } from "./identity.repository";
 import { identityErrors } from "./identity.errors";
-import type { PublicUserDTO, CompanionProfileDTO } from "./identity.types";
+import type {
+  AppStateResponseDTO,
+  CompanionProfileDTO,
+  NextAction,
+  PublicUserDTO
+} from "./identity.types";
 
 // In-memory limiter for email-based login attempts.
 const emailRateLimiter = new EmailRateLimiter(
@@ -200,6 +207,68 @@ export const identityService = {
     return toPublicUser(user, companionProfile);
   },
 
+  // Return the minimal app routing state needed by the mobile app to decide where to go next.
+  async getMyAppState(userId: string): Promise<AppStateResponseDTO> {
+    const user = await identityRepository.findUserById(prisma, userId);
+    if (!user) {
+      throw identityErrors.userNotFound();
+    }
+
+    const companionProfileRow =
+      user.role === "COMPANION"
+        ? await identityRepository.findCompanionProfileByUserId(prisma, user.id)
+        : null;
+
+    const primaryBookingRow =
+      user.role === "CLIENT"
+        ? await bookingRepository.findPrimaryBookingForClient(prisma, user.id)
+        : await bookingRepository.findPrimaryBookingForCompanion(prisma, user.id);
+
+    const dbNow = await ratingsRepository.getDbNow(prisma);
+
+    const ratingNeededRow =
+      user.role === "CLIENT"
+        ? await ratingsRepository.findMostRecentEligibleBookingMissingClientRating(prisma, {
+            clientId: user.id,
+            dbNow
+          })
+        : await ratingsRepository.findMostRecentEligibleBookingMissingCompanionRating(prisma, {
+            companionId: user.id,
+            dbNow
+          });
+
+    const nextAction = computeNextAction({
+      role: user.role,
+      companionIsActive: companionProfileRow?.isActive ?? null,
+      primaryBookingStatus: primaryBookingRow?.status ?? null,
+      hasRatingNeeded: Boolean(ratingNeededRow)
+    });
+
+    return {
+      user: {
+        id: user.id,
+        role: user.role,
+        companionProfile: companionProfileRow ? { isActive: companionProfileRow.isActive } : null
+      },
+      primaryBooking: primaryBookingRow
+        ? {
+            id: primaryBookingRow.id,
+            status: primaryBookingRow.status as "ACTIVE" | "CONFIRMED",
+            startAt: primaryBookingRow.startAt.toISOString(),
+            endAt: primaryBookingRow.endAt.toISOString()
+          }
+        : null,
+      ratingNeeded: ratingNeededRow
+        ? {
+            bookingId: ratingNeededRow.id,
+            status: ratingNeededRow.status as "COMPLETED" | "CANCELLED",
+            startAt: ratingNeededRow.startAt.toISOString()
+          }
+        : null,
+      nextAction
+    };
+  },
+
   // Update a user's nickname and return the refreshed profile.
   async updateNickname(userId: string, nickname: string) {
     const existing = await identityRepository.findUserById(prisma, userId);
@@ -224,6 +293,33 @@ export const identityService = {
 // Normalize email for consistent lookups and storage.
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
+}
+
+// Compute the most important UI action for the mobile app.
+function computeNextAction(input: {
+  role: UserRole;
+  companionIsActive: boolean | null;
+  primaryBookingStatus: "ACTIVE" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | null;
+  hasRatingNeeded: boolean;
+}): NextAction {
+  if (input.primaryBookingStatus === "ACTIVE") {
+    return "ACTIVE_SESSION";
+  }
+
+  if (input.primaryBookingStatus === "CONFIRMED") {
+    return "MATCHING";
+  }
+
+  if (input.hasRatingNeeded) {
+    return "RATING_NEEDED";
+  }
+
+  const companionInactive = input.role === "COMPANION" && input.companionIsActive === false;
+  if (companionInactive) {
+    return "COMPANION_INACTIVE";
+  }
+
+  return "IDLE";
 }
 
 // Map a user record into the public API DTO.

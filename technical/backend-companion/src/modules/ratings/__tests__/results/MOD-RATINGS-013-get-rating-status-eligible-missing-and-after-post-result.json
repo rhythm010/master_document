@@ -1,0 +1,455 @@
+{
+  "runId": "RUN-20260511040523363-MOD-RATINGS-013",
+  "testId": "MOD-RATINGS-013",
+  "status": "PASS",
+  "startedAt": "2026-05-11T04:05:23.363Z",
+  "endedAt": "2026-05-11T04:05:23.504Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "GET /bookings/add0b276-dbba-4878-88d1-cb06ad1d8423/rating-status",
+      "startedAt": "2026-05-11T04:05:23.457Z",
+      "endedAt": "2026-05-11T04:05:23.462Z",
+      "durationMs": 5,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-11T04:05:23.462Z",
+      "endedAt": "2026-05-11T04:05:23.462Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 3,
+      "target": "POST /bookings/add0b276-dbba-4878-88d1-cb06ad1d8423/rating",
+      "startedAt": "2026-05-11T04:05:23.463Z",
+      "endedAt": "2026-05-11T04:05:23.495Z",
+      "durationMs": 32,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 4,
+      "target": "API response validation",
+      "startedAt": "2026-05-11T04:05:23.495Z",
+      "endedAt": "2026-05-11T04:05:23.495Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 201
+    },
+    {
+      "step": 5,
+      "target": "GET /bookings/add0b276-dbba-4878-88d1-cb06ad1d8423/rating-status",
+      "startedAt": "2026-05-11T04:05:23.495Z",
+      "endedAt": "2026-05-11T04:05:23.500Z",
+      "durationMs": 5,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 6,
+      "target": "API response validation",
+      "startedAt": "2026-05-11T04:05:23.500Z",
+      "endedAt": "2026-05-11T04:05:23.500Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 7,
+      "target": "DB verify booking_ratings",
+      "startedAt": "2026-05-11T04:05:23.500Z",
+      "endedAt": "2026-05-11T04:05:23.503Z",
+      "durationMs": 3,
+      "result": "PASS"
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "bookingId": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+        "callerUserId": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+        "callerRole": "CLIENT",
+        "ratingType": "CLIENT_RATING_DUO",
+        "eligibleForRating": true,
+        "eligibilityReason": "COMPLETED",
+        "hasSubmitted": false,
+        "ratingId": null,
+        "ratingCreatedAt": null,
+        "ratingNeeded": true
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests rating status for a completed booking with no rating yet.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 1,
+        "target": "GET /bookings/add0b276-dbba-4878-88d1-cb06ad1d8423/rating-status",
+        "startedAt": "2026-05-11T04:05:23.457Z",
+        "endedAt": "2026-05-11T04:05:23.462Z",
+        "durationMs": 5,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "bookingId": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+          "callerUserId": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+          "callerRole": "CLIENT",
+          "ratingType": "CLIENT_RATING_DUO",
+          "eligibleForRating": true,
+          "eligibilityReason": "COMPLETED",
+          "hasSubmitted": false,
+          "ratingId": null,
+          "ratingCreatedAt": null,
+          "ratingNeeded": true
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "bookingId",
+            "expected": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+            "actual": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "callerUserId",
+            "expected": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+            "actual": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "callerRole",
+            "expected": "CLIENT",
+            "actual": "CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "CLIENT_RATING_DUO",
+            "actual": "CLIENT_RATING_DUO",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "eligibleForRating",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "eligibilityReason",
+            "expected": "COMPLETED",
+            "actual": "COMPLETED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "hasSubmitted",
+            "expected": false,
+            "actual": false,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingId",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingNeeded",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System reports eligible + not yet submitted + ratingNeeded=true.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-11T04:05:23.462Z",
+        "endedAt": "2026-05-11T04:05:23.462Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "id": "e999304f-4d99-43ee-b9e9-1696509de634",
+        "bookingId": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+        "raterUserId": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+        "ratingType": "CLIENT_RATING_DUO",
+        "stars": null,
+        "tags": [
+          "Professional"
+        ],
+        "comment": "",
+        "createdAt": "2026-05-11T04:05:23.476Z"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client submits a rating.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 3,
+        "target": "POST /bookings/add0b276-dbba-4878-88d1-cb06ad1d8423/rating",
+        "startedAt": "2026-05-11T04:05:23.463Z",
+        "endedAt": "2026-05-11T04:05:23.495Z",
+        "durationMs": 32,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 4,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 3,
+        "response": {
+          "id": "e999304f-4d99-43ee-b9e9-1696509de634",
+          "bookingId": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+          "raterUserId": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+          "ratingType": "CLIENT_RATING_DUO",
+          "stars": null,
+          "tags": [
+            "Professional"
+          ],
+          "comment": "",
+          "createdAt": "2026-05-11T04:05:23.476Z"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 201,
+            "actual": 201,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "id",
+            "expected": "e999304f-4d99-43ee-b9e9-1696509de634",
+            "actual": "e999304f-4d99-43ee-b9e9-1696509de634",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingType",
+            "expected": "CLIENT_RATING_DUO",
+            "actual": "CLIENT_RATING_DUO",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "Rating is created.",
+      "statusCode": 201,
+      "serviceHit": {
+        "step": 4,
+        "target": "API response validation",
+        "startedAt": "2026-05-11T04:05:23.495Z",
+        "endedAt": "2026-05-11T04:05:23.495Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 201
+      }
+    },
+    {
+      "step": 5,
+      "result": "PASS",
+      "observed": {
+        "bookingId": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+        "callerUserId": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+        "callerRole": "CLIENT",
+        "ratingType": "CLIENT_RATING_DUO",
+        "eligibleForRating": true,
+        "eligibilityReason": "COMPLETED",
+        "hasSubmitted": true,
+        "ratingId": "e999304f-4d99-43ee-b9e9-1696509de634",
+        "ratingCreatedAt": "2026-05-11T04:05:23.476Z",
+        "ratingNeeded": false
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests rating status again after submission.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 5,
+        "target": "GET /bookings/add0b276-dbba-4878-88d1-cb06ad1d8423/rating-status",
+        "startedAt": "2026-05-11T04:05:23.495Z",
+        "endedAt": "2026-05-11T04:05:23.500Z",
+        "durationMs": 5,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 6,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 5,
+        "response": {
+          "bookingId": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+          "callerUserId": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+          "callerRole": "CLIENT",
+          "ratingType": "CLIENT_RATING_DUO",
+          "eligibleForRating": true,
+          "eligibilityReason": "COMPLETED",
+          "hasSubmitted": true,
+          "ratingId": "e999304f-4d99-43ee-b9e9-1696509de634",
+          "ratingCreatedAt": "2026-05-11T04:05:23.476Z",
+          "ratingNeeded": false
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "bookingId",
+            "expected": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+            "actual": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "hasSubmitted",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingId",
+            "expected": "e999304f-4d99-43ee-b9e9-1696509de634",
+            "actual": "e999304f-4d99-43ee-b9e9-1696509de634",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingNeeded",
+            "expected": false,
+            "actual": false,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System reflects that the rating has been submitted.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 6,
+        "target": "API response validation",
+        "startedAt": "2026-05-11T04:05:23.500Z",
+        "endedAt": "2026-05-11T04:05:23.500Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 7,
+      "result": "PASS",
+      "observed": {
+        "sql": "SELECT * FROM \"booking_ratings\" WHERE booking_id = $1 AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = $2 LIMIT 50;",
+        "params": [
+          "add0b276-dbba-4878-88d1-cb06ad1d8423",
+          "10aabfa3-3633-4368-9afc-151dd24a1f5d"
+        ],
+        "rowCount": 1,
+        "rows": [
+          {
+            "id": "e999304f-4d99-43ee-b9e9-1696509de634",
+            "booking_id": "add0b276-dbba-4878-88d1-cb06ad1d8423",
+            "rater_user_id": "10aabfa3-3633-4368-9afc-151dd24a1f5d",
+            "rating_type": "CLIENT_RATING_DUO",
+            "stars": null,
+            "tags": [
+              "Professional"
+            ],
+            "comment": "",
+            "created_at": "2026-05-11T04:05:23.476Z"
+          }
+        ],
+        "checks": [
+          {
+            "type": "rowCount",
+            "expectedRows": 1,
+            "actualRows": 1,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "row": 0,
+            "field": "id",
+            "expected": "e999304f-4d99-43ee-b9e9-1696509de634",
+            "actual": "e999304f-4d99-43ee-b9e9-1696509de634",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "layman": "Verify rating row exists in DB for this caller.",
+      "serviceHit": {
+        "step": 7,
+        "target": "DB verify booking_ratings",
+        "startedAt": "2026-05-11T04:05:23.500Z",
+        "endedAt": "2026-05-11T04:05:23.503Z",
+        "durationMs": 3,
+        "result": "PASS"
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

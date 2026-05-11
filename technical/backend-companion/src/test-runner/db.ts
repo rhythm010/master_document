@@ -243,6 +243,13 @@ export async function applySeedData(
             ]);
 
             if (role === "CLIENT") {
+              // Mirror venue/booking multi-seed support: capture the first two client ids.
+              if (context["ORIGINAL_CLIENT_ID"] === undefined) {
+                context["ORIGINAL_CLIENT_ID"] = id;
+              } else if (context["TARGET_CLIENT_ID"] === undefined) {
+                context["TARGET_CLIENT_ID"] = id;
+              }
+
               if (context["CLIENT_ID"] === undefined) {
                 context["CLIENT_ID"] = id;
               }
@@ -548,6 +555,14 @@ export async function applySeedData(
           extendedAt
         ]);
 
+        // Mirror venue seeding: capture the first two booking ids for multi-booking scenarios.
+        if (context["ORIGINAL_BOOKING_ID"] === undefined) {
+          context["ORIGINAL_BOOKING_ID"] = id;
+        } else if (context["TARGET_BOOKING_ID"] === undefined) {
+          context["TARGET_BOOKING_ID"] = id;
+        }
+
+        // Backwards-compatible keys used by existing tests.
         if (context["BOOKING_ID"] === undefined) {
           context["BOOKING_ID"] = id;
         }

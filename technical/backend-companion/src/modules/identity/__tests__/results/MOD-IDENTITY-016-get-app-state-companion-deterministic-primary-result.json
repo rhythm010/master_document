@@ -1,0 +1,194 @@
+{
+  "runId": "RUN-20260511040523363-MOD-IDENTITY-016",
+  "testId": "MOD-IDENTITY-016",
+  "status": "PASS",
+  "startedAt": "2026-05-11T04:05:23.363Z",
+  "endedAt": "2026-05-11T04:05:23.482Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "DB booking_companion_assignments query",
+      "startedAt": "2026-05-11T04:05:23.466Z",
+      "endedAt": "2026-05-11T04:05:23.467Z",
+      "durationMs": 1,
+      "result": "PASS"
+    },
+    {
+      "step": 2,
+      "target": "GET /users/me/app-state",
+      "startedAt": "2026-05-11T04:05:23.467Z",
+      "endedAt": "2026-05-11T04:05:23.482Z",
+      "durationMs": 15,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 3,
+      "target": "API response validation",
+      "startedAt": "2026-05-11T04:05:23.482Z",
+      "endedAt": "2026-05-11T04:05:23.482Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 200
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "rows": [],
+        "rowCount": 2
+      },
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "layman": "Test-only: attach the seeded captain+vice to the second (ACTIVE) booking.",
+      "serviceHit": {
+        "step": 1,
+        "target": "DB booking_companion_assignments query",
+        "startedAt": "2026-05-11T04:05:23.466Z",
+        "endedAt": "2026-05-11T04:05:23.467Z",
+        "durationMs": 1,
+        "result": "PASS"
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "user": {
+          "id": "0300d517-ac1c-475b-a7b9-3060e8f04b40",
+          "role": "COMPANION",
+          "companionProfile": {
+            "isActive": true
+          }
+        },
+        "primaryBooking": {
+          "id": "ba279fa9-e73b-43fc-a273-d49ad1d9e817",
+          "status": "ACTIVE",
+          "startAt": "2026-05-13T10:00:00.000Z",
+          "endAt": "2026-05-13T12:00:00.000Z"
+        },
+        "ratingNeeded": null,
+        "nextAction": "ACTIVE_SESSION"
+      },
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "layman": "Captain requests app-state when assigned to both a CONFIRMED and an ACTIVE booking.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 2,
+        "target": "GET /users/me/app-state",
+        "startedAt": "2026-05-11T04:05:23.467Z",
+        "endedAt": "2026-05-11T04:05:23.482Z",
+        "durationMs": 15,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 3,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 2,
+        "response": {
+          "user": {
+            "id": "0300d517-ac1c-475b-a7b9-3060e8f04b40",
+            "role": "COMPANION",
+            "companionProfile": {
+              "isActive": true
+            }
+          },
+          "primaryBooking": {
+            "id": "ba279fa9-e73b-43fc-a273-d49ad1d9e817",
+            "status": "ACTIVE",
+            "startAt": "2026-05-13T10:00:00.000Z",
+            "endAt": "2026-05-13T12:00:00.000Z"
+          },
+          "ratingNeeded": null,
+          "nextAction": "ACTIVE_SESSION"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "user.id",
+            "expected": "0300d517-ac1c-475b-a7b9-3060e8f04b40",
+            "actual": "0300d517-ac1c-475b-a7b9-3060e8f04b40",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "user.role",
+            "expected": "COMPANION",
+            "actual": "COMPANION",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "user.companionProfile.isActive",
+            "expected": true,
+            "actual": true,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "primaryBooking.id",
+            "expected": "ba279fa9-e73b-43fc-a273-d49ad1d9e817",
+            "actual": "ba279fa9-e73b-43fc-a273-d49ad1d9e817",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "primaryBooking.status",
+            "expected": "ACTIVE",
+            "actual": "ACTIVE",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "nextAction",
+            "expected": "ACTIVE_SESSION",
+            "actual": "ACTIVE_SESSION",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System selects the ACTIVE booking deterministically as the primary booking for the companion.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 3,
+        "target": "API response validation",
+        "startedAt": "2026-05-11T04:05:23.482Z",
+        "endedAt": "2026-05-11T04:05:23.482Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

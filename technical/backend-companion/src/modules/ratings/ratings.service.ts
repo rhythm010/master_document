@@ -1,10 +1,16 @@
 import type { Prisma } from "@prisma/client";
 
+import type { DbClient } from "../../shared/db/prisma";
 import { prisma } from "../../shared/db/prisma";
 
 import { ratingsErrors } from "./ratings.errors";
 import { ratingsRepository } from "./ratings.repository";
-import type { BookingRatingDTO, CreateBookingRatingInput, CreateBookingRatingResult } from "./ratings.types";
+import type {
+  BookingRatingDTO,
+  BookingRatingStatusDTO,
+  CreateBookingRatingInput,
+  CreateBookingRatingResult
+} from "./ratings.types";
 
 export const ratingsService = {
   // Create an immutable booking rating for the caller (client or assigned companion).
@@ -64,6 +70,61 @@ export const ratingsService = {
         rating: toBookingRatingDTO(existing)
       };
     });
+  },
+
+  // Return eligibility + submission status for rating a booking.
+  async getBookingRatingStatus(input: {
+    bookingId: string;
+    caller: { id: string; role: "CLIENT" | "COMPANION" };
+  }): Promise<BookingRatingStatusDTO> {
+    const booking = await ratingsRepository.findBookingForRating(prisma, input.bookingId);
+    if (!booking) {
+      throw ratingsErrors.bookingNotFound();
+    }
+
+    const dbNow = await ratingsRepository.getDbNow(prisma);
+
+    const ratingType = await inferRatingTypeAndAuthorize(prisma, {
+      bookingId: booking.id,
+      bookingClientId: booking.clientId,
+      caller: input.caller
+    });
+
+    const eligibility = computeRatingEligibility({
+      status: booking.status,
+      startAt: booking.startAt,
+      dbNow
+    });
+
+    const existing = await ratingsRepository.findExistingBookingRating(prisma, {
+      bookingId: booking.id,
+      ratingType,
+      raterUserId: input.caller.id
+    });
+
+    const mostRecentMissing =
+      input.caller.role === "CLIENT"
+        ? await ratingsRepository.findMostRecentEligibleBookingMissingClientRating(prisma, {
+            clientId: input.caller.id,
+            dbNow
+          })
+        : await ratingsRepository.findMostRecentEligibleBookingMissingCompanionRating(prisma, {
+            companionId: input.caller.id,
+            dbNow
+          });
+
+    return {
+      bookingId: booking.id,
+      callerUserId: input.caller.id,
+      callerRole: input.caller.role,
+      ratingType,
+      eligibleForRating: eligibility.eligibleForRating,
+      eligibilityReason: eligibility.reason,
+      hasSubmitted: Boolean(existing),
+      ratingId: existing?.id ?? null,
+      ratingCreatedAt: existing ? existing.createdAt.toISOString() : null,
+      ratingNeeded: mostRecentMissing ? mostRecentMissing.id === booking.id : false
+    };
   }
 };
 
@@ -109,8 +170,28 @@ async function ensureBookingEligibleForRating(
   throw ratingsErrors.invalidStateTransition();
 }
 
+// Determine whether a booking is currently eligible for rating submission.
+function computeRatingEligibility(input: {
+  status: string;
+  startAt: Date;
+  dbNow: Date;
+}): { eligibleForRating: boolean; reason: string } {
+  if (input.status === "COMPLETED") {
+    return { eligibleForRating: true, reason: "COMPLETED" };
+  }
+
+  if (input.status === "CANCELLED") {
+    const started = input.startAt.getTime() <= input.dbNow.getTime();
+    return started
+      ? { eligibleForRating: true, reason: "CANCELLED_STARTED" }
+      : { eligibleForRating: false, reason: "CANCELLED_NOT_STARTED" };
+  }
+
+  return { eligibleForRating: false, reason: "STATUS_NOT_ELIGIBLE" };
+}
+
 async function inferRatingTypeAndAuthorize(
-  db: Prisma.TransactionClient,
+  db: DbClient,
   input: {
     bookingId: string;
     bookingClientId: string;

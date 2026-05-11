@@ -1,0 +1,42 @@
+{
+  "testId": "MOD-IDENTITY-014",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get app-state returns MATCHING when primary booking is CONFIRMED",
+  "flowType": "happy",
+  "linkedRequirement": "identity/get-app-state",
+  "filePath": "technical/backend-companion/src/modules/identity/__tests__/MOD-IDENTITY-014-get-app-state-confirmed-matching.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate GET /users/me/app-state returns primaryBooking (CONFIRMED) and nextAction=MATCHING.",
+  "featureSdsVersion": "identity-and-auth.feature-sds.md",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "booking", "status": "CONFIRMED", "count": 1 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/users/me/app-state",
+      "authType": "Bearer",
+      "layman": "Client requests their app-state when they have a CONFIRMED booking."
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "user.id={{CLIENT_ID}}",
+        "primaryBooking.id={{BOOKING_ID}}",
+        "primaryBooking.status=CONFIRMED",
+        "nextAction=MATCHING",
+        "ratingNeeded=null"
+      ],
+      "layman": "System returns primary booking (CONFIRMED) and nextAction=MATCHING."
+    }
+  ],
+  "openQuestions": []
+}

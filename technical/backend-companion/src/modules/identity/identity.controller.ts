@@ -40,6 +40,11 @@ export const identityController = {
     const result = await identityService.getMe(req.user!.id);
     res.status(200).json(result);
   }),
+  // Return the authenticated user's app routing state (next action + primary booking + rating need).
+  getMyAppState: asyncHandler(async (req: Request, res: Response) => {
+    const result = await identityService.getMyAppState(req.user!.id);
+    res.status(200).json(result);
+  }),
   // Update the authenticated user's nickname.
   updateNickname: asyncHandler(async (req: Request, res: Response) => {
     const input = updateNicknameSchema.parse(req.body);

@@ -29,6 +29,7 @@ router.post("/auth/resend-verification", identityController.resendVerification);
 router.post("/auth/login", loginLimiter, identityController.login);
 // Authenticated user profile routes.
 router.get("/users/me", authMiddleware, identityController.getMe);
+router.get("/users/me/app-state", authMiddleware, identityController.getMyAppState);
 router.patch("/users/me", authMiddleware, identityController.updateNickname);
 
 export { router as identityRouter };

@@ -26,3 +26,16 @@ export type CreateBookingRatingResult = {
   status: 200 | 201;
   rating: BookingRatingDTO;
 };
+
+export type BookingRatingStatusDTO = {
+  bookingId: string;
+  callerUserId: string;
+  callerRole: "CLIENT" | "COMPANION";
+  ratingType: BookingRatingType;
+  eligibleForRating: boolean;
+  eligibilityReason: string;
+  hasSubmitted: boolean;
+  ratingId: string | null;
+  ratingCreatedAt: string | null;
+  ratingNeeded: boolean;
+};
