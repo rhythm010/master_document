@@ -4,7 +4,8 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "${workspaceFolder}/mcp/test-runner-mcp/dist/index.js"
+        "${workspaceFolder}/mcp/run-server.mjs",
+        "test-runner-mcp"
       ],
       "env": {
         "NODE_ENV": "test"
@@ -14,7 +15,8 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "${workspaceFolder}/mcp/project-context-mcp/dist/index.js"
+        "${workspaceFolder}/mcp/run-server.mjs",
+        "project-context-mcp"
       ],
       "env": {
         "NODE_ENV": "development"
@@ -24,7 +26,8 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "${workspaceFolder}/mcp/project-context-mcp-fe/dist/index.js"
+        "${workspaceFolder}/mcp/run-server.mjs",
+        "project-context-mcp-fe"
       ],
       "env": {
         "NODE_ENV": "development"
