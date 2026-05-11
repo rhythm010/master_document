@@ -1,0 +1,54 @@
+{
+  "testId": "MOD-IDENTITY-015",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get app-state prioritizes ACTIVE booking over ratingNeeded",
+  "flowType": "happy",
+  "linkedRequirement": "identity/get-app-state",
+  "filePath": "technical/backend-companion/src/modules/identity/__tests__/MOD-IDENTITY-015-get-app-state-active-beats-rating-needed.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate GET /users/me/app-state returns nextAction=ACTIVE_SESSION when an ACTIVE booking exists, even if there is an eligible terminal booking missing a rating.",
+  "featureSdsVersion": "identity-and-auth.feature-sds.md + ratings.feature-sds.md",
+  "seedData": [
+    { "entity": "venue", "count": 2 },
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "booking", "status": "ACTIVE", "count": 1 },
+    {
+      "entity": "booking",
+      "count": 1,
+      "values": {
+        "status": "COMPLETED",
+        "clientId": "{{CLIENT_ID}}",
+        "venueId": "{{VENUE_ID}}",
+        "startAt": "{{TARGET_START_AT}}",
+        "endAt": "{{TARGET_END_AT}}"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/users/me/app-state",
+      "authType": "Bearer",
+      "layman": "Client requests app-state with one ACTIVE booking and one terminal booking missing rating."
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "user.id={{CLIENT_ID}}",
+        "primaryBooking.id={{BOOKING_ID}}",
+        "primaryBooking.status=ACTIVE",
+        "ratingNeeded.bookingId={{TARGET_BOOKING_ID}}",
+        "ratingNeeded.status=COMPLETED",
+        "nextAction=ACTIVE_SESSION"
+      ],
+      "layman": "System returns ACTIVE as nextAction and still reports ratingNeeded separately."
+    }
+  ],
+  "openQuestions": []
+}

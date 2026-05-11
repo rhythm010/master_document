@@ -1,0 +1,77 @@
+{
+  "testId": "MOD-IDENTITY-016",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get app-state companion primary booking is deterministic (ACTIVE beats CONFIRMED)",
+  "flowType": "happy",
+  "linkedRequirement": "identity/get-app-state",
+  "filePath": "technical/backend-companion/src/modules/identity/__tests__/MOD-IDENTITY-016-get-app-state-companion-deterministic-primary.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate GET /users/me/app-state selects primaryBooking deterministically for a companion: ACTIVE > CONFIRMED, with explicit ordering.",
+  "featureSdsVersion": "identity-and-auth.feature-sds.md",
+  "seedData": [
+    { "entity": "venue", "count": 2 },
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    {
+      "entity": "user",
+      "role": "CLIENT",
+      "count": 1,
+      "values": {
+        "email": "client2.{{RUN_ID}}@test.local",
+        "name": "Seed Client 2",
+        "nickname": "client2_{{RUN_ID}}"
+      }
+    },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+
+    { "entity": "booking", "status": "CONFIRMED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 },
+
+    {
+      "entity": "booking",
+      "status": "ACTIVE",
+      "count": 1,
+      "values": {
+        "clientId": "{{TARGET_CLIENT_ID}}",
+        "venueId": "{{VENUE_ID}}",
+        "startAt": "{{TARGET_START_AT}}",
+        "endAt": "{{TARGET_END_AT}}"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "TestExecutor",
+      "actionType": "dbQuery",
+      "target": "booking_companion_assignments",
+      "query": "INSERT INTO booking_companion_assignments (id, booking_id, companion_id, designation, presence_status, self_match_status, client_match_status) VALUES (md5(random()::text || clock_timestamp()::text)::uuid, '{{TARGET_BOOKING_ID}}', '{{CAPTAIN_ID}}', 'CAPTAIN', 'ASSIGNED', 'NOT_MATCHED', 'WAITING_FOR_CLIENT'), (md5(random()::text || clock_timestamp()::text || 'x')::uuid, '{{TARGET_BOOKING_ID}}', '{{VICE_CAPTAIN_ID}}', 'VICE_CAPTAIN', 'ASSIGNED', 'NOT_MATCHED', 'WAITING_FOR_CLIENT') ON CONFLICT (booking_id, designation) DO UPDATE SET companion_id = EXCLUDED.companion_id, presence_status = EXCLUDED.presence_status, self_match_status = EXCLUDED.self_match_status, client_match_status = EXCLUDED.client_match_status", 
+      "layman": "Test-only: attach the seeded captain+vice to the second (ACTIVE) booking."
+    },
+    {
+      "step": 2,
+      "actor": "Captain",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/users/me/app-state",
+      "authType": "Bearer",
+      "layman": "Captain requests app-state when assigned to both a CONFIRMED and an ACTIVE booking."
+    },
+    {
+      "step": 3,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "user.id={{CAPTAIN_ID}}",
+        "user.role=COMPANION",
+        "user.companionProfile.isActive=true",
+        "primaryBooking.id={{TARGET_BOOKING_ID}}",
+        "primaryBooking.status=ACTIVE",
+        "nextAction=ACTIVE_SESSION"
+      ],
+      "layman": "System selects the ACTIVE booking deterministically as the primary booking for the companion."
+    }
+  ],
+  "openQuestions": []
+}

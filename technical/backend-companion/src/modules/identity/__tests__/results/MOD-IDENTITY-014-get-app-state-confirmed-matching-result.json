@@ -1,0 +1,156 @@
+{
+  "runId": "RUN-20260511040523361-MOD-IDENTITY-014",
+  "testId": "MOD-IDENTITY-014",
+  "status": "PASS",
+  "startedAt": "2026-05-11T04:05:23.361Z",
+  "endedAt": "2026-05-11T04:05:23.455Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "GET /users/me/app-state",
+      "startedAt": "2026-05-11T04:05:23.443Z",
+      "endedAt": "2026-05-11T04:05:23.455Z",
+      "durationMs": 12,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-11T04:05:23.455Z",
+      "endedAt": "2026-05-11T04:05:23.455Z",
+      "durationMs": 0,
+      "result": "PASS",
+      "statusCode": 200
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "user": {
+          "id": "1618b975-4054-4811-8939-ce653af3d72f",
+          "role": "CLIENT",
+          "companionProfile": null
+        },
+        "primaryBooking": {
+          "id": "c7f692d1-be93-4d50-9027-3322c0ef18a4",
+          "status": "CONFIRMED",
+          "startAt": "2026-05-12T10:00:00.000Z",
+          "endAt": "2026-05-12T12:00:00.000Z"
+        },
+        "ratingNeeded": null,
+        "nextAction": "MATCHING"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests their app-state when they have a CONFIRMED booking.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 1,
+        "target": "GET /users/me/app-state",
+        "startedAt": "2026-05-11T04:05:23.443Z",
+        "endedAt": "2026-05-11T04:05:23.455Z",
+        "durationMs": 12,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "user": {
+            "id": "1618b975-4054-4811-8939-ce653af3d72f",
+            "role": "CLIENT",
+            "companionProfile": null
+          },
+          "primaryBooking": {
+            "id": "c7f692d1-be93-4d50-9027-3322c0ef18a4",
+            "status": "CONFIRMED",
+            "startAt": "2026-05-12T10:00:00.000Z",
+            "endAt": "2026-05-12T12:00:00.000Z"
+          },
+          "ratingNeeded": null,
+          "nextAction": "MATCHING"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "user.id",
+            "expected": "1618b975-4054-4811-8939-ce653af3d72f",
+            "actual": "1618b975-4054-4811-8939-ce653af3d72f",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "primaryBooking.id",
+            "expected": "c7f692d1-be93-4d50-9027-3322c0ef18a4",
+            "actual": "c7f692d1-be93-4d50-9027-3322c0ef18a4",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "primaryBooking.status",
+            "expected": "CONFIRMED",
+            "actual": "CONFIRMED",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "nextAction",
+            "expected": "MATCHING",
+            "actual": "MATCHING",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingNeeded",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns primary booking (CONFIRMED) and nextAction=MATCHING.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-11T04:05:23.455Z",
+        "endedAt": "2026-05-11T04:05:23.455Z",
+        "durationMs": 0,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}

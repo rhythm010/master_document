@@ -133,6 +133,7 @@ Evidence hierarchy for marking something “Implemented”:
 | Identity | POST | `/auth/resend-verification` | No | Implemented | `lib/api/auth.ts` | — |
 | Identity | POST | `/auth/login` | No | Implemented | `lib/api/auth.ts` (when UI exists) | 429 throttling via rate limiter |
 | Identity | GET | `/users/me` | Yes (Bearer) | Implemented | **Used** (session restore) | — |
+| Identity | GET | `/users/me/app-state` | Yes (Bearer) | Implemented | Planned | Resolves current-state routing gaps `FE-BE-GAP-006/007/008` |
 | Identity | PATCH | `/users/me` | Yes (Bearer) | Implemented | Planned | Update nickname |
 | Roster | GET | `/venues?q=...` | Yes (Bearer) | Implemented | Planned | Requires non-empty `q` (`FE-BE-GAP-013`) |
 | Roster | GET | `/availability?venueId=...&date=YYYY-MM-DD` | Yes (Bearer) | Implemented | Planned | — |
@@ -150,7 +151,8 @@ Evidence hierarchy for marking something “Implemented”:
 | Session | GET | `/bookings/:id/session` | Yes | Implemented | Planned | — |
 | Session | GET | `/bookings/:id/messages` | Yes (COMPANION) | Implemented | Planned | — |
 | Session | POST | `/bookings/:id/messages` | Yes (COMPANION) | Implemented | Planned | Body: `{ content }` only |
-| Ratings | POST | `/bookings/:id/rating` | Yes | Implemented | Planned | Missing read/status endpoint: `FE-BE-GAP-023` |
+| Ratings | POST | `/bookings/:id/rating` | Yes | Implemented | Planned | — |
+| Ratings | GET | `/bookings/:id/rating-status` | Yes | Implemented | Planned | Eligibility + submitted/needed status |
 | Companion Profile | GET | `/companion-profiles/me` | Yes (COMPANION) | Implemented | Planned | — |
 | Companion Profile | POST | `/companion-profiles/upload-picture` | Yes (COMPANION) | Implemented | Planned | Multipart field name: `picture` (`FE-BE-GAP-026` prod storage) |
 | Companion Profile | PATCH | `/companion-profiles/me` | Yes (COMPANION) | Implemented | Planned | Update `languages`/`profilePictureUrl` |
@@ -376,6 +378,60 @@ Evidence hierarchy for marking something “Implemented”:
 
 **Gap / Unknowns:**
 - Confirm whether “network error should log out” is desired product behavior.
+
+---
+
+### Identity: Get Current App State (Routing)
+
+**Status:** Implemented (backend), Planned (frontend wiring)  
+**Method:** GET  
+**Path:** `/users/me/app-state`  
+**Purpose:** Return minimal user info + primary booking + rating need + computed `nextAction` for backend-driven home routing.  
+**Auth Required:** Yes (`Authorization: Bearer <accessToken>`)  
+**Backend Source:**
+- Route: `technical/backend-companion/src/modules/identity/identity.route.ts`
+- Controller: `technical/backend-companion/src/modules/identity/identity.controller.ts`
+- Service: `technical/backend-companion/src/modules/identity/identity.service.ts`
+- Deterministic booking selection: `technical/backend-companion/src/modules/booking/booking.repository.ts`
+- Rating-needed lookup: `technical/backend-companion/src/modules/ratings/ratings.repository.ts`
+
+**Request Body:** None
+
+**Success Response (200):**
+```json
+{
+  "user": {
+    "id": "uuid",
+    "role": "CLIENT|COMPANION",
+    "companionProfile": { "isActive": true } | null
+  },
+  "primaryBooking": {
+    "id": "uuid",
+    "status": "ACTIVE|CONFIRMED",
+    "startAt": "ISO timestamp",
+    "endAt": "ISO timestamp"
+  } | null,
+  "ratingNeeded": {
+    "bookingId": "uuid",
+    "status": "COMPLETED|CANCELLED",
+    "startAt": "ISO timestamp"
+  } | null,
+  "nextAction": "ACTIVE_SESSION|MATCHING|RATING_NEEDED|COMPANION_INACTIVE|IDLE"
+}
+```
+
+**Notable contract behavior:**
+- `primaryBooking` selection is deterministic:
+  - prefer `ACTIVE` over `CONFIRMED`
+  - within a status: `startAt` ascending, then `id` ascending
+- `ratingNeeded` uses the same `dbNow` approach as rating submission logic:
+  - `COMPLETED` is eligible
+  - `CANCELLED` is only eligible when `booking.startAt <= dbNow`
+- Response intentionally avoids PII (does not return name/email).
+
+**Test Coverage:**
+- Backend JSON tests:
+  - `MOD-IDENTITY-013`, `MOD-IDENTITY-014`, `MOD-IDENTITY-015`, `MOD-IDENTITY-016`
 
 ---
 
@@ -614,9 +670,50 @@ Evidence hierarchy for marking something “Implemented”:
 - Status `201` or `200` (backend may return existing rating)
 - Body: `BookingRatingDTO`
 
+**Related endpoints:**
+- `GET /bookings/:id/rating-status` (eligibility + submission status)
+
 **Gap / Unknowns:**
-- `FE-BE-GAP-023` (no read endpoint for rating status)
 - `FE-BE-GAP-024` (product decision: negative tags set)
+
+---
+
+### Ratings: Get Booking Rating Status
+
+**Status:** Implemented (backend), Planned (frontend wiring)  
+**Method:** GET  
+**Path:** `/bookings/:id/rating-status`  
+**Purpose:** Return rating eligibility + whether the authenticated caller has submitted a rating for this booking, plus whether this booking is the caller’s current `ratingNeeded` booking.  
+**Auth Required:** Yes
+
+**Authorization (enforced):**
+- Client owner (`bookings.client_id == auth.userId`), OR
+- Assigned companion (exists in `booking_companion_assignments` for this booking)
+
+**Success Response (200):**
+```json
+{
+  "bookingId": "uuid",
+  "callerUserId": "uuid",
+  "callerRole": "CLIENT|COMPANION",
+  "ratingType": "CLIENT_RATING_DUO|COMPANION_RATING_CLIENT",
+  "eligibleForRating": true,
+  "eligibilityReason": "COMPLETED|CANCELLED_STARTED|CANCELLED_NOT_STARTED|STATUS_NOT_ELIGIBLE",
+  "hasSubmitted": false,
+  "ratingId": null,
+  "ratingCreatedAt": null,
+  "ratingNeeded": true
+}
+```
+
+**Error Responses (examples):**
+- 401 `UNAUTHORIZED`
+- 403 `FORBIDDEN`
+- 404 `BOOKING_NOT_FOUND`
+
+**Test Coverage:**
+- Backend JSON tests:
+  - `MOD-RATINGS-013`, `MOD-RATINGS-014`
 
 ---
 
@@ -823,12 +920,12 @@ Relevant gaps:
 | 0 — Real Device Placeholder | API base URL, `/health` | `GET /health` | `FE-BE-GAP-001` resolved; frontend E2E may be stale |
 | 1 — Core Foundation | API client, env config, token storage | `GET /health`, `GET /users/me` | `FE-BE-GAP-003` staging email config |
 | 2 — Identity Flow | signup/login/verify/resend | `/auth/*`, `/users/me` | Deep link wiring still missing in frontend |
-| 3 — Backend-driven home | “current state” routing | (missing) | `FE-BE-GAP-006`, `FE-BE-GAP-007`, `FE-BE-GAP-008` |
+| 3 — Backend-driven home | “current state” routing | `GET /users/me/app-state` | Resolved: `FE-BE-GAP-006`, `FE-BE-GAP-007`, `FE-BE-GAP-008` |
 | 4 — Booking flow | venues, availability, bookings | `/venues`, `/availability`, `/bookings*` | `FE-BE-GAP-009`…`FE-BE-GAP-014` |
 | 5 — Native capabilities | push + deep links | (missing push APIs) | `FE-BE-GAP-015`, `FE-BE-GAP-016` |
 | 6 — Matching | matching context + verify | `/bookings/:id/*matching*` | `FE-BE-GAP-017`…`FE-BE-GAP-019` |
 | 7 — Active session | session + messages + extend | `/bookings/:id/session`, `/extend`, `/messages` | `FE-BE-GAP-020`, `FE-BE-GAP-021` |
-| 8 — Ratings | ratings post + routing | `/bookings/:id/rating` | `FE-BE-GAP-022`…`FE-BE-GAP-024` |
+| 8 — Ratings | ratings post + routing | `/bookings/:id/rating`, `/bookings/:id/rating-status` | `FE-BE-GAP-022`…`FE-BE-GAP-024` |
 | 9 — Release hardening | staging/prod env + data | deployed URLs + seed | `FE-BE-GAP-025`…`FE-BE-GAP-027` |
 
 ---

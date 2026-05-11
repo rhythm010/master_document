@@ -35,6 +35,60 @@ export const bookingRepository = {
       }
     }),
 
+  // Find the primary booking for a client in a deterministic way.
+  // Priority: ACTIVE > CONFIRMED; ordering within status: startAt asc, id asc.
+  findPrimaryBookingForClient: async (db: DbClient, clientId: string) => {
+    const active = await db.booking.findFirst({
+      where: { clientId, status: "ACTIVE" },
+      orderBy: [{ startAt: "asc" }, { id: "asc" }],
+      select: { id: true, status: true, startAt: true, endAt: true }
+    });
+
+    if (active) {
+      return active;
+    }
+
+    return db.booking.findFirst({
+      where: { clientId, status: "CONFIRMED" },
+      orderBy: [{ startAt: "asc" }, { id: "asc" }],
+      select: { id: true, status: true, startAt: true, endAt: true }
+    });
+  },
+
+  // Find the primary booking for a companion in a deterministic way.
+  // Priority: ACTIVE > CONFIRMED; ordering within status: startAt asc, id asc.
+  findPrimaryBookingForCompanion: async (db: DbClient, companionId: string) => {
+    const active = await db.booking.findFirst({
+      where: {
+        status: "ACTIVE",
+        assignments: {
+          some: {
+            companionId
+          }
+        }
+      },
+      orderBy: [{ startAt: "asc" }, { id: "asc" }],
+      select: { id: true, status: true, startAt: true, endAt: true }
+    });
+
+    if (active) {
+      return active;
+    }
+
+    return db.booking.findFirst({
+      where: {
+        status: "CONFIRMED",
+        assignments: {
+          some: {
+            companionId
+          }
+        }
+      },
+      orderBy: [{ startAt: "asc" }, { id: "asc" }],
+      select: { id: true, status: true, startAt: true, endAt: true }
+    });
+  },
+
   // List booking colors currently used by non-terminal bookings at a venue.
   listUsedBookingColorsForVenue: async (db: DbClient, venueId: string) => {
     const rows = await db.booking.findMany({

@@ -21,3 +21,30 @@ export type PublicUserDTO = {
   createdAt: Date;
   companionProfile?: CompanionProfileDTO;
 };
+
+export type NextAction =
+  | "ACTIVE_SESSION"
+  | "MATCHING"
+  | "RATING_NEEDED"
+  | "COMPANION_INACTIVE"
+  | "IDLE";
+
+export type AppStateResponseDTO = {
+  user: {
+    id: string;
+    role: UserRole;
+    companionProfile: { isActive: boolean } | null;
+  };
+  primaryBooking: {
+    id: string;
+    status: "ACTIVE" | "CONFIRMED";
+    startAt: string;
+    endAt: string;
+  } | null;
+  ratingNeeded: {
+    bookingId: string;
+    status: "COMPLETED" | "CANCELLED";
+    startAt: string;
+  } | null;
+  nextAction: NextAction;
+};

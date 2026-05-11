@@ -2,7 +2,11 @@ import type { Request, Response } from "express";
 
 import { asyncHandler } from "../../shared/utils/asyncHandler";
 
-import { createBookingRatingBodySchema, createBookingRatingParamsSchema } from "./ratings.schema";
+import {
+  bookingRatingStatusParamsSchema,
+  createBookingRatingBodySchema,
+  createBookingRatingParamsSchema
+} from "./ratings.schema";
 import { ratingsService } from "./ratings.service";
 
 export const ratingsController = {
@@ -23,5 +27,20 @@ export const ratingsController = {
     });
 
     res.status(result.status).json(result.rating);
+  }),
+
+  // Return the rating eligibility/submission status for this booking + caller.
+  getBookingRatingStatus: asyncHandler(async (req: Request, res: Response) => {
+    const params = bookingRatingStatusParamsSchema.parse(req.params);
+
+    const result = await ratingsService.getBookingRatingStatus({
+      bookingId: params.id,
+      caller: {
+        id: req.user!.id,
+        role: req.user!.role
+      }
+    });
+
+    res.status(200).json(result);
   })
 };

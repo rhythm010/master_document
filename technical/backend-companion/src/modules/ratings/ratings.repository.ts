@@ -19,10 +19,12 @@ export const ratingsRepository = {
 
   // Check whether the companion is assigned to the booking.
   findCompanionAssignmentForBooking: (db: DbClient, input: { bookingId: string; companionId: string }) =>
-    db.bookingCompanionAssignment.findFirst({
+    db.bookingCompanionAssignment.findUnique({
       where: {
-        bookingId: input.bookingId,
-        companionId: input.companionId
+        bookingId_companionId: {
+          bookingId: input.bookingId,
+          companionId: input.companionId
+        }
       },
       select: {
         id: true
@@ -114,11 +116,13 @@ export const ratingsRepository = {
     ratingType: BookingRatingType;
     raterUserId: string;
   }) =>
-    db.bookingRating.findFirst({
+    db.bookingRating.findUnique({
       where: {
-        bookingId: input.bookingId,
-        ratingType: input.ratingType,
-        raterUserId: input.raterUserId
+        bookingId_ratingType_raterUserId: {
+          bookingId: input.bookingId,
+          ratingType: input.ratingType,
+          raterUserId: input.raterUserId
+        }
       },
       select: {
         id: true,
@@ -166,5 +170,73 @@ export const ratingsRepository = {
           AND br.stars IS NOT NULL
       ), 0.00)
       WHERE cp.user_id IN (${Prisma.join(companionIds.map((id) => Prisma.sql`${id}::uuid`))})
-    `)
+    `),
+
+  // Find the most recent terminal booking (by startAt desc, id desc) for the client
+  // that is eligible for rating but is missing a CLIENT_RATING_DUO from that client.
+  findMostRecentEligibleBookingMissingClientRating: (
+    db: DbClient,
+    input: { clientId: string; dbNow: Date }
+  ) =>
+    db.booking.findFirst({
+      where: {
+        clientId: input.clientId,
+        status: {
+          in: ["COMPLETED", "CANCELLED"]
+        },
+        OR: [
+          { status: "COMPLETED" },
+          { status: "CANCELLED", startAt: { lte: input.dbNow } }
+        ],
+        ratings: {
+          none: {
+            ratingType: "CLIENT_RATING_DUO",
+            raterUserId: input.clientId
+          }
+        }
+      },
+      orderBy: [{ startAt: "desc" }, { id: "desc" }],
+      select: {
+        id: true,
+        status: true,
+        startAt: true,
+        endAt: true
+      }
+    }),
+
+  // Find the most recent terminal booking (by startAt desc, id desc) for the companion
+  // that is eligible for rating but is missing a COMPANION_RATING_CLIENT from that companion.
+  findMostRecentEligibleBookingMissingCompanionRating: (
+    db: DbClient,
+    input: { companionId: string; dbNow: Date }
+  ) =>
+    db.booking.findFirst({
+      where: {
+        status: {
+          in: ["COMPLETED", "CANCELLED"]
+        },
+        OR: [
+          { status: "COMPLETED" },
+          { status: "CANCELLED", startAt: { lte: input.dbNow } }
+        ],
+        assignments: {
+          some: {
+            companionId: input.companionId
+          }
+        },
+        ratings: {
+          none: {
+            ratingType: "COMPANION_RATING_CLIENT",
+            raterUserId: input.companionId
+          }
+        }
+      },
+      orderBy: [{ startAt: "desc" }, { id: "desc" }],
+      select: {
+        id: true,
+        status: true,
+        startAt: true,
+        endAt: true
+      }
+    })
 };

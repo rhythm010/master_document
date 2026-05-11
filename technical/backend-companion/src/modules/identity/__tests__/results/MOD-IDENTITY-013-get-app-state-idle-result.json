@@ -1,0 +1,153 @@
+{
+  "runId": "RUN-20260511040523346-MOD-IDENTITY-013",
+  "testId": "MOD-IDENTITY-013",
+  "status": "PASS",
+  "startedAt": "2026-05-11T04:05:23.347Z",
+  "endedAt": "2026-05-11T04:05:23.447Z",
+  "environmentCheck": {
+    "apiServer": "OK",
+    "mailpit": "OK",
+    "database": "OK"
+  },
+  "serviceHitLog": [
+    {
+      "step": 1,
+      "target": "GET /users/me/app-state",
+      "startedAt": "2026-05-11T04:05:23.398Z",
+      "endedAt": "2026-05-11T04:05:23.446Z",
+      "durationMs": 48,
+      "result": "PASS",
+      "statusCode": 200
+    },
+    {
+      "step": 2,
+      "target": "API response validation",
+      "startedAt": "2026-05-11T04:05:23.446Z",
+      "endedAt": "2026-05-11T04:05:23.447Z",
+      "durationMs": 1,
+      "result": "PASS",
+      "statusCode": 200
+    }
+  ],
+  "stepResults": [
+    {
+      "step": 1,
+      "result": "PASS",
+      "observed": {
+        "user": {
+          "id": "5bd05a0d-2f6b-46e2-8665-3738801ac503",
+          "role": "CLIENT",
+          "companionProfile": null
+        },
+        "primaryBooking": null,
+        "ratingNeeded": null,
+        "nextAction": "IDLE"
+      },
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "layman": "Client requests their app-state (routing) info.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 1,
+        "target": "GET /users/me/app-state",
+        "startedAt": "2026-05-11T04:05:23.398Z",
+        "endedAt": "2026-05-11T04:05:23.446Z",
+        "durationMs": 48,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    },
+    {
+      "step": 2,
+      "result": "PASS",
+      "observed": {
+        "lastApiRequestStep": 1,
+        "response": {
+          "user": {
+            "id": "5bd05a0d-2f6b-46e2-8665-3738801ac503",
+            "role": "CLIENT",
+            "companionProfile": null
+          },
+          "primaryBooking": null,
+          "ratingNeeded": null,
+          "nextAction": "IDLE"
+        },
+        "checks": [
+          {
+            "type": "statusCode",
+            "expected": 200,
+            "actual": 200,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "user.id",
+            "expected": "5bd05a0d-2f6b-46e2-8665-3738801ac503",
+            "actual": "5bd05a0d-2f6b-46e2-8665-3738801ac503",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "user.role",
+            "expected": "CLIENT",
+            "actual": "CLIENT",
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "user.companionProfile",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "primaryBooking",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "ratingNeeded",
+            "expected": null,
+            "actual": null,
+            "pass": true
+          },
+          {
+            "type": "equals",
+            "field": "nextAction",
+            "expected": "IDLE",
+            "actual": "IDLE",
+            "pass": true
+          }
+        ]
+      },
+      "actor": "System",
+      "actionType": "apiResponse",
+      "layman": "System returns IDLE with no booking and no rating required.",
+      "statusCode": 200,
+      "serviceHit": {
+        "step": 2,
+        "target": "API response validation",
+        "startedAt": "2026-05-11T04:05:23.446Z",
+        "endedAt": "2026-05-11T04:05:23.447Z",
+        "durationMs": 1,
+        "result": "PASS",
+        "statusCode": 200
+      }
+    }
+  ],
+  "assertionSummary": {
+    "api": "PASS",
+    "db": "PASS",
+    "external": "PASS",
+    "mustNotOccur": "PASS"
+  },
+  "failures": [],
+  "cleanup": {
+    "status": "SKIPPED",
+    "reason": "Default behavior - cleanup not requested",
+    "actions": []
+  }
+}
