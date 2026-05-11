@@ -1,0 +1,104 @@
+{
+  "testId": "MOD-RATINGS-013",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get rating-status returns eligible/missing, then submitted after POST",
+  "flowType": "happy",
+  "linkedRequirement": "ratings/get-rating-status",
+  "filePath": "technical/backend-companion/src/modules/ratings/__tests__/MOD-RATINGS-013-get-rating-status-eligible-missing-and-after-post.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate GET /bookings/:id/rating-status returns eligibility + submission state, and reflects the submission after POST /bookings/:id/rating.",
+  "featureSdsVersion": "ratings.feature-sds.md v1.0.0",
+  "seedData": [
+    { "entity": "user", "role": "CLIENT", "count": 1 },
+    { "entity": "venue", "count": 1 },
+    { "entity": "companion_profile", "designation": "CAPTAIN", "count": 1 },
+    { "entity": "companion_profile", "designation": "VICE_CAPTAIN", "count": 1 },
+    { "entity": "booking", "status": "COMPLETED", "count": 1 },
+    { "entity": "booking_companion_assignment", "count": 2 }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:id/rating-status",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "layman": "Client requests rating status for a completed booking with no rating yet."
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "bookingId={{BOOKING_ID}}",
+        "callerUserId={{CLIENT_ID}}",
+        "callerRole=CLIENT",
+        "ratingType=CLIENT_RATING_DUO",
+        "eligibleForRating=true",
+        "eligibilityReason=COMPLETED",
+        "hasSubmitted=false",
+        "ratingId=null",
+        "ratingNeeded=true"
+      ],
+      "layman": "System reports eligible + not yet submitted + ratingNeeded=true."
+    },
+    {
+      "step": 3,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "POST",
+      "endpoint": "/bookings/:id/rating",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "payload": { "stars": null, "tags": ["Professional"] },
+      "storeResponseFields": ["id"],
+      "storeAs": "RATING_ID",
+      "layman": "Client submits a rating."
+    },
+    {
+      "step": 4,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 201,
+      "expectedResponseFields": ["id={{RATING_ID}}", "ratingType=CLIENT_RATING_DUO"],
+      "layman": "Rating is created."
+    },
+    {
+      "step": 5,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/bookings/:id/rating-status",
+      "authType": "Bearer",
+      "pathParams": { "id": "{{BOOKING_ID}}" },
+      "layman": "Client requests rating status again after submission."
+    },
+    {
+      "step": 6,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "bookingId={{BOOKING_ID}}",
+        "hasSubmitted=true",
+        "ratingId={{RATING_ID}}",
+        "ratingNeeded=false"
+      ],
+      "layman": "System reflects that the rating has been submitted."
+    },
+    {
+      "step": 7,
+      "actor": "TestExecutor",
+      "actionType": "dbVerification",
+      "target": "booking_ratings",
+      "query": "WHERE booking_id = {{BOOKING_ID}} AND rating_type = 'CLIENT_RATING_DUO' AND rater_user_id = {{CLIENT_ID}}",
+      "expectedRows": 1,
+      "expectedFields": { "id": "{{RATING_ID}}" },
+      "layman": "Verify rating row exists in DB for this caller."
+    }
+  ],
+  "openQuestions": []
+}

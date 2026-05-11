@@ -304,7 +304,7 @@ Resolution notes:
 
 Created at: 2026-05-09T11:21:28Z
 
-Status: Open
+Status: Resolved
 
 Severity: Blocker
 
@@ -327,12 +327,21 @@ Acceptance criteria for resolution:
 After login/app refresh, the frontend can call backend data and route the user to Home, Booking Confirmation, Matching, Active Session, Feedback, or idle state without manual booking ID entry.
 
 Resolution notes:
+Resolved 2026-05-11.
+- Implemented `GET /users/me/app-state` (auth required).
+- Evidence (backend):
+  - `technical/backend-companion/src/modules/identity/identity.route.ts`
+  - `technical/backend-companion/src/modules/identity/identity.controller.ts`
+  - `technical/backend-companion/src/modules/identity/identity.service.ts`
+  - Deterministic primary booking selection:
+    - `technical/backend-companion/src/modules/booking/booking.repository.ts` (`findPrimaryBookingForClient`)
+- Tests (backend JSON runner): `MOD-IDENTITY-013`, `MOD-IDENTITY-014`, `MOD-IDENTITY-015`.
 
 ### FE-BE-GAP-007: Assigned Companion Current Booking Lookup
 
 Created at: 2026-05-09T11:28:42Z
 
-Status: Open
+Status: Resolved
 
 Severity: Blocker
 
@@ -355,12 +364,20 @@ Acceptance criteria for resolution:
 A logged-in Companion can land in the correct home/matching/session/rating state without manually entering a booking id.
 
 Resolution notes:
+Resolved 2026-05-11.
+- Covered by shared endpoint `GET /users/me/app-state` (auth required).
+- Companion primary booking selection is deterministic:
+  - prefer `ACTIVE` over `CONFIRMED`
+  - within status: `startAt` asc, then `id` asc
+- Evidence (backend):
+  - `technical/backend-companion/src/modules/booking/booking.repository.ts` (`findPrimaryBookingForCompanion`)
+- Tests (backend JSON runner): `MOD-IDENTITY-016`.
 
 ### FE-BE-GAP-008: Rating Submitted / Rating Needed State Lookup
 
 Created at: 2026-05-09T11:28:42Z
 
-Status: Open
+Status: Resolved
 
 Severity: Needed Soon
 
@@ -383,6 +400,16 @@ Acceptance criteria for resolution:
 The frontend can determine from backend state whether to show Feedback or Home for the authenticated user.
 
 Resolution notes:
+Resolved 2026-05-11.
+- Implemented rating-needed lookup in `GET /users/me/app-state`.
+- Implemented per-booking read endpoint: `GET /bookings/:id/rating-status` (auth required).
+- Eligibility rules match ratings feature SDS (CANCELLED eligible only if `startAt <= dbNow`).
+- Evidence (backend):
+  - `technical/backend-companion/src/modules/ratings/ratings.route.ts`
+  - `technical/backend-companion/src/modules/ratings/ratings.controller.ts`
+  - `technical/backend-companion/src/modules/ratings/ratings.service.ts`
+  - `technical/backend-companion/src/modules/ratings/ratings.repository.ts`
+- Tests (backend JSON runner): `MOD-RATINGS-013`, `MOD-RATINGS-014`.
 
 ## Milestone 4: Booking Logic Flow
 

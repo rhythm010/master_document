@@ -1,0 +1,39 @@
+{
+  "testId": "MOD-IDENTITY-013",
+  "artifactStatus": "FINALIZED_EXECUTABLE",
+  "scenarioName": "Get app-state (idle) returns IDLE with no booking or rating needed",
+  "flowType": "happy",
+  "linkedRequirement": "identity/get-app-state",
+  "filePath": "technical/backend-companion/src/modules/identity/__tests__/MOD-IDENTITY-013-get-app-state-idle.json",
+  "executionMode": "api+db+auth",
+  "objective": "Validate GET /users/me/app-state returns a minimal user object and nextAction=IDLE when there is no primary booking and no rating needed.",
+  "featureSdsVersion": "identity-and-auth.feature-sds.md + ratings.feature-sds.md",
+  "seedData": [{ "entity": "user", "role": "CLIENT", "count": 1 }],
+  "steps": [
+    {
+      "step": 1,
+      "actor": "Client",
+      "actionType": "apiRequest",
+      "method": "GET",
+      "endpoint": "/users/me/app-state",
+      "authType": "Bearer",
+      "layman": "Client requests their app-state (routing) info."
+    },
+    {
+      "step": 2,
+      "actor": "System",
+      "actionType": "apiResponse",
+      "expectedStatus": 200,
+      "expectedResponseFields": [
+        "user.id={{CLIENT_ID}}",
+        "user.role=CLIENT",
+        "user.companionProfile=null",
+        "primaryBooking=null",
+        "ratingNeeded=null",
+        "nextAction=IDLE"
+      ],
+      "layman": "System returns IDLE with no booking and no rating required."
+    }
+  ],
+  "openQuestions": []
+}
