@@ -132,7 +132,7 @@ export default function LoginScreen() {
 
       <Pressable onPress={() => router.push('/(auth)/signup')} accessibilityRole="link">
         <Text style={{ textAlign: 'center', color: '#0066cc' }}>
-          Don't have an account? Sign up
+          Don&apos;t have an account? Sign up
         </Text>
       </Pressable>
     </View>

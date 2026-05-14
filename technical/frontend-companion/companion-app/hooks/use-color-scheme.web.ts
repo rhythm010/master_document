@@ -1,21 +1,14 @@
-import { useEffect, useState } from 'react';
 import { useColorScheme as useRNColorScheme } from 'react-native';
+import type { ColorSchemeName } from 'react-native';
 
 /**
- * To support static rendering, this value needs to be re-calculated on the client side for web
+ * Return internal app color scheme.
+ *
+ * Forced to `light` so the app uses light mode regardless of the OS/system setting.
  */
-export function useColorScheme() {
-  const [hasHydrated, setHasHydrated] = useState(false);
-
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
-
-  const colorScheme = useRNColorScheme();
-
-  if (hasHydrated) {
-    return colorScheme;
-  }
+export function useColorScheme(): ColorSchemeName {
+  // Call the underlying RN hook to preserve React hook ordering expectations.
+  useRNColorScheme();
 
   return 'light';
 }
