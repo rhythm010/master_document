@@ -257,6 +257,7 @@ Converts/refines draft scenario artifacts into runnable machine-executable test 
 * produces a full backend gap analysis report for user review
 * does not implement frontend or backend code
 * does not update the backend gap register or create handoff artifacts until the user approves
+* never creates or updates milestone implementation documents; recommended milestone-document changes must be handed to the FE Implementation Agent
 
 # AGENT FILE LOCATION
 
@@ -842,6 +843,7 @@ Receive frontend milestone scope
 
 * Backend Gap Agent owns backend gap analysis and final backend verification.
 * FE Implementation Agent owns milestone implementation document creation/update.
+* Backend Gap Agent must not edit milestone implementation documents, even after approval; it reports needed changes for FE Implementation Agent to apply.
 * Backend gap register updates require explicit user approval.
 * Milestone brief edits require explicit user approval.
 * Frontend/backend production code must not be edited in this mode.
@@ -968,6 +970,7 @@ This pass is verification-only:
 * verify that registered gaps match the user decision record
 * report concrete mismatches, missing gap references, or unsafe assumptions
 * do not restart gap discovery from scratch unless a concrete mismatch requires it
+* do not edit the implementation document; hand any required implementation-document changes back to FE Implementation Agent
 * do not edit files during this verification pass
 
 Maximum one post-implementation-document Backend Gap Agent verification round unless the user explicitly asks for another.
