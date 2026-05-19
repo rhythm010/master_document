@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M03-RESTORE-001-session-restore-non-auth-error-shows-retry",
+  "title": "Session restore: non-auth backend error shows retry screen and preserves persisted token",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "03",
+  "area": "restore",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/companion-app/app/index.tsx",
+    "technical/frontend-companion/companion-app/components/ui/ErrorScreen.tsx",
+    "technical/frontend-companion/companion-app/components/ui/LoadingScreen.tsx",
+    "technical/frontend-companion/companion-app/lib/api/auth.ts",
+    "technical/frontend-companion/companion-app/lib/api/app-state.ts",
+    "technical/frontend-companion/companion-app/lib/api-client.ts",
+    "technical/frontend-companion/companion-app/lib/app-state/sync-and-route.ts",
+    "technical/frontend-companion/companion-app/lib/app-state/resolve-route.ts",
+    "technical/frontend-companion/companion-app/store/session.ts",
+    "technical/frontend-companion/frontend-backend-contract.md",
+    "technical/frontend-companion/milestones/milestone-03-backend-driven-home-state.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Playwright runs Expo Web using baseURL http://localhost:8081 (playwright.config.ts webServer)."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Before page load, localStorage contains 'auth_token' = DATA-1 so app/index.tsx attempts session restore."
+    },
+    {
+      "id": "PRE-3",
+      "description": "Before page load, localStorage contains 'onboarding_complete' = 'true' so successful routing targets home (not onboarding) on retry success."
+    },
+    {
+      "id": "PRE-4",
+      "description": "Playwright intercepts GET **/users/me with a two-attempt sequence: attempt 1 returns a non-auth error (e.g., 503 with JSON error envelope), attempt 2 returns 200 with a CLIENT user.",
+      "mockResponseSequence": [
+        {
+          "playwrightRoutePattern": "**/users/me",
+          "method": "GET",
+          "status": 503,
+          "body": { "code": "SERVICE_UNAVAILABLE", "message": "Service unavailable" }
+        },
+        {
+          "playwrightRoutePattern": "**/users/me",
+          "method": "GET",
+          "status": 200,
+          "body": {
+            "id": "fake-client-id-m03-restore-001",
+            "role": "CLIENT",
+            "name": "Restore Client",
+            "nickname": "RestoreClient",
+            "email": "restore.client@example.com",
+            "emailVerified": true,
+            "biometricAuthEnabled": false
+          }
+        }
+      ],
+      "notes": "Validator implementation note: use a request counter inside page.route('**/users/me', ...) to fulfill different responses on first vs second invocation."
+    },
+    {
+      "id": "PRE-5",
+      "description": "Playwright intercepts GET **/users/me/app-state with a two-attempt sequence: attempt 1 returns non-auth error (503), attempt 2 returns 200 with nextAction=IDLE (CLIENT).",
+      "mockResponseSequence": [
+        {
+          "playwrightRoutePattern": "**/users/me/app-state",
+          "method": "GET",
+          "status": 503,
+          "body": { "code": "SERVICE_UNAVAILABLE", "message": "Service unavailable" }
+        },
+        {
+          "playwrightRoutePattern": "**/users/me/app-state",
+          "method": "GET",
+          "status": 200,
+          "body": {
+            "user": {
+              "id": "fake-client-id-m03-restore-001",
+              "role": "CLIENT",
+              "companionProfile": null
+            },
+            "primaryBooking": null,
+            "ratingNeeded": null,
+            "nextAction": "IDLE"
+          }
+        }
+      ],
+      "notes": "On attempt 1, app/index.tsx may call /users/me/app-state from the fallback path inside the catch block (after /users/me fails). On attempt 2, syncAndRoute will call /users/me/app-state after /users/me succeeds."
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "persistedAuthToken",
+      "value": "fake-jwt-token-m03-restore-001",
+      "strategy": "staticValue",
+      "notes": "Seeded into localStorage key 'auth_token' before the app loads."
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/",
+      "notes": "App loads SessionRestore (app/index.tsx) which reads persisted token and attempts GET /users/me first."
+    },
+    {
+      "step": 2,
+      "action": "waitForText",
+      "target": { "text": "Cannot reach server. Please try again." },
+      "timeoutMs": 12000,
+      "notes": "Non-auth error path should render ErrorScreen with this exact message (app/index.tsx)."
+    },
+    {
+      "step": 3,
+      "action": "click",
+      "target": { "role": "button", "name": "Retry" },
+      "notes": "ErrorScreen uses React Native <Button title=\"Retry\" />."
+    },
+    {
+      "step": 4,
+      "action": "waitForNetworkIdle",
+      "notes": "After clicking Retry, restore() runs again and should re-attempt /users/me and then /users/me/app-state."
+    },
+    {
+      "step": 5,
+      "action": "waitForRoute",
+      "value": "/home",
+      "timeoutMs": 12000,
+      "notes": "On retry success (attempt 2), resolved route for IDLE CLIENT should be /(client)/home → web URL /home."
+    },
+    {
+      "step": 6,
+      "action": "waitForText",
+      "target": { "text": "Client Home" },
+      "timeoutMs": 8000
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 2,
+      "type": "uiVisible",
+      "target": { "text": "Cannot reach server. Please try again." }
+    },
+    {
+      "assertion": 2,
+      "afterStep": 2,
+      "type": "uiVisible",
+      "target": { "text": "Retry" }
+    },
+    {
+      "assertion": 3,
+      "afterStep": 2,
+      "type": "storageValuePresent",
+      "key": "auth_token",
+      "notes": "Non-auth errors must not clear persisted token; app/index.tsx only logs out on 401/403."
+    },
+    {
+      "assertion": 4,
+      "afterStep": 2,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/users/me",
+      "status": 503
+    },
+    {
+      "assertion": 5,
+      "afterStep": 2,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/users/me/app-state",
+      "status": 503
+    },
+    {
+      "assertion": 6,
+      "afterStep": 4,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/users/me",
+      "status": 200
+    },
+    {
+      "assertion": 7,
+      "afterStep": 4,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/users/me/app-state",
+      "status": 200
+    },
+    {
+      "assertion": 8,
+      "afterStep": 5,
+      "type": "routeContains",
+      "value": "home"
+    },
+    {
+      "assertion": 9,
+      "afterStep": 6,
+      "type": "uiVisible",
+      "target": { "text": "Client Home" }
+    }
+  ],
+  "manualValidationRequired": [],
+  "blockedTargets": [],
+  "notes": [
+    "Task ID: TASK-20260519-001",
+    "This design explicitly uses ONLY existing endpoints referenced in code/contract: GET /users/me and GET /users/me/app-state.",
+    "If the validator prefers not to implement a two-attempt mock, it may stop after Assertion 3 (Retry visible + token preserved). The sequence-based approach is recommended because it validates the Retry actually recovers."
+  ]
+}

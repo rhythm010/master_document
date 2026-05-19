@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M03-HOME-001-client-login-idle-routes-home-and-book-cta",
+  "title": "Client login (IDLE app-state) routes to Client Home and Book companions CTA navigates to Location",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "03",
+  "area": "home",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/milestones/milestone-03-backend-driven-home-state.md",
+    "technical/frontend-companion/companion-app/app/(auth)/login.tsx",
+    "technical/frontend-companion/companion-app/app/(client)/home.tsx",
+    "technical/frontend-companion/companion-app/app/(client)/location.tsx",
+    "technical/frontend-companion/companion-app/lib/api/auth.ts",
+    "technical/frontend-companion/companion-app/lib/api/app-state.ts",
+    "technical/frontend-companion/companion-app/lib/app-state/sync-and-route.ts",
+    "technical/frontend-companion/companion-app/lib/app-state/resolve-route.ts",
+    "technical/frontend-companion/companion-app/lib/onboarding-storage.ts",
+    "technical/frontend-companion/frontend-backend-contract.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Playwright runs Expo Web using baseURL http://localhost:8081 (playwright.config.ts webServer)."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Before page load, localStorage key 'onboarding_complete' is set to 'true' (hasCompletedOnboarding uses AsyncStorage, which stores raw key in localStorage on web)."
+    },
+    {
+      "id": "PRE-3",
+      "description": "Playwright intercepts POST **/auth/login and fulfills 200 with a CLIENT login response (no invented endpoints; endpoint exists in lib/api/auth.ts).",
+      "mockResponse": {
+        "playwrightRoutePattern": "**/auth/login",
+        "method": "POST",
+        "status": 200,
+        "body": {
+          "accessToken": "fake-jwt-client-token-m03-home-001",
+          "tokenType": "Bearer",
+          "expiresInSeconds": 3600,
+          "user": {
+            "id": "fake-client-id-m03-001",
+            "role": "CLIENT",
+            "name": "Client Login Test",
+            "nickname": "ClientLoginM03",
+            "email": "client.m03.001@example.com",
+            "emailVerified": true,
+            "biometricAuthEnabled": false
+          }
+        }
+      }
+    },
+    {
+      "id": "PRE-4",
+      "description": "Playwright intercepts GET **/users/me/app-state and fulfills 200 with nextAction=IDLE and role=CLIENT (no invented endpoints; endpoint exists in lib/api/app-state.ts and contract).",
+      "mockResponse": {
+        "playwrightRoutePattern": "**/users/me/app-state",
+        "method": "GET",
+        "status": 200,
+        "body": {
+          "user": {
+            "id": "fake-client-id-m03-001",
+            "role": "CLIENT",
+            "companionProfile": null
+          },
+          "primaryBooking": null,
+          "ratingNeeded": null,
+          "nextAction": "IDLE"
+        }
+      }
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "clientEmail",
+      "value": "client.m03.001@example.com",
+      "strategy": "staticValue"
+    },
+    {
+      "id": "DATA-2",
+      "name": "clientPassword",
+      "value": "test-password-123",
+      "strategy": "staticValue"
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/login",
+      "notes": "On web, Expo Router route groups are stripped from the URL (e.g. /(auth)/login resolves to /login)."
+    },
+    {
+      "step": 2,
+      "action": "waitForText",
+      "target": { "text": "Login" },
+      "timeoutMs": 10000
+    },
+    {
+      "step": 3,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-1"
+    },
+    {
+      "step": 4,
+      "action": "fill",
+      "target": { "placeholder": "Password" },
+      "valueRef": "DATA-2"
+    },
+    {
+      "step": 5,
+      "action": "click",
+      "target": { "role": "button", "name": "Log In" }
+    },
+    {
+      "step": 6,
+      "action": "waitForNetworkIdle",
+      "notes": "Covers POST /auth/login and GET /users/me/app-state used by syncAndRoute()."
+    },
+    {
+      "step": 7,
+      "action": "waitForRoute",
+      "value": "/home",
+      "timeoutMs": 12000
+    },
+    {
+      "step": 8,
+      "action": "waitForText",
+      "target": { "text": "Client Home" },
+      "timeoutMs": 8000
+    },
+    {
+      "step": 9,
+      "action": "click",
+      "target": { "role": "button", "name": "Book companions" },
+      "notes": "Button text is required by patch: visible text 'Book companions' routes to /(client)/location."
+    },
+    {
+      "step": 10,
+      "action": "waitForRoute",
+      "value": "/location",
+      "timeoutMs": 8000
+    },
+    {
+      "step": 11,
+      "action": "waitForText",
+      "target": { "text": "Placeholder Route" },
+      "timeoutMs": 8000
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 5,
+      "type": "networkRequestObserved",
+      "method": "POST",
+      "path": "/auth/login"
+    },
+    {
+      "assertion": 2,
+      "afterStep": 6,
+      "type": "networkResponseObserved",
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200
+    },
+    {
+      "assertion": 3,
+      "afterStep": 6,
+      "type": "networkRequestObserved",
+      "method": "GET",
+      "path": "/users/me/app-state"
+    },
+    {
+      "assertion": 4,
+      "afterStep": 6,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/users/me/app-state",
+      "status": 200
+    },
+    {
+      "assertion": 5,
+      "afterStep": 8,
+      "type": "uiVisible",
+      "target": { "text": "Client Home" }
+    },
+    {
+      "assertion": 6,
+      "afterStep": 8,
+      "type": "uiVisible",
+      "target": { "text": "Book companions" }
+    },
+    {
+      "assertion": 7,
+      "afterStep": 10,
+      "type": "routeContains",
+      "value": "location"
+    },
+    {
+      "assertion": 8,
+      "afterStep": 11,
+      "type": "uiVisible",
+      "target": { "text": "Placeholder Route" }
+    }
+  ],
+  "manualValidationRequired": [],
+  "blockedTargets": [],
+  "notes": [
+    "Task ID: TASK-20260519-001",
+    "This test intentionally uses network interception for /auth/login and /users/me/app-state to make the M03 routing deterministic without inventing endpoints."
+  ]
+}

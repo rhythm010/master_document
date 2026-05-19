@@ -1,9 +1,13 @@
 import { Stack, useRouter } from 'expo-router';
 import React from 'react';
-import { useSessionStore } from '@/store/session';
+import { useForegroundAppStateRefresh } from '@/hooks/use-foreground-app-state-refresh';
 import { hasCompletedOnboarding } from '@/lib/onboarding-storage';
+import { useSessionStore } from '@/store/session';
 
+/** Authenticated client route group layout (guards role + onboarding and syncs on foreground). */
 export default function ClientLayout() {
+  useForegroundAppStateRefresh();
+
   const { user, isLoading } = useSessionStore();
   const router = useRouter();
 

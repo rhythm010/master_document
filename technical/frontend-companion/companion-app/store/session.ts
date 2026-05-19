@@ -3,6 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { apiClient } from '@/lib/api-client';
 import type { SessionUser } from '@/lib/api/auth';
+import { invalidateAppStateSyncAndRouteCache } from '@/lib/app-state/sync-and-route';
+import { useAppStateStore } from '@/store/app-state';
 
 const TOKEN_KEY = 'auth_token';
 
@@ -48,14 +50,20 @@ export const useSessionStore = create<SessionState>((set) => ({
   isLoading: false,
 
   login: async (token, user) => {
+    // Token changes must invalidate any in-flight app-state sync to avoid cross-session reuse.
+    invalidateAppStateSyncAndRouteCache();
     await persistToken(token);
     apiClient.setToken(token);
     set({ user, token, isLoading: false });
   },
 
   logout: async () => {
+    // Ensure logout invalidates any in-flight app-state sync.
+    invalidateAppStateSyncAndRouteCache();
     await clearToken();
     apiClient.setToken(null);
+    // Clear any cached app-state so a new session starts from a clean slate.
+    useAppStateStore.getState().clearAppState();
     set({ user: null, token: null, isLoading: false });
   },
 

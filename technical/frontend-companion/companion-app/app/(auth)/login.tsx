@@ -1,14 +1,18 @@
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter, useSegments } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
 import { AppApiError } from '@/lib/api-client';
 import { login as callLogin, resendVerification } from '@/lib/api/auth';
+import { syncAndRoute } from '@/lib/app-state/sync-and-route';
 import { useSessionStore } from '@/store/session';
 import { InlineError } from '@/components/ui/InlineError';
 
+/** Login form screen. */
 export default function LoginScreen() {
   const router = useRouter();
-  const { login: storeLogin } = useSessionStore();
+  const pathname = usePathname();
+  const segments = useSegments();
+  const { login: storeLogin, logout } = useSessionStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,6 +21,7 @@ export default function LoginScreen() {
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendSuccess, setResendSuccess] = useState<string | null>(null);
 
+  /** Submit credentials and route via backend app-state. */
   async function handleLogin() {
     setLoading(true);
     setError(null);
@@ -26,9 +31,16 @@ export default function LoginScreen() {
     try {
       const response = await callLogin(email.trim(), password);
       await storeLogin(response.accessToken, response.user);
-      router.replace(
-        response.user.role === 'COMPANION' ? '/(companion)/home' : '/(client)/home'
-      );
+
+      await syncAndRoute({
+        router,
+        pathname,
+        segments,
+        token: response.accessToken,
+        logout,
+        roleForFallback: response.user.role,
+        fallbackToRoleHomeOnNonAuthError: true,
+      });
     } catch (err) {
       if (err instanceof AppApiError) {
         if (err.code === 'EMAIL_NOT_VERIFIED') {

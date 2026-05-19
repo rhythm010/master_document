@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "fe-ui-test-design.v1",
+  "testId": "FE-M03-HOME-002-companion-login-inactive-routes-home",
+  "title": "Companion login routes to Companion Home and shows 'Companion inactive' when app-state indicates inactive",
+  "status": "FINALIZED_UI_DESIGN",
+  "designMode": "IMPLEMENTED_UI_FINALIZATION",
+  "milestone": "03",
+  "area": "home",
+  "runtimeTargets": ["web"],
+  "requiredBackend": true,
+  "sourceRefs": [
+    "technical/frontend-companion/milestones/milestone-03-backend-driven-home-state.md",
+    "technical/frontend-companion/companion-app/app/(auth)/login.tsx",
+    "technical/frontend-companion/companion-app/app/(companion)/home.tsx",
+    "technical/frontend-companion/companion-app/app/(companion)/_layout.tsx",
+    "technical/frontend-companion/companion-app/lib/api/auth.ts",
+    "technical/frontend-companion/companion-app/lib/api/app-state.ts",
+    "technical/frontend-companion/companion-app/lib/app-state/sync-and-route.ts",
+    "technical/frontend-companion/companion-app/lib/app-state/resolve-route.ts",
+    "technical/frontend-companion/companion-app/lib/onboarding-storage.ts",
+    "technical/frontend-companion/frontend-backend-contract.md"
+  ],
+  "preconditions": [
+    {
+      "id": "PRE-1",
+      "description": "Playwright runs Expo Web using baseURL http://localhost:8081 (playwright.config.ts webServer)."
+    },
+    {
+      "id": "PRE-2",
+      "description": "Before page load, localStorage key 'onboarding_complete' is set to 'true' so resolveRouteForAppState does not route to /(companion)/onboarding."
+    },
+    {
+      "id": "PRE-3",
+      "description": "Playwright intercepts POST **/auth/login and fulfills 200 with a COMPANION login response.",
+      "mockResponse": {
+        "playwrightRoutePattern": "**/auth/login",
+        "method": "POST",
+        "status": 200,
+        "body": {
+          "accessToken": "fake-jwt-companion-token-m03-home-002",
+          "tokenType": "Bearer",
+          "expiresInSeconds": 3600,
+          "user": {
+            "id": "fake-companion-id-m03-002",
+            "role": "COMPANION",
+            "name": "Companion Login Test",
+            "nickname": "CompanionLoginM03",
+            "email": "companion.m03.002@example.com",
+            "emailVerified": true,
+            "biometricAuthEnabled": false
+          }
+        }
+      }
+    },
+    {
+      "id": "PRE-4",
+      "description": "Playwright intercepts GET **/users/me/app-state and fulfills 200 with role=COMPANION and inactive state (either nextAction=COMPANION_INACTIVE or companionProfile.isActive=false).",
+      "mockResponse": {
+        "playwrightRoutePattern": "**/users/me/app-state",
+        "method": "GET",
+        "status": 200,
+        "body": {
+          "user": {
+            "id": "fake-companion-id-m03-002",
+            "role": "COMPANION",
+            "companionProfile": { "isActive": false }
+          },
+          "primaryBooking": null,
+          "ratingNeeded": null,
+          "nextAction": "COMPANION_INACTIVE"
+        }
+      }
+    }
+  ],
+  "testData": [
+    {
+      "id": "DATA-1",
+      "name": "companionEmail",
+      "value": "companion.m03.002@example.com",
+      "strategy": "staticValue"
+    },
+    {
+      "id": "DATA-2",
+      "name": "companionPassword",
+      "value": "test-password-123",
+      "strategy": "staticValue"
+    }
+  ],
+  "journey": [
+    {
+      "step": 1,
+      "action": "openApp",
+      "route": "/(auth)/login"
+    },
+    {
+      "step": 2,
+      "action": "waitForText",
+      "target": { "text": "Login" },
+      "timeoutMs": 10000
+    },
+    {
+      "step": 3,
+      "action": "fill",
+      "target": { "placeholder": "Email" },
+      "valueRef": "DATA-1"
+    },
+    {
+      "step": 4,
+      "action": "fill",
+      "target": { "placeholder": "Password" },
+      "valueRef": "DATA-2"
+    },
+    {
+      "step": 5,
+      "action": "click",
+      "target": { "role": "button", "name": "Log In" }
+    },
+    {
+      "step": 6,
+      "action": "waitForNetworkIdle",
+      "notes": "Covers POST /auth/login and GET /users/me/app-state used by syncAndRoute()."
+    },
+    {
+      "step": 7,
+      "action": "waitForRoute",
+      "value": "/home",
+      "timeoutMs": 12000
+    },
+    {
+      "step": 8,
+      "action": "waitForText",
+      "target": { "text": "Companion Home" },
+      "timeoutMs": 8000
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": 1,
+      "afterStep": 6,
+      "type": "networkResponseObserved",
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200
+    },
+    {
+      "assertion": 2,
+      "afterStep": 6,
+      "type": "networkResponseObserved",
+      "method": "GET",
+      "path": "/users/me/app-state",
+      "status": 200
+    },
+    {
+      "assertion": 3,
+      "afterStep": 8,
+      "type": "uiVisible",
+      "target": { "text": "Companion Home" }
+    },
+    {
+      "assertion": 4,
+      "afterStep": 8,
+      "type": "uiVisible",
+      "target": { "text": "Companion inactive" },
+      "notes": "Required patch: Companion home shows text 'Companion inactive' when appState indicates inactive."
+    }
+  ],
+  "manualValidationRequired": [],
+  "blockedTargets": [],
+  "notes": [
+    "Task ID: TASK-20260519-001",
+    "The inactive banner is rendered in app/(companion)/home.tsx when appState.nextAction === 'COMPANION_INACTIVE' OR companionProfile.isActive === false."
+  ]
+}

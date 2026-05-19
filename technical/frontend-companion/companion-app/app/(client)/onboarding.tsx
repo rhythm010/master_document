@@ -1,7 +1,9 @@
-import { useRouter } from 'expo-router';
+import { usePathname, useRouter, useSegments } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { syncAndRoute } from '@/lib/app-state/sync-and-route';
 import { markOnboardingComplete } from '@/lib/onboarding-storage';
+import { useSessionStore } from '@/store/session';
 
 const SLIDES = [
   {
@@ -18,21 +20,36 @@ const SLIDES = [
   },
 ];
 
+/** Minimal client onboarding slides (local storage). */
 export default function ClientOnboardingScreen() {
   const router = useRouter();
+  const pathname = usePathname();
+  const segments = useSegments();
+  const { user, token, logout } = useSessionStore();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   function handleBack() {
     setCurrentSlide((prev) => prev - 1);
   }
 
+  /** Advance slides; on completion, sync app-state and route accordingly. */
   async function handleNext() {
     if (currentSlide < SLIDES.length - 1) {
       setCurrentSlide((prev) => prev + 1);
-    } else {
-      await markOnboardingComplete();
-      router.replace('/(client)/home');
+      return;
     }
+
+    await markOnboardingComplete();
+
+    await syncAndRoute({
+      router,
+      pathname,
+      segments,
+      token,
+      logout,
+      roleForFallback: user?.role,
+      fallbackToRoleHomeOnNonAuthError: true,
+    });
   }
 
   return (
